@@ -7,4 +7,5 @@ window.SUPABASE_CONFIG = {
   url: 'https://gylxgpqdbhbuoxaxbazb.supabase.co',
   key: 'sb_publishable_3bpRJx_gbvhNNMWM5TlpAg_qss7NmHl',
   table: 'places',
+  bucket: 'place-photos',   // Supabase Storage bucket（放照片）
 };

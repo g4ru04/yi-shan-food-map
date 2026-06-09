@@ -13,11 +13,13 @@ create table if not exists public.places (
   rating        numeric(2,1) check (rating >= 0 and rating <= 5), -- 我的星等 0~5
   google_rating numeric(2,1) check (google_rating >= 1 and google_rating <= 5), -- Google 星等 1~5
   google_url    text,                                             -- Google 連結 或 place_id
-  author        text                                              -- 建立者（上傳當下的使用者名稱）
+  author        text,                                             -- 建立者（上傳當下的使用者名稱）
+  image_url     text                                              -- 照片網址（選填，存在 Supabase Storage）
 );
 
--- 若資料表已存在但缺 author 欄位，補上（已存在則無動作）
-alter table public.places add column if not exists author text;
+-- 若資料表已存在但缺欄位，補上（已存在則無動作）
+alter table public.places add column if not exists author    text;
+alter table public.places add column if not exists image_url text;
 
 -- 依時間排序常用，加個索引
 create index if not exists places_created_at_idx on public.places (created_at desc);
@@ -37,3 +39,19 @@ create policy "public read"   on public.places for select using (true);
 create policy "public insert" on public.places for insert with check (true);
 create policy "public update" on public.places for update using (true) with check (true);
 create policy "public delete" on public.places for delete using (true);
+
+-- ============================================================
+--  Storage：放照片用的 bucket（公開）
+-- ============================================================
+insert into storage.buckets (id, name, public)
+values ('place-photos', 'place-photos', true)
+on conflict (id) do nothing;
+
+-- 開放匿名金鑰可上傳 / 讀取 / 刪除這個 bucket 的檔案
+drop policy if exists "place-photos read"   on storage.objects;
+drop policy if exists "place-photos insert" on storage.objects;
+drop policy if exists "place-photos delete" on storage.objects;
+
+create policy "place-photos read"   on storage.objects for select using (bucket_id = 'place-photos');
+create policy "place-photos insert" on storage.objects for insert with check (bucket_id = 'place-photos');
+create policy "place-photos delete" on storage.objects for delete using (bucket_id = 'place-photos');

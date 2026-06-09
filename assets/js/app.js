@@ -4,7 +4,19 @@
 const CFG = window.SUPABASE_CONFIG;
 const sb = supabase.createClient(CFG.url, CFG.key);
 const TABLE = CFG.table || 'places';
+const BUCKET = CFG.bucket || 'place-photos';
 const TAIWAN = [23.97, 120.97];
+
+// 上傳圖片到 Supabase Storage，回傳公開網址
+async function uploadImage(file) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, file, {
+    cacheControl: '3600', upsert: false, contentType: file.type,
+  });
+  if (error) throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
 
 let places = [];
 let mainMap, markerLayer;
@@ -159,6 +171,7 @@ function renderMap() {
     m.bindPopup(`
       <div class="popup-name">${esc(p.name)}</div>
       <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
+      ${p.image_url ? `<img class="popup-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" />` : ''}
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
     `);
     m.addTo(markerLayer);
@@ -178,6 +191,7 @@ window.openDetail = function (id) {
       <span>✍️ ${esc(p.author || '—')}</span>
       <span>🕑 ${fmtDate(p.created_at)}</span>
     </div>
+    ${p.image_url ? `<a href="${esc(p.image_url)}" target="_blank" rel="noopener"><img class="detail-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" /></a>` : ''}
     <div class="pc-review">${p.review ? esc(p.review) : '<span class="muted">（沒有評價）</span>'}</div>
     <div class="modal-actions">
       <a class="btn primary" href="${googleMapsUrl(p)}" target="_blank" rel="noopener">🗺️ 在 Google Maps 開啟</a>
@@ -201,6 +215,7 @@ function renderList() {
   }
   c.innerHTML = places.map(p => `
     <div class="place-card">
+      ${p.image_url ? `<img class="pc-thumb" src="${esc(p.image_url)}" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
       <div class="pc-main">
         <h3>${esc(p.name)}</h3>
         <div class="pc-meta">
@@ -248,6 +263,14 @@ document.querySelector('[name="review"]').addEventListener('input', e => {
   $('#review-count').textContent = e.target.value.length;
 });
 
+// 選照片時即時預覽
+document.querySelector('[name="image"]').addEventListener('change', e => {
+  const file = e.target.files[0];
+  const prev = $('#image-preview');
+  if (file) { prev.src = URL.createObjectURL(file); prev.hidden = false; }
+  else { prev.hidden = true; prev.removeAttribute('src'); }
+});
+
 $('#place-form').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target;
@@ -263,6 +286,18 @@ $('#place-form').addEventListener('submit', async e => {
   if (!rec.name || isNaN(rec.lat) || isNaN(rec.lon)) {
     return toast('店名、緯度、經度為必填', true);
   }
+
+  // 照片：有選新檔就上傳；編輯時沒選新檔則沿用舊圖
+  const file = f.image.files[0];
+  if (editingId) rec.image_url = places.find(x => x.id === editingId)?.image_url ?? null;
+  if (file) {
+    const btn = $('#submit-btn');
+    btn.disabled = true; btn.textContent = '上傳圖片中…';
+    try { rec.image_url = await uploadImage(file); }
+    catch (err) { btn.disabled = false; return toast('圖片上傳失敗：' + err.message, true); }
+    btn.disabled = false;
+  }
+
   let error;
   if (editingId) {
     ({ error } = await sb.from(TABLE).update(rec).eq('id', editingId));  // 編輯保留原建立者
@@ -283,7 +318,10 @@ function resetForm() {
   $('#review-count').textContent = '0';
   $('#form-title').textContent = '新增一個地點';
   $('#submit-btn').textContent = '儲存地點';
+  $('#submit-btn').disabled = false;
   $('#cancel-edit').hidden = true;
+  $('#image-preview').hidden = true;
+  $('#image-preview').removeAttribute('src');
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
 }
 
@@ -299,6 +337,10 @@ window.editPlace = async function (id) {
   f.rating.value = p.rating ?? '';
   f.google_rating.value = p.google_rating ?? '';
   f.google_url.value = p.google_url ?? '';
+  f.image.value = '';
+  const prev = $('#image-preview');
+  if (p.image_url) { prev.src = p.image_url; prev.hidden = false; }
+  else { prev.hidden = true; prev.removeAttribute('src'); }
   $('#review-count').textContent = (p.review ?? '').length;
   editingId = id;
   $('#form-title').textContent = `編輯：${p.name}`;
@@ -314,10 +356,10 @@ $('#cancel-edit').addEventListener('click', resetForm);
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊' },
-  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊' },
+  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '' },
+  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊', image_url: '' },
 ];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author'];
+const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url'];
 
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
@@ -371,6 +413,7 @@ function normalize(raw) {
     google_rating: raw.google_rating === '' || raw.google_rating == null ? null : parseFloat(raw.google_rating),
     google_url: (raw.google_url ?? '').toString().trim() || null,
     author: (raw.author ?? '').toString().trim() || currentUser(),  // 沒填就用目前使用者
+    image_url: (raw.image_url ?? '').toString().trim() || null,     // 匯入時填圖片網址即可
   };
   return out;
 }

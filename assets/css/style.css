@@ -125,6 +125,12 @@ textarea { resize: vertical; }
 .modal-box .pc-review { white-space: pre-wrap; line-height: 1.6; margin-bottom: 18px; }
 .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* ---------- 圖片 ---------- */
+.image-preview { max-width: 100%; max-height: 200px; border-radius: 10px; margin-bottom: 14px; display: block; object-fit: cover; }
+.pc-thumb { width: 84px; height: 84px; object-fit: cover; border-radius: 10px; flex-shrink: 0; cursor: pointer; }
+.detail-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 12px; margin-bottom: 14px; cursor: zoom-in; }
+.popup-img { width: 100%; max-width: 200px; max-height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; display: block; }
+
 /* ---------- 問候語 ---------- */
 .greeting {
   position: fixed; top: 12px; right: 14px; z-index: 1500;
