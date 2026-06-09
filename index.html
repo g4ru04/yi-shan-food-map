@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>阿珊的美食地圖</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 側邊欄 -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-emoji">🍜</span>
+        <span class="brand-title">阿珊的<br />美食地圖</span>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-view="map">🗺️ <span>地圖</span></button>
+        <button class="nav-btn" data-view="list">📋 <span>列表</span></button>
+        <button class="nav-btn" data-view="add">➕ <span>新增 / 匯入</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <span id="count-badge">— 筆紀錄</span>
+      </div>
+    </aside>
+
+    <!-- 主內容 -->
+    <main class="content">
+      <!-- 1) 地圖 -->
+      <section id="view-map" class="view active">
+        <div id="map"></div>
+      </section>
+
+      <!-- 2) 列表 -->
+      <section id="view-list" class="view">
+        <div class="view-head">
+          <h2>去過的地方（依時間新到舊）</h2>
+        </div>
+        <div id="list-container" class="list-container"></div>
+      </section>
+
+      <!-- 3) 新增 / 匯入 -->
+      <section id="view-add" class="view">
+        <div class="view-head">
+          <h2 id="form-title">新增一個地點</h2>
+        </div>
+
+        <div class="add-grid">
+          <!-- 表單 -->
+          <form id="place-form" class="card">
+            <label>店家名稱 *
+              <input type="text" name="name" required maxlength="100" placeholder="例：阿珊牛肉麵" />
+            </label>
+
+            <div class="row">
+              <label>緯度 lat *
+                <input type="number" name="lat" step="any" required placeholder="25.0330" />
+              </label>
+              <label>經度 lon *
+                <input type="number" name="lon" step="any" required placeholder="121.5654" />
+              </label>
+            </div>
+            <p class="hint">👉 不知道座標？直接點下面的小地圖選位置就會自動填入。</p>
+            <div id="pick-map"></div>
+
+            <div class="row">
+              <label>我的星等（0~5）
+                <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
+              </label>
+              <label>Google 星等（1~5）
+                <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
+              </label>
+            </div>
+
+            <label>Google 連結 / place_id
+              <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+            </label>
+
+            <label>文字評價（500 字內）
+              <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
+              <span class="counter"><span id="review-count">0</span> / 500</span>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit" class="btn primary" id="submit-btn">儲存地點</button>
+              <button type="button" class="btn ghost" id="cancel-edit" hidden>取消編輯</button>
+            </div>
+          </form>
+
+          <!-- 批次匯入 -->
+          <div class="card">
+            <h3>📦 批次匯入</h3>
+            <p class="hint">支援 <b>CSV</b> 或 <b>JSON</b> 檔。第一次用建議先下載範例照著填。</p>
+            <button type="button" class="btn" id="download-sample">⬇️ 下載 CSV 範例</button>
+            <button type="button" class="btn" id="download-sample-json">⬇️ 下載 JSON 範例</button>
+
+            <label class="file-drop">
+              <input type="file" id="import-file" accept=".csv,.json,text/csv,application/json" hidden />
+              <span>點此選擇 CSV / JSON 檔</span>
+            </label>
+            <div id="import-preview" class="import-preview"></div>
+            <button type="button" class="btn primary" id="import-confirm" hidden>確認匯入</button>
+
+            <details class="fmt">
+              <summary>檔案格式說明</summary>
+              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url</code></p>
+              <p><code>name / lat / lon</code> 必填，其餘可留空。</p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 詳細視窗 -->
+  <div id="detail-modal" class="modal" hidden>
+    <div class="modal-box" id="detail-box"></div>
+  </div>
+
+  <!-- 提示訊息 -->
+  <div id="toast" class="toast" hidden></div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- App -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
