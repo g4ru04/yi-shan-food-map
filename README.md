@@ -23,36 +23,7 @@
 
 ---
 
-## 安裝步驟
-
-### 1. 建立資料表
-到 [Supabase](https://supabase.com) 專案 → **SQL Editor** → 貼上 [`schema.sql`](./schema.sql) 全部內容 → **Run**。
-
-### 2. 設定金鑰
-編輯 [`assets/js/config.js`](./assets/js/config.js)，填入你自己的 Project URL 與 publishable（anon）key。
-> 這把 key 本來就是公開用的，可以安全 commit。**service_role key 絕對不要放這裡。**
-
-### 3. 本機預覽
-因為用到 fetch，需要透過 http server 開啟（不能直接雙擊 html）：
-```bash
-python3 -m http.server 8000
-# 開 http://localhost:8000
-```
-
-### 4. 部署到 GitHub Pages
-1. 推上 GitHub。
-2. Repo → **Settings → Pages → Build and deployment → Source** 選 **GitHub Actions**。
-3. 之後每次 push 到 `main`，[`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 會自動部署。
-4. 網址會是 `https://<帳號>.github.io/<repo 名>/`。
-
----
-
-## ⚠️ 關於安全性
-
-`schema.sql` 預設開放匿名金鑰可「讀 + 寫 + 改 + 刪」，方便你和朋友共用。
-缺點是**任何拿到網址的人都能修改資料**。
-
-若想「**所有人可看、只有你能改**」，把 `schema.sql` 中的 insert / update / delete policy 刪掉，改成只保留 `public read`，並改用 Supabase Auth 登入後才開放寫入。詳見 [Supabase RLS 文件](https://supabase.com/docs/guides/database/postgres/row-level-security)。
+## 使用說明
 
 ### 新增 / 匯入頁的密碼
 進入「新增 / 匯入」分頁（含編輯、刪除入口的編輯動作）需要輸入密碼，通過後整個瀏覽分頁的工作階段都記住。
@@ -61,7 +32,7 @@ python3 -m http.server 8000
 ```bash
 echo -n "你的新密碼" | shasum -a 256
 ```
-> 提醒：這是「前端密碼」，只能擋一般使用者誤觸，擋不住懂技術的人（雜湊是公開的）。要真正的權限控管請搭配上面的 Supabase Auth + RLS。
+> 提醒：這是「前端密碼」，只能擋一般使用者誤觸，擋不住懂技術的人（雜湊是公開的）。
 
 ### 使用者名字
 第一次開啟會詢問名字並存進 cookie（一年），之後右上角顯示「Hi, 名字」，點一下可改名。
