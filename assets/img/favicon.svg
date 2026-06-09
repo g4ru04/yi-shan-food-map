@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <clipPath id="mapClip">
+      <path d="M5 14 22 11 42 14 59 11 59 50 42 53 22 50 5 53 Z"/>
+    </clipPath>
+  </defs>
+  <!-- 折疊地圖底（米灰） -->
+  <g clip-path="url(#mapClip)">
+    <rect x="0" y="0" width="64" height="64" fill="#dcd8cf"/>
+    <!-- 綠地（公園） -->
+    <path d="M2 30 18 28 22 40 6 46 Z" fill="#a7cd86"/>
+    <path d="M40 40 60 38 62 56 44 56 Z" fill="#a7cd86"/>
+    <path d="M28 8 44 10 44 22 30 22 Z" fill="#cfd2bf"/>
+    <!-- 河流（藍） -->
+    <path d="M0 18 12 22 8 40 0 44 Z" fill="#a3c6e3"/>
+    <!-- 道路（白） -->
+    <path d="M22 9 24 54" stroke="#fff" stroke-width="4" fill="none"/>
+    <path d="M3 28 60 22" stroke="#fff" stroke-width="3.5" fill="none"/>
+    <!-- 主要道路（黃） -->
+    <path d="M6 50 30 34 60 30" stroke="#eebb4d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+  </g>
+  <!-- 地圖外框與折線（白） -->
+  <path d="M5 14 22 11 42 14 59 11 59 50 42 53 22 50 5 53 Z"
+        fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M22 11 22 50 M42 14 42 53" stroke="#fff" stroke-width="2" opacity="0.85"/>
+  <!-- 紅色定位標記 -->
+  <path fill="#d65a57" stroke="#fff" stroke-width="1.5"
+        d="M32 18c-4.4 0-8 3.4-8 7.7 0 5.6 8 13.3 8 13.3s8-7.7 8-13.3c0-4.3-3.6-7.7-8-7.7z"/>
+  <circle cx="32" cy="25.5" r="3.2" fill="#fff"/>
+</svg>

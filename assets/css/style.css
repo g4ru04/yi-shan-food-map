@@ -190,7 +190,14 @@ textarea { resize: vertical; }
   .view-head { padding: 16px 16px 0; }
   .list-container { padding: 0 16px 24px; }
   .add-grid { padding: 0 16px 24px; }
-  .place-card { flex-direction: column; }
+  /* 手機版維持「圖左、資訊中、按鈕右」橫向排列，減少留白 */
+  .place-card { gap: 10px; padding: 12px; align-items: flex-start; }
+  .pc-thumb { width: 64px; height: 64px; }
+  .place-card h3 { font-size: 15px; }
+  .place-card .pc-meta { gap: 6px; font-size: 12px; }
+  .place-card .pc-review { font-size: 13px; }
+  .place-card .pc-actions { align-self: stretch; }
+  .place-card .pc-actions .btn { padding: 5px 10px; font-size: 12px; }
 }
 
 /* ---------- 首次進入彈窗（尋人啟事風格）---------- */
