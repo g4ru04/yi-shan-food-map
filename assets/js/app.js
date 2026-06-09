@@ -245,7 +245,7 @@ function renderMap() {
     if (p.lat == null || p.lon == null) return;
     const m = L.marker([p.lat, p.lon]);
     m.bindPopup(`
-      <div class="popup-name">${esc(p.name)}${p.category ? ` <span class="popup-cat">${esc(p.category)}</span>` : ''}</div>
+      <div class="popup-name">${esc(p.name)}${p.category ? ` <span class="popup-cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="popup-cat closed">已歇業</span>' : ''}</div>
       <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
       ${p.image_url ? `<img class="popup-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" />` : ''}
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
@@ -261,7 +261,7 @@ window.openDetail = function (id) {
   const p = places.find(x => x.id === id);
   if (!p) return;
   $('#detail-box').innerHTML = `
-    <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_restaurant === false ? ' <span class="badge">非餐廳</span>' : ''}</h3>
+    <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_restaurant === false ? ' <span class="badge">非餐廳</span>' : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
     <div class="pc-meta">
       ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
       <span>✍️ ${esc(p.author || '—')}</span>
@@ -295,7 +295,7 @@ function renderList() {
     <div class="place-card">
       ${p.image_url ? `<img class="pc-thumb" src="${esc(p.image_url)}" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
       <div class="pc-main">
-        <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}</h3>
+        <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
         <div class="pc-meta">
           ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
           <span>✍️ ${esc(p.author || '—')}</span>
@@ -363,6 +363,7 @@ $('#place-form').addEventListener('submit', async e => {
     visited_at: f.visited_at.value ? new Date(f.visited_at.value).toISOString() : null,
     category: f.category.value.trim() || null,
     is_restaurant: f.is_restaurant.checked,
+    is_closed: f.is_closed.checked,
   };
   if (!rec.name || isNaN(rec.lat) || isNaN(rec.lon)) {
     return toast('店名、緯度、經度為必填', true);
@@ -421,6 +422,7 @@ window.editPlace = async function (id) {
   f.visited_at.value = toLocalInput(p.visited_at);
   f.category.value = p.category ?? '';
   f.is_restaurant.checked = p.is_restaurant !== false;   // null/undefined 視為餐廳
+  f.is_closed.checked = p.is_closed === true;
   f.image.value = '';
   const prev = $('#image-preview');
   if (p.image_url) { prev.src = p.image_url; prev.hidden = false; }
@@ -440,10 +442,10 @@ $('#cancel-edit').addEventListener('click', resetForm);
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00', category: '麵食', is_restaurant: true },
-  { name: '彩虹眷村', lat: 24.1339, lon: 120.6107, review: '拍照景點', rating: 4, google_rating: 4.3, google_url: '', author: '阿珊', image_url: '', visited_at: '', category: '景點', is_restaurant: false },
+  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00', category: '麵食', is_restaurant: true, is_closed: false },
+  { name: '彩虹眷村', lat: 24.1339, lon: 120.6107, review: '拍照景點', rating: 4, google_rating: 4.3, google_url: '', author: '阿珊', image_url: '', visited_at: '', category: '景點', is_restaurant: false, is_closed: false },
 ];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at', 'category', 'is_restaurant'];
+const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at', 'category', 'is_restaurant', 'is_closed'];
 
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
@@ -501,14 +503,16 @@ function normalize(raw) {
     visited_at: parseDate(raw.visited_at),                          // 造訪時間（可留空）
     category: (raw.category ?? '').toString().trim() || null,
     is_restaurant: parseBool(raw.is_restaurant),                    // 留空預設為餐廳
+    is_closed: parseBool(raw.is_closed, false),                     // 留空預設未歇業
   };
   return out;
 }
 
-// 解析布林：空白預設 true；false/0/否/no/n 視為 false
-function parseBool(v) {
-  if (v == null || String(v).trim() === '') return true;
-  return !/^(false|0|否|no|n)$/i.test(String(v).trim());
+// 解析布林：空白用 dflt；false/0/否/no/n 視為 false，其餘視為 true
+function parseBool(v, dflt = true) {
+  const s = String(v ?? '').trim();
+  if (s === '') return dflt;
+  return !/^(false|0|否|no|n)$/i.test(s);
 }
 
 $('#import-file').addEventListener('change', async e => {

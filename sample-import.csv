@@ -1,3 +1,3 @@
-name,lat,lon,review,rating,google_rating,google_url,author,image_url,visited_at,category,is_restaurant
-阿珊牛肉麵,25.0330,121.5654,湯頭濃郁，肉大塊！,4.5,4.2,https://maps.app.goo.gl/example,阿珊,,2026-06-07 17:00,麵食,true
-彩虹眷村,24.1339,120.6107,拍照景點,4,4.3,,阿珊,,,景點,false
+name,lat,lon,review,rating,google_rating,google_url,author,image_url,visited_at,category,is_restaurant,is_closed
+阿珊牛肉麵,25.0330,121.5654,湯頭濃郁，肉大塊！,4.5,4.2,https://maps.app.goo.gl/example,阿珊,,2026-06-07 17:00,麵食,true,false
+彩虹眷村,24.1339,120.6107,拍照景點,4,4.3,,阿珊,,,景點,false,false

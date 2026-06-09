@@ -78,6 +78,11 @@
               這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
             </label>
 
+            <label class="checkbox-label">
+              <input type="checkbox" name="is_closed" />
+              已永久歇業
+            </label>
+
             <div class="row">
               <label>緯度 lat *
                 <input type="number" name="lat" step="any" required placeholder="25.0330" />
@@ -134,10 +139,11 @@
 
             <details class="fmt">
               <summary>檔案格式說明</summary>
-              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url, author, image_url, visited_at, category, is_restaurant</code></p>
+              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url, author, image_url, visited_at, category, is_restaurant, is_closed</code></p>
               <p><code>name / lat / lon</code> 必填，其餘可留空。</p>
               <p><code>visited_at</code> 造訪時間填如 <code>2026-06-07 17:00</code>。</p>
               <p><code>is_restaurant</code> 留空＝餐廳；非餐廳填 <code>false</code> 或 <code>否</code>。</p>
+              <p><code>is_closed</code> 留空＝營業中；已歇業填 <code>true</code> 或 <code>是</code>。</p>
               <p>批次匯入的 <code>image_url</code> 請直接填圖片網址（批次無法上傳檔案，檔案上傳請用左邊表單）。</p>
             </details>
           </div>
