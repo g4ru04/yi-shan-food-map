@@ -61,7 +61,63 @@ function showView(name) {
   if (name === 'map' && mainMap) setTimeout(() => mainMap.invalidateSize(), 50);
   if (name === 'add' && pickMap) setTimeout(() => pickMap.invalidateSize(), 50);
 }
-$$('.nav-btn').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+$$('.nav-btn').forEach(b => b.addEventListener('click', async () => {
+  // 進入「新增 / 匯入」頁需要密碼
+  if (b.dataset.view === 'add' && !(await unlockAdd())) return;
+  showView(b.dataset.view);
+}));
+
+// ---------- 密碼鎖（新增 / 匯入頁）----------
+const ADD_PWD_HASH = 'c0d7c54022345b39c9be73e19b30ccb040ba03b1fefb2566a9f510a09aba4796';
+let addUnlocked = false;
+
+async function sha256(str) {
+  const data = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 通過一次後整個 session 都記住，回傳是否解鎖成功
+async function unlockAdd() {
+  if (addUnlocked) return true;
+  const pwd = prompt('請輸入密碼：');
+  if (pwd === null) return false;            // 使用者按取消
+  if ((await sha256(pwd)) === ADD_PWD_HASH) {
+    addUnlocked = true;
+    return true;
+  }
+  toast('密碼錯誤', true);
+  return false;
+}
+
+// ---------- 使用者名字（cookie）----------
+function getCookie(name) {
+  const m = document.cookie.split('; ').find(c => c.startsWith(name + '='));
+  return m ? decodeURIComponent(m.split('=').slice(1).join('=')) : null;
+}
+function setCookie(name, value, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + days * 864e5);
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+}
+function renderGreeting(name) {
+  const g = $('#greeting');
+  g.textContent = `Hi, ${name} 👋`;
+  g.hidden = false;
+}
+function initUserName() {
+  let name = getCookie('username');
+  if (!name) {
+    name = (prompt('歡迎！請輸入你的名字：') || '').trim() || '訪客';
+    setCookie('username', name, 365);
+  }
+  renderGreeting(name);
+}
+// 點問候語可改名字
+$('#greeting').addEventListener('click', () => {
+  const name = (prompt('修改名字：', getCookie('username') || '') || '').trim();
+  if (name) { setCookie('username', name, 365); renderGreeting(name); }
+});
 
 // ---------- 讀取資料 ----------
 async function loadPlaces() {
@@ -225,9 +281,10 @@ function resetForm() {
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
 }
 
-window.editPlace = function (id) {
+window.editPlace = async function (id) {
   const p = places.find(x => x.id === id);
   if (!p) return;
+  if (!(await unlockAdd())) return;          // 編輯也需要密碼
   const f = $('#place-form');
   f.name.value = p.name ?? '';
   f.lat.value = p.lat ?? '';
@@ -357,6 +414,7 @@ $('#import-confirm').addEventListener('click', async () => {
 });
 
 // ---------- 啟動 ----------
+initUserName();
 initMainMap();
 initPickMap();
 loadPlaces();
