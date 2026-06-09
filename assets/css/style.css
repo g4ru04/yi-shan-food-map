@@ -12,6 +12,8 @@
 }
 
 * { box-sizing: border-box; }
+/* hidden 屬性永遠優先（.modal/.image-preview 的 display 規則會蓋過預設 [hidden]）*/
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   margin: 0;
