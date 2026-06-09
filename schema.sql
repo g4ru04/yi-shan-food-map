@@ -12,8 +12,12 @@ create table if not exists public.places (
   review        text        check (char_length(review) <= 500),   -- 文字評價（500 字內）
   rating        numeric(2,1) check (rating >= 0 and rating <= 5), -- 我的星等 0~5
   google_rating numeric(2,1) check (google_rating >= 1 and google_rating <= 5), -- Google 星等 1~5
-  google_url    text                                              -- Google 連結 或 place_id
+  google_url    text,                                             -- Google 連結 或 place_id
+  author        text                                              -- 建立者（上傳當下的使用者名稱）
 );
+
+-- 若資料表已存在但缺 author 欄位，補上（已存在則無動作）
+alter table public.places add column if not exists author text;
 
 -- 依時間排序常用，加個索引
 create index if not exists places_created_at_idx on public.places (created_at desc);

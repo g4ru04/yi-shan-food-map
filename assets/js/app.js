@@ -105,6 +105,10 @@ function renderGreeting(name) {
   g.textContent = `Hi, ${name} 👋`;
   g.hidden = false;
 }
+// 目前使用者名稱（給「建立者」用）
+function currentUser() {
+  return getCookie('username') || '訪客';
+}
 function initUserName() {
   let name = getCookie('username');
   if (!name) {
@@ -154,7 +158,7 @@ function renderMap() {
     const m = L.marker([p.lat, p.lon]);
     m.bindPopup(`
       <div class="popup-name">${esc(p.name)}</div>
-      <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★</div>
+      <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
     `);
     m.addTo(markerLayer);
@@ -171,6 +175,7 @@ window.openDetail = function (id) {
     <h3>${esc(p.name)}</h3>
     <div class="pc-meta">
       ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
+      <span>✍️ ${esc(p.author || '—')}</span>
       <span>🕑 ${fmtDate(p.created_at)}</span>
     </div>
     <div class="pc-review">${p.review ? esc(p.review) : '<span class="muted">（沒有評價）</span>'}</div>
@@ -200,6 +205,7 @@ function renderList() {
         <h3>${esc(p.name)}</h3>
         <div class="pc-meta">
           ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
+          <span>✍️ ${esc(p.author || '—')}</span>
           <span>🕑 ${fmtDate(p.created_at)}</span>
         </div>
         <div class="pc-review">${p.review ? esc(p.review) : '<span class="muted">（沒有評價）</span>'}</div>
@@ -259,9 +265,9 @@ $('#place-form').addEventListener('submit', async e => {
   }
   let error;
   if (editingId) {
-    ({ error } = await sb.from(TABLE).update(rec).eq('id', editingId));
+    ({ error } = await sb.from(TABLE).update(rec).eq('id', editingId));  // 編輯保留原建立者
   } else {
-    ({ error } = await sb.from(TABLE).insert(rec));
+    ({ error } = await sb.from(TABLE).insert({ ...rec, author: currentUser() }));
   }
   if (error) return toast('儲存失敗：' + error.message, true);
   toast(editingId ? '已更新' : '已新增');
@@ -308,10 +314,10 @@ $('#cancel-edit').addEventListener('click', resetForm);
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example' },
-  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '' },
+  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊' },
+  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊' },
 ];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url'];
+const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author'];
 
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
@@ -364,6 +370,7 @@ function normalize(raw) {
     rating: raw.rating === '' || raw.rating == null ? null : parseFloat(raw.rating),
     google_rating: raw.google_rating === '' || raw.google_rating == null ? null : parseFloat(raw.google_rating),
     google_url: (raw.google_url ?? '').toString().trim() || null,
+    author: (raw.author ?? '').toString().trim() || currentUser(),  // 沒填就用目前使用者
   };
   return out;
 }
