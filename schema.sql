@@ -15,13 +15,17 @@ create table if not exists public.places (
   google_url    text,                                             -- Google 連結 或 place_id
   author        text,                                             -- 建立者（上傳當下的使用者名稱）
   image_url     text,                                             -- 照片網址（選填，存在 Supabase Storage）
-  visited_at    timestamptz                                       -- 實際造訪日期時間（選填，與 created_at 區分）
+  visited_at    timestamptz,                                      -- 實際造訪日期時間（選填，與 created_at 區分）
+  category      text,                                             -- 類型（例：意大利餐廳、咖啡廳、景點）
+  is_restaurant boolean not null default true                     -- 是否為餐廳（給篩選用）
 );
 
 -- 若資料表已存在但缺欄位，補上（已存在則無動作）
-alter table public.places add column if not exists author     text;
-alter table public.places add column if not exists image_url  text;
-alter table public.places add column if not exists visited_at timestamptz;
+alter table public.places add column if not exists author        text;
+alter table public.places add column if not exists image_url     text;
+alter table public.places add column if not exists visited_at    timestamptz;
+alter table public.places add column if not exists category      text;
+alter table public.places add column if not exists is_restaurant boolean not null default true;
 
 -- 依時間排序常用，加個索引
 create index if not exists places_created_at_idx on public.places (created_at desc);

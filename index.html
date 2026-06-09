@@ -35,13 +35,19 @@
     <main class="content">
       <!-- 1) 地圖 -->
       <section id="view-map" class="view active">
+        <label class="map-filter">
+          <input type="checkbox" class="filter-toggle" /> 只顯示餐廳
+        </label>
         <div id="map"></div>
       </section>
 
       <!-- 2) 列表 -->
       <section id="view-list" class="view">
         <div class="view-head">
-          <h2>去過的地方（依時間新到舊）</h2>
+          <h2>造訪餐廳列表（依造訪時間新到舊）</h2>
+          <label class="list-filter">
+            <input type="checkbox" class="filter-toggle" /> 只顯示餐廳
+          </label>
         </div>
         <div id="list-container" class="list-container"></div>
       </section>
@@ -61,6 +67,15 @@
 
             <label>造訪時間（選填）
               <input type="datetime-local" name="visited_at" />
+            </label>
+
+            <label>類型（選填）
+              <input type="text" name="category" maxlength="40" placeholder="例：意大利餐廳、咖啡廳、景點" />
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" name="is_restaurant" checked />
+              這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
             </label>
 
             <div class="row">
@@ -119,9 +134,10 @@
 
             <details class="fmt">
               <summary>檔案格式說明</summary>
-              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url, author, image_url, visited_at</code></p>
+              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url, author, image_url, visited_at, category, is_restaurant</code></p>
               <p><code>name / lat / lon</code> 必填，其餘可留空。</p>
               <p><code>visited_at</code> 造訪時間填如 <code>2026-06-07 17:00</code>。</p>
+              <p><code>is_restaurant</code> 留空＝餐廳；非餐廳填 <code>false</code> 或 <code>否</code>。</p>
               <p>批次匯入的 <code>image_url</code> 請直接填圖片網址（批次無法上傳檔案，檔案上傳請用左邊表單）。</p>
             </details>
           </div>

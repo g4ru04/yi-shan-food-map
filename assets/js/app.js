@@ -59,6 +59,12 @@ let mainMap, markerLayer;
 let pickMap, pickMarker;
 let editingId = null;
 let pendingImport = null;
+let onlyRestaurants = false;   // 篩選：只顯示餐廳
+
+// 套用篩選後要顯示的資料
+function visiblePlaces() {
+  return onlyRestaurants ? places.filter(p => p.is_restaurant) : places;
+}
 
 // ---------- 小工具 ----------
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -201,10 +207,25 @@ async function loadPlaces() {
     return;
   }
   places = data || [];
-  $('#count-badge').textContent = `${places.length} 筆紀錄`;
+  render();
+}
+
+// 套用目前篩選後重畫地圖與列表
+function render() {
+  const vis = visiblePlaces();
+  $('#count-badge').textContent = onlyRestaurants
+    ? `${vis.length} / ${places.length} 筆（只餐廳）`
+    : `${places.length} 筆紀錄`;
   renderMap();
   renderList();
 }
+
+// 篩選開關（地圖頁與列表頁的勾選框共用同一狀態）
+$$('.filter-toggle').forEach(cb => cb.addEventListener('change', e => {
+  onlyRestaurants = e.target.checked;
+  $$('.filter-toggle').forEach(other => { other.checked = onlyRestaurants; });
+  render();
+}));
 
 // ---------- 1) 地圖 ----------
 function initMainMap() {
@@ -220,11 +241,11 @@ function renderMap() {
   if (!markerLayer) return;
   markerLayer.clearLayers();
   const pts = [];
-  places.forEach(p => {
+  visiblePlaces().forEach(p => {
     if (p.lat == null || p.lon == null) return;
     const m = L.marker([p.lat, p.lon]);
     m.bindPopup(`
-      <div class="popup-name">${esc(p.name)}</div>
+      <div class="popup-name">${esc(p.name)}${p.category ? ` <span class="popup-cat">${esc(p.category)}</span>` : ''}</div>
       <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
       ${p.image_url ? `<img class="popup-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" />` : ''}
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
@@ -240,7 +261,7 @@ window.openDetail = function (id) {
   const p = places.find(x => x.id === id);
   if (!p) return;
   $('#detail-box').innerHTML = `
-    <h3>${esc(p.name)}</h3>
+    <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_restaurant === false ? ' <span class="badge">非餐廳</span>' : ''}</h3>
     <div class="pc-meta">
       ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
       <span>✍️ ${esc(p.author || '—')}</span>
@@ -265,15 +286,16 @@ $('#detail-modal').addEventListener('click', e => {
 // ---------- 2) 列表 ----------
 function renderList() {
   const c = $('#list-container');
-  if (!places.length) {
-    c.innerHTML = '<p class="hint">還沒有任何紀錄，去「新增 / 匯入」加第一筆吧！</p>';
+  const list = visiblePlaces();
+  if (!list.length) {
+    c.innerHTML = `<p class="hint">${places.length ? '沒有符合「只顯示餐廳」的紀錄。' : '還沒有任何紀錄，去「新增 / 匯入」加第一筆吧！'}</p>`;
     return;
   }
-  c.innerHTML = places.map(p => `
+  c.innerHTML = list.map(p => `
     <div class="place-card">
       ${p.image_url ? `<img class="pc-thumb" src="${esc(p.image_url)}" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
       <div class="pc-main">
-        <h3>${esc(p.name)}</h3>
+        <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}</h3>
         <div class="pc-meta">
           ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
           <span>✍️ ${esc(p.author || '—')}</span>
@@ -339,6 +361,8 @@ $('#place-form').addEventListener('submit', async e => {
     google_rating: f.google_rating.value === '' ? null : parseFloat(f.google_rating.value),
     google_url: f.google_url.value.trim() || null,
     visited_at: f.visited_at.value ? new Date(f.visited_at.value).toISOString() : null,
+    category: f.category.value.trim() || null,
+    is_restaurant: f.is_restaurant.checked,
   };
   if (!rec.name || isNaN(rec.lat) || isNaN(rec.lon)) {
     return toast('店名、緯度、經度為必填', true);
@@ -395,6 +419,8 @@ window.editPlace = async function (id) {
   f.google_rating.value = p.google_rating ?? '';
   f.google_url.value = p.google_url ?? '';
   f.visited_at.value = toLocalInput(p.visited_at);
+  f.category.value = p.category ?? '';
+  f.is_restaurant.checked = p.is_restaurant !== false;   // null/undefined 視為餐廳
   f.image.value = '';
   const prev = $('#image-preview');
   if (p.image_url) { prev.src = p.image_url; prev.hidden = false; }
@@ -414,10 +440,10 @@ $('#cancel-edit').addEventListener('click', resetForm);
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00' },
-  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊', image_url: '', visited_at: '' },
+  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00', category: '麵食', is_restaurant: true },
+  { name: '彩虹眷村', lat: 24.1339, lon: 120.6107, review: '拍照景點', rating: 4, google_rating: 4.3, google_url: '', author: '阿珊', image_url: '', visited_at: '', category: '景點', is_restaurant: false },
 ];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at'];
+const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at', 'category', 'is_restaurant'];
 
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
@@ -473,8 +499,16 @@ function normalize(raw) {
     author: (raw.author ?? '').toString().trim() || currentUser(),  // 沒填就用目前使用者
     image_url: (raw.image_url ?? '').toString().trim() || null,     // 匯入時填圖片網址即可
     visited_at: parseDate(raw.visited_at),                          // 造訪時間（可留空）
+    category: (raw.category ?? '').toString().trim() || null,
+    is_restaurant: parseBool(raw.is_restaurant),                    // 留空預設為餐廳
   };
   return out;
+}
+
+// 解析布林：空白預設 true；false/0/否/no/n 視為 false
+function parseBool(v) {
+  if (v == null || String(v).trim() === '') return true;
+  return !/^(false|0|否|no|n)$/i.test(String(v).trim());
 }
 
 $('#import-file').addEventListener('change', async e => {
