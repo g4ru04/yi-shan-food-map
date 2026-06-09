@@ -560,8 +560,27 @@ $('#import-confirm').addEventListener('click', async () => {
   showView('list');
 });
 
+// ---------- 首次進入彈窗（尋人啟事風格）----------
+// 每位使用者第一次進入網頁都會看到，點「確認」後記住不再跳出。
+// done() 會在彈窗關閉後（或不需顯示時）呼叫，接著才跑改名等流程。
+function initPoster(done) {
+  const SEEN_KEY = 'ashan_poster_seen';
+  let seen = false;
+  try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch { /* 隱私模式等 */ }
+  if (seen) { done(); return; }
+
+  const modal = $('#poster-modal');
+  modal.hidden = false;
+  $('#poster-confirm').addEventListener('click', () => {
+    modal.hidden = true;
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch { /* 忽略 */ }
+    done();
+  }, { once: true });
+}
+
 // ---------- 啟動 ----------
-initUserName();
+// 先讓地圖等背景就緒，彈窗確認後才問使用者名字（避免 prompt 蓋住彈窗）
 initMainMap();
 initPickMap();
 loadPlaces();
+initPoster(initUserName);

@@ -192,3 +192,48 @@ textarea { resize: vertical; }
   .add-grid { padding: 0 16px 24px; }
   .place-card { flex-direction: column; }
 }
+
+/* ---------- 首次進入彈窗（尋人啟事風格）---------- */
+.poster-modal {
+  position: fixed; inset: 0; z-index: 3000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .55); padding: 20px;
+}
+.poster {
+  background: #fff; width: 100%; max-width: 360px;
+  padding: 26px 24px 24px; text-align: center;
+  border: 1px solid #ddd;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .35);
+  animation: poster-in .25s ease-out;
+}
+@keyframes poster-in {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+.poster-title {
+  margin: 0 0 18px; color: #111;
+  font-weight: 900; font-size: 38px; line-height: 1.25;
+  letter-spacing: 6px;
+  font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+}
+.poster-img {
+  display: block; width: 100%; height: auto;
+  filter: grayscale(1) contrast(1.05);
+  border: 1px solid #bbb;
+}
+.poster-caption {
+  margin: 16px 0 20px; color: #222;
+  font-size: 16px; line-height: 1.9; letter-spacing: 1px;
+}
+.poster-confirm {
+  border: 0; cursor: pointer;
+  background: #2b2118; color: #fff;
+  padding: 11px 40px; border-radius: 6px;
+  font-size: 15px; font-weight: 700;
+  transition: background .15s;
+}
+.poster-confirm:hover { background: var(--primary); }
+
+@media (max-width: 760px) {
+  .poster-title { font-size: 32px; letter-spacing: 4px; }
+}
