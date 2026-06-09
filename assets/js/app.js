@@ -80,7 +80,25 @@ function esc(s) {
 
 function fmtDate(iso) {
   if (!iso) return '';
-  return new Date(iso).toLocaleString('zh-TW', { hour12: false });
+  return new Date(iso).toLocaleString('zh-TW', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+}
+
+// 任意日期字串 → ISO（無法解析則回 null），給匯入用
+function parseDate(v) {
+  if (!v) return null;
+  const d = new Date(String(v).trim());
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+// ISO 字串 → <input type="datetime-local"> 需要的本地時間字串
+function toLocalInput(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 function stars(v, cls = '') {
@@ -175,6 +193,7 @@ $('#greeting').addEventListener('click', () => {
 async function loadPlaces() {
   const { data, error } = await sb.from(TABLE)
     .select('*')
+    .order('visited_at', { ascending: false, nullsFirst: false })  // 造訪時間新到舊（沒填的排後面）
     .order('created_at', { ascending: false });
   if (error) {
     toast('讀取失敗：' + error.message, true);
@@ -225,7 +244,8 @@ window.openDetail = function (id) {
     <div class="pc-meta">
       ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
       <span>✍️ ${esc(p.author || '—')}</span>
-      <span>🕑 ${fmtDate(p.created_at)}</span>
+      ${p.visited_at ? `<span>📅 造訪 ${fmtDate(p.visited_at)}</span>` : ''}
+      <span>🕑 建立 ${fmtDate(p.created_at)}</span>
     </div>
     ${p.image_url ? `<a href="${esc(p.image_url)}" target="_blank" rel="noopener"><img class="detail-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" /></a>` : ''}
     <div class="pc-review">${p.review ? esc(p.review) : '<span class="muted">（沒有評價）</span>'}</div>
@@ -257,7 +277,7 @@ function renderList() {
         <div class="pc-meta">
           ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
           <span>✍️ ${esc(p.author || '—')}</span>
-          <span>🕑 ${fmtDate(p.created_at)}</span>
+          <span>📅 ${p.visited_at ? '造訪 ' + fmtDate(p.visited_at) : '建立 ' + fmtDate(p.created_at)}</span>
         </div>
         <div class="pc-review">${p.review ? esc(p.review) : '<span class="muted">（沒有評價）</span>'}</div>
       </div>
@@ -318,6 +338,7 @@ $('#place-form').addEventListener('submit', async e => {
     rating: f.rating.value === '' ? null : parseFloat(f.rating.value),
     google_rating: f.google_rating.value === '' ? null : parseFloat(f.google_rating.value),
     google_url: f.google_url.value.trim() || null,
+    visited_at: f.visited_at.value ? new Date(f.visited_at.value).toISOString() : null,
   };
   if (!rec.name || isNaN(rec.lat) || isNaN(rec.lon)) {
     return toast('店名、緯度、經度為必填', true);
@@ -373,6 +394,7 @@ window.editPlace = async function (id) {
   f.rating.value = p.rating ?? '';
   f.google_rating.value = p.google_rating ?? '';
   f.google_url.value = p.google_url ?? '';
+  f.visited_at.value = toLocalInput(p.visited_at);
   f.image.value = '';
   const prev = $('#image-preview');
   if (p.image_url) { prev.src = p.image_url; prev.hidden = false; }
@@ -392,10 +414,10 @@ $('#cancel-edit').addEventListener('click', resetForm);
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '' },
-  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊', image_url: '' },
+  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00' },
+  { name: '巷口豆花', lat: 25.0410, lon: 121.5430, review: '古早味，便宜大碗', rating: 4, google_rating: 4.4, google_url: '', author: '阿珊', image_url: '', visited_at: '' },
 ];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url'];
+const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at'];
 
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
@@ -450,6 +472,7 @@ function normalize(raw) {
     google_url: (raw.google_url ?? '').toString().trim() || null,
     author: (raw.author ?? '').toString().trim() || currentUser(),  // 沒填就用目前使用者
     image_url: (raw.image_url ?? '').toString().trim() || null,     // 匯入時填圖片網址即可
+    visited_at: parseDate(raw.visited_at),                          // 造訪時間（可留空）
   };
   return out;
 }
