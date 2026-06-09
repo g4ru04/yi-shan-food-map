@@ -7,12 +7,48 @@ const TABLE = CFG.table || 'places';
 const BUCKET = CFG.bucket || 'place-photos';
 const TAIWAN = [23.97, 120.97];
 
+// 上傳前壓縮：等比縮到最長邊 maxDim、重新編碼成 JPEG
+async function compressImage(file, maxDim = 1600, quality = 0.82) {
+  // 非圖片或 GIF（怕弄壞動畫）就原檔上傳
+  if (!file.type.startsWith('image/') || file.type === 'image/gif') return file;
+  try {
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = rej;
+      im.src = dataUrl;
+    });
+    let { width, height } = img;
+    if (Math.max(width, height) > maxDim) {
+      const scale = maxDim / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', quality));
+    if (!blob || blob.size >= file.size) return file;   // 壓不贏原檔就用原檔
+    return new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;   // 壓縮失敗就退回原檔，不擋上傳
+  }
+}
+
 // 上傳圖片到 Supabase Storage，回傳公開網址
 async function uploadImage(file) {
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const out = await compressImage(file);
+  const ext = (out.name.split('.').pop() || 'jpg').toLowerCase();
   const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await sb.storage.from(BUCKET).upload(path, file, {
-    cacheControl: '3600', upsert: false, contentType: file.type,
+  const { error } = await sb.storage.from(BUCKET).upload(path, out, {
+    cacheControl: '3600', upsert: false, contentType: out.type,
   });
   if (error) throw error;
   return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
