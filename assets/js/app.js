@@ -414,6 +414,7 @@ function resetForm() {
   $('#image-preview').hidden = true;
   $('#image-preview').removeAttribute('src');
   $('#place-form').classList.remove('editing');   // 回到新增模式（完整展開）
+  $('#rating-row').prepend($('#rating-field'));    // 我的星等回到與 Google 星等同列
   $('#more-fields').open = true;
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
 }
@@ -441,6 +442,7 @@ window.editPlace = async function (id) {
   $('#review-count').textContent = (p.review ?? '').length;
   editingId = id;
   f.classList.add('editing');        // 編輯模式：評價類置頂、其他資料收合
+  $('#rating-slot').appendChild($('#rating-field'));   // 我的星等搬到置頂
   $('#more-fields').open = false;
   $('#form-title').textContent = `編輯：${p.name}`;
   $('#submit-btn').textContent = '更新地點';

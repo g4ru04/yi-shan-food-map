@@ -65,9 +65,8 @@
           <form id="place-form" class="card">
             <!-- 我的星等 / 評價 / 照片（編輯時置頂；新增時照原順序排在後面）-->
             <div id="priority-fields">
-              <label>我的星等（0~5）
-                <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
-              </label>
+              <!-- 我的星等：編輯模式會被搬到這裡置頂；新增模式留在下方與 Google 星等同列 -->
+              <div id="rating-slot"></div>
 
               <label>文字評價（500 字內）
                 <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
@@ -117,9 +116,14 @@
               <p class="hint">👉 不知道座標？直接點下面的小地圖選位置就會自動填入。</p>
               <div id="pick-map"></div>
 
-              <label>Google 星等（1~5）
-                <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
-              </label>
+              <div class="row" id="rating-row">
+                <label id="rating-field">我的星等（0~5）
+                  <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
+                </label>
+                <label>Google 星等（1~5）
+                  <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
+                </label>
+              </div>
 
               <label>Google 連結 / place_id
                 <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
