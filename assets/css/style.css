@@ -136,6 +136,15 @@ textarea { resize: vertical; }
 #place-form.editing .more-fields[open] > summary::before { content: '▾ '; }
 #place-form.editing .more-fields[open] { padding-bottom: 8px; }
 
+/* 我的星等 slot：編輯模式佔半列（與照片並排）；新增模式為空則隱藏，照片佔整列 */
+#rating-slot { flex: 1; }
+#rating-slot:empty { display: none; }
+#rating-photo-row > label { margin-bottom: 14px; }
+
+/* 編輯模式：隱藏批次匯入、表單佔滿整個寬度 */
+.add-grid:has(#place-form.editing) { grid-template-columns: 1fr; }
+.add-grid:has(#place-form.editing) #import-card { display: none; }
+
 /* ---------- Buttons ---------- */
 .btn {
   border: 1px solid var(--border); background: #fff; color: var(--text);

@@ -246,7 +246,7 @@ function renderMap() {
     const m = L.marker([p.lat, p.lon]);
     m.bindPopup(`
       <div class="popup-name">${esc(p.name)}${p.category ? ` <span class="popup-cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="popup-cat closed">已歇業</span>' : ''}</div>
-      <div class="popup-meta">我的 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
+      <div class="popup-meta">乙珊評分 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
       ${p.image_url ? `<img class="popup-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" />` : ''}
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
     `);
@@ -264,7 +264,7 @@ window.openDetail = function (id) {
     <button class="modal-close" onclick="closeDetail()" aria-label="關閉">×</button>
     <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_restaurant === false ? ' <span class="badge">非餐廳</span>' : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
     <div class="pc-meta">
-      ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
+      ${stars(p.rating)} 乙珊評分　${stars(p.google_rating, 'g')} Google
       <span>✍️ ${esc(p.author || '—')}</span>
       ${p.visited_at ? `<span>📅 造訪 ${fmtDate(p.visited_at)}</span>` : ''}
       <span>🕑 建立 ${fmtDate(p.created_at)}</span>
@@ -297,7 +297,7 @@ function renderList() {
       <div class="pc-main">
         <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
         <div class="pc-meta">
-          ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
+          ${stars(p.rating)} 乙珊評分　${stars(p.google_rating, 'g')} Google
           <span>✍️ ${esc(p.author || '—')}</span>
           <span>📅 ${p.visited_at ? '造訪 ' + fmtDate(p.visited_at) : '建立 ' + fmtDate(p.created_at)}</span>
         </div>

@@ -65,23 +65,24 @@
           <form id="place-form" class="card">
             <!-- 我的星等 / 評價 / 照片（編輯時置頂；新增時照原順序排在後面）-->
             <div id="priority-fields">
-              <!-- 我的星等：編輯模式會被搬到這裡置頂；新增模式留在下方與 Google 星等同列 -->
-              <div id="rating-slot"></div>
-
               <label>文字評價（500 字內）
                 <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
                 <span class="counter"><span id="review-count">0</span> / 500</span>
               </label>
 
-              <label>照片（選填）
-                <input type="file" name="image" accept="image/*" />
-              </label>
+              <!-- 編輯模式：我的星等(搬進 slot) 與 照片 同列；新增模式 slot 為空、照片佔整列 -->
+              <div class="row" id="rating-photo-row">
+                <div id="rating-slot"></div>
+                <label>照片（選填）
+                  <input type="file" name="image" accept="image/*" />
+                </label>
+              </div>
               <img id="image-preview" class="image-preview" hidden alt="預覽" />
             </div>
 
             <!-- 其他資料：新增時展開呈現一般表單；編輯時收合 -->
             <details id="more-fields" class="more-fields" open>
-              <summary>其他資料（店名、座標、類型、Google 資訊…）</summary>
+              <summary>其他資料（店名,類型,...）</summary>
 
               <label>店家名稱 *
                 <input type="text" name="name" maxlength="100" placeholder="例：阿珊牛肉麵" />
@@ -117,7 +118,7 @@
               <div id="pick-map"></div>
 
               <div class="row" id="rating-row">
-                <label id="rating-field">我的星等（0~5）
+                <label id="rating-field">乙珊評分（0~5）
                   <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
                 </label>
                 <label>Google 星等（1~5）
@@ -136,8 +137,8 @@
             </div>
           </form>
 
-          <!-- 批次匯入 -->
-          <div class="card">
+          <!-- 批次匯入（編輯模式隱藏）-->
+          <div class="card" id="import-card">
             <h3>📦 批次匯入</h3>
             <p class="hint">支援 <b>CSV</b> 或 <b>JSON</b> 檔。第一次用建議先下載範例照著填。</p>
             <button type="button" class="btn" id="download-sample">⬇️ 下載 CSV 範例</button>
