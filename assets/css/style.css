@@ -111,13 +111,30 @@ textarea { resize: vertical; }
 #pick-map { height: 220px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border); }
 .form-actions { display: flex; gap: 10px; }
 
-/* 編輯/新增表單的「其他資料」收合區 */
-.more-fields { border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; margin-bottom: 16px; background: #fffdfb; }
-.more-fields > summary { cursor: pointer; font-weight: 600; color: var(--primary-dark); padding: 12px 2px; list-style: none; }
-.more-fields > summary::-webkit-details-marker { display: none; }
-.more-fields > summary::before { content: '▸ '; }
-.more-fields[open] > summary::before { content: '▾ '; }
-.more-fields[open] { padding-bottom: 8px; }
+/* 表單分區：新增=完整展開（其他資料在前、評價類在後）；編輯=評價類置頂、其他收合 */
+#place-form { display: flex; flex-direction: column; }
+#more-fields { order: 1; }
+#priority-fields { order: 2; }
+.form-actions { order: 3; }
+#place-form.editing #priority-fields { order: 1; }
+#place-form.editing #more-fields { order: 2; }
+
+/* 新增模式：其他資料當作一般欄位呈現（無外框、不顯示摘要列）*/
+.more-fields > summary { display: none; }
+
+/* 編輯模式：其他資料變成可收合的方塊 */
+#place-form.editing .more-fields {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 0 14px; margin-bottom: 16px; background: #fffdfb;
+}
+#place-form.editing .more-fields > summary {
+  display: block; cursor: pointer; font-weight: 600;
+  color: var(--primary-dark); padding: 12px 2px; list-style: none;
+}
+#place-form.editing .more-fields > summary::-webkit-details-marker { display: none; }
+#place-form.editing .more-fields > summary::before { content: '▸ '; }
+#place-form.editing .more-fields[open] > summary::before { content: '▾ '; }
+#place-form.editing .more-fields[open] { padding-bottom: 8px; }
 
 /* ---------- Buttons ---------- */
 .btn {

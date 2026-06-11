@@ -63,23 +63,25 @@
         <div class="add-grid">
           <!-- 表單 -->
           <form id="place-form" class="card">
-            <!-- 最常填的：我的星等 / 評價 / 照片 -->
-            <label>我的星等（0~5）
-              <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
-            </label>
+            <!-- 我的星等 / 評價 / 照片（編輯時置頂；新增時照原順序排在後面）-->
+            <div id="priority-fields">
+              <label>我的星等（0~5）
+                <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
+              </label>
 
-            <label>文字評價（500 字內）
-              <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
-              <span class="counter"><span id="review-count">0</span> / 500</span>
-            </label>
+              <label>文字評價（500 字內）
+                <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
+                <span class="counter"><span id="review-count">0</span> / 500</span>
+              </label>
 
-            <label>照片（選填）
-              <input type="file" name="image" accept="image/*" />
-            </label>
-            <img id="image-preview" class="image-preview" hidden alt="預覽" />
+              <label>照片（選填）
+                <input type="file" name="image" accept="image/*" />
+              </label>
+              <img id="image-preview" class="image-preview" hidden alt="預覽" />
+            </div>
 
-            <!-- 其他資料（預設收合，點開再填）-->
-            <details id="more-fields" class="more-fields">
+            <!-- 其他資料：新增時展開呈現一般表單；編輯時收合 -->
+            <details id="more-fields" class="more-fields" open>
               <summary>其他資料（店名、座標、類型、Google 資訊…）</summary>
 
               <label>店家名稱 *

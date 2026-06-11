@@ -413,7 +413,8 @@ function resetForm() {
   $('#cancel-edit').hidden = true;
   $('#image-preview').hidden = true;
   $('#image-preview').removeAttribute('src');
-  $('#more-fields').open = false;   // 其他資料區恢復收合
+  $('#place-form').classList.remove('editing');   // 回到新增模式（完整展開）
+  $('#more-fields').open = true;
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
 }
 
@@ -439,6 +440,8 @@ window.editPlace = async function (id) {
   else { prev.hidden = true; prev.removeAttribute('src'); }
   $('#review-count').textContent = (p.review ?? '').length;
   editingId = id;
+  f.classList.add('editing');        // 編輯模式：評價類置頂、其他資料收合
+  $('#more-fields').open = false;
   $('#form-title').textContent = `編輯：${p.name}`;
   $('#submit-btn').textContent = '更新地點';
   $('#cancel-edit').hidden = false;
