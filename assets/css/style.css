@@ -162,11 +162,18 @@ textarea { resize: vertical; }
 
 /* ---------- Modal ---------- */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-.modal-box { background: #fff; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; max-height: 85vh; overflow-y: auto; }
-.modal-box h3 { margin: 0 0 12px; font-size: 20px; }
+.modal-box { position: relative; background: #fff; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.modal-box h3 { margin: 0 36px 12px 0; font-size: 20px; }
 .modal-box .pc-meta { margin-bottom: 14px; }
 .modal-box .pc-review { white-space: pre-wrap; line-height: 1.6; margin-bottom: 18px; }
 .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.modal-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px; border: none; border-radius: 50%;
+  background: #f3ece2; color: var(--text); font-size: 20px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: #e7dccd; }
 
 /* ---------- 圖片 ---------- */
 .image-preview { max-width: 100%; max-height: 200px; border-radius: 10px; margin-bottom: 14px; display: block; object-fit: cover; }

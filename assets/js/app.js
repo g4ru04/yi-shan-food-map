@@ -261,6 +261,7 @@ window.openDetail = function (id) {
   const p = places.find(x => x.id === id);
   if (!p) return;
   $('#detail-box').innerHTML = `
+    <button class="modal-close" onclick="closeDetail()" aria-label="關閉">×</button>
     <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_restaurant === false ? ' <span class="badge">非餐廳</span>' : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
     <div class="pc-meta">
       ${stars(p.rating)} 我的　${stars(p.google_rating, 'g')} Google
@@ -274,7 +275,6 @@ window.openDetail = function (id) {
       <a class="btn primary" href="${googleMapsUrl(p)}" target="_blank" rel="noopener">🗺️ 在 Google Maps 開啟</a>
       <button class="btn" onclick="editPlace(${p.id})">✏️ 編輯</button>
       <button class="btn danger" onclick="deletePlace(${p.id})">🗑️ 刪除</button>
-      <button class="btn ghost" onclick="closeDetail()">關閉</button>
     </div>`;
   $('#detail-modal').hidden = false;
 };
