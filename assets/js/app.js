@@ -327,6 +327,13 @@ function initPickMap() {
     maxZoom: 19, attribution: '&copy; OpenStreetMap',
   }).addTo(pickMap);
   pickMap.on('click', e => setPick(e.latlng.lat, e.latlng.lng));
+  // 收合區展開時，地圖才有尺寸，需重算
+  $('#more-fields').addEventListener('toggle', e => {
+    if (e.target.open) setTimeout(() => {
+      pickMap.invalidateSize();
+      if (pickMarker) pickMap.setView(pickMarker.getLatLng(), 14);
+    }, 60);
+  });
 }
 
 function setPick(lat, lon) {
@@ -366,7 +373,9 @@ $('#place-form').addEventListener('submit', async e => {
     is_closed: f.is_closed.checked,
   };
   if (!rec.name || isNaN(rec.lat) || isNaN(rec.lon)) {
-    return toast('店名、緯度、經度為必填', true);
+    $('#more-fields').open = true;   // 必填欄在收合區，展開讓使用者看到
+    setTimeout(() => pickMap.invalidateSize(), 50);
+    return toast('店名、緯度、經度為必填（在「其他資料」裡）', true);
   }
 
   // 照片：有選新檔就上傳；編輯時沒選新檔則沿用舊圖
@@ -404,6 +413,7 @@ function resetForm() {
   $('#cancel-edit').hidden = true;
   $('#image-preview').hidden = true;
   $('#image-preview').removeAttribute('src');
+  $('#more-fields').open = false;   // 其他資料區恢復收合
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
 }
 

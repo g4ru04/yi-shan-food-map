@@ -63,50 +63,9 @@
         <div class="add-grid">
           <!-- 表單 -->
           <form id="place-form" class="card">
-            <label>店家名稱 *
-              <input type="text" name="name" required maxlength="100" placeholder="例：阿珊牛肉麵" />
-            </label>
-
-            <label>造訪時間（選填）
-              <input type="datetime-local" name="visited_at" />
-            </label>
-
-            <label>類型（選填）
-              <input type="text" name="category" maxlength="40" placeholder="例：意大利餐廳、咖啡廳、景點" />
-            </label>
-
-            <label class="checkbox-label">
-              <input type="checkbox" name="is_restaurant" checked />
-              這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
-            </label>
-
-            <label class="checkbox-label">
-              <input type="checkbox" name="is_closed" />
-              已永久歇業
-            </label>
-
-            <div class="row">
-              <label>緯度 lat *
-                <input type="number" name="lat" step="any" required placeholder="25.0330" />
-              </label>
-              <label>經度 lon *
-                <input type="number" name="lon" step="any" required placeholder="121.5654" />
-              </label>
-            </div>
-            <p class="hint">👉 不知道座標？直接點下面的小地圖選位置就會自動填入。</p>
-            <div id="pick-map"></div>
-
-            <div class="row">
-              <label>我的星等（0~5）
-                <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
-              </label>
-              <label>Google 星等（1~5）
-                <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
-              </label>
-            </div>
-
-            <label>Google 連結 / place_id
-              <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+            <!-- 最常填的：我的星等 / 評價 / 照片 -->
+            <label>我的星等（0~5）
+              <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
             </label>
 
             <label>文字評價（500 字內）
@@ -118,6 +77,52 @@
               <input type="file" name="image" accept="image/*" />
             </label>
             <img id="image-preview" class="image-preview" hidden alt="預覽" />
+
+            <!-- 其他資料（預設收合，點開再填）-->
+            <details id="more-fields" class="more-fields">
+              <summary>其他資料（店名、座標、類型、Google 資訊…）</summary>
+
+              <label>店家名稱 *
+                <input type="text" name="name" maxlength="100" placeholder="例：阿珊牛肉麵" />
+              </label>
+
+              <label>造訪時間（選填）
+                <input type="datetime-local" name="visited_at" />
+              </label>
+
+              <label>類型（選填）
+                <input type="text" name="category" maxlength="40" placeholder="例：意大利餐廳、咖啡廳、景點" />
+              </label>
+
+              <label class="checkbox-label">
+                <input type="checkbox" name="is_restaurant" checked />
+                這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
+              </label>
+
+              <label class="checkbox-label">
+                <input type="checkbox" name="is_closed" />
+                已永久歇業
+              </label>
+
+              <div class="row">
+                <label>緯度 lat *
+                  <input type="number" name="lat" step="any" placeholder="25.0330" />
+                </label>
+                <label>經度 lon *
+                  <input type="number" name="lon" step="any" placeholder="121.5654" />
+                </label>
+              </div>
+              <p class="hint">👉 不知道座標？直接點下面的小地圖選位置就會自動填入。</p>
+              <div id="pick-map"></div>
+
+              <label>Google 星等（1~5）
+                <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
+              </label>
+
+              <label>Google 連結 / place_id
+                <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+              </label>
+            </details>
 
             <div class="form-actions">
               <button type="submit" class="btn primary" id="submit-btn">儲存地點</button>

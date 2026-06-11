@@ -111,6 +111,14 @@ textarea { resize: vertical; }
 #pick-map { height: 220px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border); }
 .form-actions { display: flex; gap: 10px; }
 
+/* 編輯/新增表單的「其他資料」收合區 */
+.more-fields { border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; margin-bottom: 16px; background: #fffdfb; }
+.more-fields > summary { cursor: pointer; font-weight: 600; color: var(--primary-dark); padding: 12px 2px; list-style: none; }
+.more-fields > summary::-webkit-details-marker { display: none; }
+.more-fields > summary::before { content: '▸ '; }
+.more-fields[open] > summary::before { content: '▾ '; }
+.more-fields[open] { padding-bottom: 8px; }
+
 /* ---------- Buttons ---------- */
 .btn {
   border: 1px solid var(--border); background: #fff; color: var(--text);
