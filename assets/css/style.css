@@ -59,6 +59,39 @@ body {
 /* ---------- Map ---------- */
 #view-map { padding: 0; position: relative; }
 #map { height: 100%; width: 100%; }
+/* ---------- 我的位置 FAB ---------- */
+.btn-locate {
+  position: absolute; bottom: 24px; right: 16px; z-index: 600;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: #fff; color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.btn-locate:hover { background: var(--primary); color: #fff; }
+.btn-locate.locating { animation: loc-pulse .8s infinite alternate; }
+@keyframes loc-pulse {
+  from { box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+  to   { box-shadow: 0 2px 16px rgba(232,89,12,.5); }
+}
+
+/* ---------- Pick Mode Bar ---------- */
+.pick-mode-bar {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 600; background: var(--primary); color: #fff;
+  padding: 10px 18px; border-radius: 30px;
+  font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  animation: slideUp .2s ease-out;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.pick-mode-bar .btn { margin: 0; background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); color: #fff; }
+#map.pick-mode { cursor: crosshair; }
+
 .map-filter {
   position: absolute; top: 12px; left: 60px; z-index: 600;
   background: #fff; border: 1px solid var(--border); border-radius: 20px;
@@ -109,6 +142,11 @@ textarea { resize: vertical; }
 .counter { display: block; text-align: right; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 4px; }
 .hint { font-size: 13px; color: var(--muted); margin: 4px 0 10px; }
 #pick-map { height: 220px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border); }
+/* ---------- URL 自動填入 ---------- */
+.url-input-row { display: flex; gap: 8px; align-items: stretch; }
+.url-input-row input { flex: 1; min-width: 0; }
+.url-input-row .btn { margin: 6px 0 0; white-space: nowrap; flex-shrink: 0; }
+
 .form-actions { display: flex; gap: 10px; }
 
 /* 表單分區：新增=完整展開（其他資料在前、評價類在後）；編輯=評價類置頂、其他收合 */
@@ -231,6 +269,8 @@ textarea { resize: vertical; }
   .view-head { padding: 16px 16px 0; }
   .list-container { padding: 0 16px 24px; }
   .add-grid { padding: 0 16px 24px; }
+  .btn-locate { bottom: 16px; right: 12px; }
+  .pick-mode-bar { bottom: 16px; }
   /* 手機版維持「圖左、資訊中、按鈕右」橫向排列，減少留白 */
   .place-card { gap: 10px; padding: 12px; align-items: flex-start; }
   .pc-thumb { width: 64px; height: 64px; }

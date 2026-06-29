@@ -41,6 +41,17 @@
           <input type="checkbox" class="filter-toggle" /> 只顯示餐廳
         </label>
         <div id="map"></div>
+        <button type="button" id="btn-locate" class="btn-locate" title="我的位置">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/>
+            <line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/>
+            <line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </button>
+        <div id="pick-mode-bar" class="pick-mode-bar" hidden>
+          <span>📍 點擊地圖選擇座標</span>
+          <button type="button" id="pick-mode-cancel" class="btn small">取消</button>
+        </div>
       </section>
 
       <!-- 2) 列表 -->
@@ -114,7 +125,8 @@
                   <input type="number" name="lon" step="any" placeholder="121.5654" />
                 </label>
               </div>
-              <p class="hint">👉 不知道座標？直接點下面的小地圖選位置就會自動填入。</p>
+              <p class="hint">👉 不知道座標？點下方小地圖，或按「從大地圖選位置」。</p>
+              <button type="button" id="btn-pick-main" class="btn small">📍 從大地圖選位置</button>
               <div id="pick-map"></div>
 
               <div class="row" id="rating-row">
@@ -127,7 +139,11 @@
               </div>
 
               <label>Google 連結 / place_id
-                <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+                <div class="url-input-row">
+                  <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+                  <button type="button" id="btn-parse-url" class="btn small">自動填入</button>
+                </div>
+                <span class="hint" id="url-parse-hint" hidden></span>
               </label>
             </details>
 

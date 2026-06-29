@@ -60,6 +60,7 @@ let pickMap, pickMarker;
 let editingId = null;
 let pendingImport = null;
 let onlyRestaurants = false;   // 篩選：只顯示餐廳
+let pickModeActive = false;    // 主地圖選座標模式
 
 // 套用篩選後要顯示的資料
 function visiblePlaces() {
@@ -124,6 +125,95 @@ function googleMapsUrl(p) {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(g)}`;
   }
   return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}`;
+}
+
+// ---------- Google URL 解析 ----------
+function parseGoogleUrl(text) {
+  const result = { lat: null, lon: null, name: null };
+  if (!text) return result;
+
+  // 精確地點座標 !3dLAT!4dLON
+  const exact = text.match(/!3d(-?[\d.]+)!4d(-?[\d.]+)/);
+  if (exact) { result.lat = parseFloat(exact[1]); result.lon = parseFloat(exact[2]); }
+
+  // 視野中心 @LAT,LON
+  if (result.lat == null) {
+    const at = text.match(/@(-?[\d.]+),(-?[\d.]+)/);
+    if (at) { result.lat = parseFloat(at[1]); result.lon = parseFloat(at[2]); }
+  }
+
+  // query 參數 ?q=LAT,LON 或 &query=LAT,LON
+  if (result.lat == null) {
+    const q = text.match(/[?&](?:q|query)=(-?[\d.]+),(-?[\d.]+)/);
+    if (q) { result.lat = parseFloat(q[1]); result.lon = parseFloat(q[2]); }
+  }
+
+  // 店名：/maps/place/名稱/@...
+  const nm = text.match(/\/maps\/place\/([^/@]+)/);
+  if (nm) result.name = decodeURIComponent(nm[1].replace(/\+/g, ' ')).trim();
+
+  return result;
+}
+
+// ---------- 短網址解析工具 ----------
+const CORS_PROXIES = [
+  url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+  url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+];
+
+function extractRedirectUrl(res, html) {
+  // 策略 1: proxy 已跟隨重導向，res.url 即為最終 URL
+  if (res.url && /google\.\w+\/maps/i.test(res.url)) return res.url;
+
+  // 策略 2: <meta http-equiv="refresh" content="...url=...">
+  const metaRefresh = html.match(
+    /<meta[^>]+http-equiv\s*=\s*["']?refresh["']?[^>]+content\s*=\s*["'][^"']*url\s*=\s*([^"'\s>]+)/i
+  );
+  if (metaRefresh && /google\.\w+\/maps/i.test(metaRefresh[1])) return metaRefresh[1];
+
+  // 策略 3: <link rel="canonical" href="...">
+  const canonical = html.match(
+    /<link[^>]+rel\s*=\s*["']canonical["'][^>]+href\s*=\s*["']([^"']+)/i
+  );
+  if (canonical && /google\.\w+\/maps/i.test(canonical[1])) return canonical[1];
+
+  // 策略 4: HTML 內任何 Google Maps URL（優先含座標的）
+  const allUrls = html.match(/https?:\/\/(?:www\.)?google\.\w+\/maps\/[^\s"'<>)}\]]+/gi);
+  if (allUrls) {
+    const withCoords = allUrls.find(u => /!3d-?[\d.]+!4d-?[\d.]+/.test(u) || /@-?[\d.]+,-?[\d.]+/.test(u));
+    return withCoords || allUrls[0];
+  }
+  return null;
+}
+
+async function resolveShortUrl(shortUrl) {
+  const errors = [];
+  for (const makeProxyUrl of CORS_PROXIES) {
+    try {
+      const proxyUrl = makeProxyUrl(shortUrl);
+      const res = await fetch(proxyUrl, { redirect: 'follow' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+
+      // 優先從重導向 URL 擷取座標
+      const redirectUrl = extractRedirectUrl(res, html);
+      if (redirectUrl) {
+        const parsed = parseGoogleUrl(redirectUrl);
+        if (parsed.lat != null) return { textToParse: redirectUrl, error: null };
+      }
+
+      // 退路：直接解析 HTML 本體
+      const parsed = parseGoogleUrl(html);
+      if (parsed.lat != null) return { textToParse: html, error: null };
+
+      errors.push(new Error('此代理回傳的內容找不到座標'));
+    } catch (err) {
+      errors.push(err);
+    }
+  }
+  const lastMsg = errors.length ? errors[errors.length - 1].message : '未知錯誤';
+  return { textToParse: null, error: new Error(lastMsg) };
 }
 
 // ---------- 導覽 ----------
@@ -229,12 +319,51 @@ $$('.filter-toggle').forEach(cb => cb.addEventListener('change', e => {
 
 // ---------- 1) 地圖 ----------
 function initMainMap() {
-  mainMap = L.map('map').setView(TAIWAN, 7);
+  mainMap = L.map('map', { doubleClickZoom: false }).setView(TAIWAN, 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap',
   }).addTo(mainMap);
   markerLayer = L.layerGroup().addTo(mainMap);
+
+  // 雙擊放大 4 級（取代預設的 +1）
+  mainMap.on('dblclick', e => {
+    if (pickModeActive) return;   // pick mode 時不觸發 zoom
+    mainMap.flyTo(e.latlng, Math.min(mainMap.getZoom() + 4, mainMap.getMaxZoom()));
+  });
+}
+
+// ---------- 我的位置 ----------
+let locMarker = null;
+
+function initLocateBtn() {
+  const btn = $('#btn-locate');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (!navigator.geolocation) return toast('你的瀏覽器不支援定位功能', true);
+    btn.classList.add('locating');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        btn.classList.remove('locating');
+        const { latitude: lat, longitude: lng } = pos.coords;
+        mainMap.flyTo([lat, lng], 16);
+        if (locMarker) locMarker.setLatLng([lat, lng]);
+        else {
+          locMarker = L.circleMarker([lat, lng], {
+            radius: 8, fillColor: '#4285f4', fillOpacity: 1,
+            color: '#fff', weight: 3,
+          }).addTo(mainMap);
+        }
+        locMarker.bindPopup('你的位置').openPopup();
+      },
+      err => {
+        btn.classList.remove('locating');
+        const msgs = { 1: '定位權限被拒絕，請在瀏覽器設定中允許', 2: '無法取得位置資訊', 3: '定位逾時，請重試' };
+        toast(msgs[err.code] || '定位失敗', true);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+    );
+  });
 }
 
 function renderMap() {
@@ -417,6 +546,38 @@ function resetForm() {
   $('#rating-row').prepend($('#rating-field'));    // 我的星等回到與 Google 星等同列
   $('#more-fields').open = true;
   if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
+  exitPickMode();
+}
+
+// ---------- 從大地圖選座標 ----------
+function enterPickMode() {
+  pickModeActive = true;
+  showView('map');
+  $('#map').classList.add('pick-mode');
+  $('#pick-mode-bar').hidden = false;
+  $('#btn-locate').style.display = 'none';
+}
+function exitPickMode() {
+  pickModeActive = false;
+  $('#map').classList.remove('pick-mode');
+  $('#pick-mode-bar').hidden = true;
+  $('#btn-locate').style.display = '';
+}
+
+function initPickMode() {
+  mainMap.on('click', e => {
+    if (!pickModeActive) return;
+    setPick(e.latlng.lat, e.latlng.lng);
+    if (pickMap) {
+      pickMap.setView([e.latlng.lat, e.latlng.lng], 14);
+      setTimeout(() => pickMap.invalidateSize(), 50);
+    }
+    toast(`已選擇座標：${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
+    exitPickMode();
+    showView('add');
+  });
+  $('#btn-pick-main').addEventListener('click', enterPickMode);
+  $('#pick-mode-cancel').addEventListener('click', () => { exitPickMode(); showView('add'); });
 }
 
 window.editPlace = async function (id) {
@@ -454,6 +615,57 @@ window.editPlace = async function (id) {
   }
 };
 $('#cancel-edit').addEventListener('click', resetForm);
+
+// ---------- Google URL 自動填入按鈕 ----------
+$('#btn-parse-url').addEventListener('click', async () => {
+  const form = $('#place-form');
+  const url = form.google_url.value.trim();
+  const hint = $('#url-parse-hint');
+  hint.hidden = true;
+
+  if (!url) { hint.textContent = '請先貼上 Google Maps 網址'; hint.hidden = false; return; }
+
+  let textToParse = url;
+  const isShort = /^https?:\/\/maps\.app\.goo\.gl\//i.test(url);
+
+  // 短網址：透過 CORS proxy 取得重導向後的完整網址
+  if (isShort) {
+    hint.textContent = '正在解析短網址…'; hint.hidden = false;
+    const { textToParse: resolved, error } = await resolveShortUrl(url);
+    if (error || !resolved) {
+      hint.textContent = '短網址解析失敗：' + (error ? error.message : '未知錯誤')
+        + '。請在 Google Maps 開啟該地點，複製瀏覽器網址列的完整網址後重試。';
+      hint.hidden = false;
+      return;
+    }
+    textToParse = resolved;
+  }
+
+  const parsed = parseGoogleUrl(textToParse);
+  const filled = [];
+
+  if (parsed.lat != null && parsed.lon != null && !isNaN(parsed.lat) && !isNaN(parsed.lon)) {
+    form.lat.value = parsed.lat.toFixed(6);
+    form.lon.value = parsed.lon.toFixed(6);
+    setPick(parsed.lat, parsed.lon);
+    if (pickMap) pickMap.setView([parsed.lat, parsed.lon], 14);
+    filled.push('座標');
+  }
+
+  if (parsed.name && !form.name.value.trim()) {
+    form.name.value = parsed.name;
+    filled.push('店名');
+  }
+
+  if (filled.length) {
+    hint.textContent = `已自動填入：${filled.join('、')}`;
+    hint.hidden = false;
+    toast(`已從網址帶入${filled.join('、')}`);
+  } else {
+    hint.textContent = '無法從此網址擷取座標，請確認是 Google Maps 網址';
+    hint.hidden = false;
+  }
+});
 
 // ---------- 批次匯入 ----------
 const SAMPLE = [
@@ -596,6 +808,8 @@ function initPoster(done) {
 // ---------- 啟動 ----------
 // 先讓地圖等背景就緒，彈窗確認後才問使用者名字（避免 prompt 蓋住彈窗）
 initMainMap();
+initLocateBtn();
+initPickMode();
 initPickMap();
 loadPlaces();
 initPoster(initUserName);
