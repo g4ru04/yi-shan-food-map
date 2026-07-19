@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓國首爾旅遊地圖 | 10/6-10/10</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; height: 100vh; }
+
+  /* Sidebar */
+  #sidebar {
+    width: 420px; min-width: 420px; height: 100vh; overflow-y: auto;
+    background: #1a1a2e; color: #eee; padding: 24px;
+    scrollbar-width: thin; scrollbar-color: #444 #1a1a2e;
+  }
+  #sidebar::-webkit-scrollbar { width: 6px; }
+  #sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+  #sidebar h1 { font-size: 22px; margin-bottom: 4px; color: #fff; }
+  #sidebar .subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
+  #sidebar h2 {
+    font-size: 15px; color: #ffd369; margin: 20px 0 10px; padding-bottom: 6px;
+    border-bottom: 1px solid #333;
+  }
+  #sidebar h3 { font-size: 14px; color: #a8d8ea; margin: 14px 0 6px; }
+
+  .hotel-rec {
+    background: #16213e; border-radius: 10px; padding: 14px; margin: 10px 0;
+    border-left: 4px solid #e94560;
+  }
+  .hotel-rec.primary { border-left-color: #ffd369; }
+  .hotel-rec .name { font-weight: 700; font-size: 14px; color: #fff; }
+  .hotel-rec .detail { font-size: 12px; color: #bbb; margin-top: 4px; line-height: 1.6; }
+  .hotel-rec .tag {
+    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    margin-top: 6px; margin-right: 4px;
+  }
+  .tag-best { background: #ffd369; color: #1a1a2e; font-weight: 700; }
+  .tag-line3 { background: #ef8a17; color: #fff; }
+  .tag-line4 { background: #2c97de; color: #fff; }
+  .tag-price { background: #27ae60; color: #fff; }
+
+  .day-card {
+    background: #16213e; border-radius: 10px; padding: 14px; margin: 8px 0;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .day-card:hover { background: #1a2744; }
+  .day-card .day-header {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .day-card .day-num { font-size: 13px; font-weight: 700; color: #ffd369; }
+  .day-card .day-date { font-size: 12px; color: #888; }
+  .day-card .day-theme { font-size: 13px; color: #fff; margin-top: 6px; font-weight: 600; }
+  .day-card .day-items { font-size: 12px; color: #bbb; margin-top: 6px; line-height: 1.8; }
+  .day-card .day-items .time { color: #a8d8ea; font-weight: 600; margin-right: 4px; }
+  .day-card .day-items .highlight { color: #ffd369; }
+
+  .legend { margin-top: 16px; }
+  .legend-item { display: flex; align-items: center; margin: 4px 0; font-size: 12px; }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; flex-shrink: 0;
+  }
+
+  .tip-box {
+    background: #0f3460; border-radius: 8px; padding: 12px; margin: 8px 0;
+    font-size: 12px; line-height: 1.7; color: #ccc;
+  }
+  .tip-box strong { color: #ffd369; }
+
+  /* Pulse animation for highlighted markers */
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(2.2); opacity: 0.4; }
+    100% { transform: scale(3); opacity: 0; }
+  }
+  .pulse-ring {
+    position: absolute; top: 50%; left: 50%;
+    width: 20px; height: 20px; margin: -10px 0 0 -10px;
+    border-radius: 50%; background: #ffd369;
+    animation: pulse 1.5s ease-out infinite;
+    pointer-events: none;
+  }
+  .marker-highlight > div {
+    transform: scale(1.8) !important;
+    transition: transform 0.3s ease;
+    z-index: 9999 !important;
+  }
+
+  /* Active day card */
+  .day-card.active { background: #1f3a5f !important; border-left: 3px solid #ffd369; }
+
+  /* Map */
+  #map { flex: 1; height: 100vh; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    body { flex-direction: column; }
+    #sidebar { width: 100%; min-width: auto; height: auto; max-height: 50vh; }
+    #map { height: 50vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>首爾 4 天 3 夜旅遊地圖</h1>
+  <div class="subtitle">10/6 (一) 19:35 抵達 → 10/10 (五) 12:35 離開 ｜ 3人 2間房</div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#e94560"></div>住宿選項</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div>購物</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div>景點/體驗</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>機場</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div>演唱會</div>
+  </div>
+
+  <!-- Hotel Recommendation -->
+  <h2>住宿推薦</h2>
+
+  <div class="hotel-rec primary">
+    <div class="name">首選 忠武路站公寓式飯店</div>
+    <div class="detail">
+      地鐵忠武路站 5 號出口直達<br>
+      3人2間房（三人房+雙人房）四晚估 $20,000~$27,000<br>
+      有廚房、1樓免費寄放行李
+    </div>
+    <span class="tag tag-best">首選推薦</span>
+    <span class="tag tag-line3">地鐵3號線 直達高陽</span>
+    <span class="tag tag-line4">地鐵4號線 明洞一站</span>
+    <span class="tag tag-price">高 CP 值</span>
+    <div class="detail" style="margin-top:8px; color:#a8d8ea;">
+      為什麼選這間？<br>
+      地鐵3號線（橘線）直達三松站（汗蒸幕）和高陽（演唱會），<b>不需轉車</b><br>
+      地鐵4號線（藍線）到明洞只要一站，購物超方便<br>
+      到仁川機場：忠武路 → 首爾站（地鐵4號線，4站）→ AREX 機場快線
+    </div>
+  </div>
+
+  <div class="hotel-rec">
+    <div class="name">備選 明洞斯坦福飯店</div>
+    <div class="detail">
+      乙支路入口站步行 2 分鐘<br>
+      樓下就是明洞商圈、樂天/新世界百貨<br>
+      購物最方便，但到高陽需轉地鐵
+    </div>
+  </div>
+
+  <!-- Itinerary -->
+  <h2>每日行程</h2>
+
+  <div class="day-card" onclick="flyToDay(1)">
+    <div class="day-header">
+      <span class="day-num">DAY 1</span>
+      <span class="day-date">10/6 (一)</span>
+    </div>
+    <div class="day-theme">抵達首爾 + 明洞夜逛</div>
+    <div class="day-items">
+      <span class="time">19:35</span> 抵達仁川機場（辦 SeS、下載 Smart Pass）<br>
+      <span class="time">20:30</span> 搭 AREX 機場快線 → 首爾站（約 43 分鐘）<br>
+      <span class="time">21:20</span> 首爾站 → 地鐵4號線 → 忠武路站（約 8 分鐘）<br>
+      <span class="time">21:30</span> Check-in 飯店、放行李<br>
+      <span class="time">22:00</span> <span class="highlight">明洞夜逛</span>（步行 5 分鐘）消夜覓食
+    </div>
+  </div>
+
+  <div class="day-card" onclick="flyToDay(2)">
+    <div class="day-header">
+      <span class="day-num">DAY 2</span>
+      <span class="day-date">10/7 (二)</span>
+    </div>
+    <div class="day-theme">購物日：明洞 + 弘大 + 聖水</div>
+    <div class="day-items">
+      <span class="time">10:00</span> <span class="highlight">明洞逛街</span>（Olive Young、免稅店報酷柏團號）<br>
+      <span class="time">12:00</span> 明洞午餐<br>
+      <span class="time">13:30</span> 地鐵4號線 忠武路 → 轉地鐵2號線 → <span class="highlight">弘大</span>（約 20 分鐘）<br>
+      <span class="time">14:00</span> 弘大購物（CHAAKAN、MIXXO、8SECONDS、SPAO、MUSINSA STANDARD）<br>
+      <span class="time">17:00</span> 地鐵2號線 弘大 → <span class="highlight">聖水</span>（約 30 分鐘）<br>
+      <span class="time">17:30</span> 聖水散步 + CHAAKAN 聖水店<br>
+      <span class="time">19:30</span> 聖水晚餐 → 回飯店
+    </div>
+  </div>
+
+  <div class="day-card" onclick="flyToDay(3)">
+    <div class="day-header">
+      <span class="day-num">DAY 3</span>
+      <span class="day-date">10/8 (三)</span>
+    </div>
+    <div class="day-theme">汗蒸幕 + The Weeknd 演唱會</div>
+    <div class="day-items">
+      <span class="time">10:00</span> 睡到自然醒、飯店附近早午餐<br>
+      <span class="time">12:00</span> 地鐵3號線（橘線）忠武路 → <span class="highlight">三松站</span>（約 50 分鐘）<br>
+      <span class="time">12:50</span> <span class="highlight">AQUAFIELD 高陽店汗蒸幕</span>（鹽磚房必體驗！）<br>
+      <span class="time">16:30</span> 離開 AQUAFIELD<br>
+      <span class="time">17:00</span> 前往高陽體育館（地鐵3號線 三松 → 花井方向，約 10-15 分鐘）<br>
+      <span class="time">17:30</span> 高陽體育館附近晚餐<br>
+      <span class="time">19:45</span> <span class="highlight">The Weeknd 演唱會</span><br>
+      <span class="time">~22:00</span> 演唱會結束 → 地鐵3號線回忠武路（約 50 分鐘）<br>
+      <span style="color:#e94560; font-size:11px;">⚠️ 地鐵末班車約 23:20~23:40，若超過請用 Kakao T 叫計程車（約₩25,000~35,000）</span>
+    </div>
+  </div>
+
+  <div class="day-card" onclick="flyToDay(4)">
+    <div class="day-header">
+      <span class="day-num">DAY 4</span>
+      <span class="day-date">10/9 (四)</span>
+    </div>
+    <div class="day-theme">最後衝刺 + 打包</div>
+    <div class="day-items">
+      <span class="time">10:00</span> <span class="highlight">明洞免稅店</span>最後補貨（樂天/新世界百貨）<br>
+      <span class="time">12:00</span> 午餐<br>
+      <span class="time">13:30</span> <span class="highlight">新堂辣雞爪</span>（地鐵6號線 新堂站，約 10 分鐘）<br>
+      <span class="time">15:00</span> 回飯店整理行李、打包<br>
+      <span class="time">18:00</span> 最後一餐晚餐（<span class="highlight">24H 豬肉湯飯</span>或明洞美食）<br>
+      <span class="time">20:00</span> 自由活動 / 早點休息
+    </div>
+  </div>
+
+  <div class="day-card" onclick="flyToDay(5)">
+    <div class="day-header">
+      <span class="day-num">DAY 5</span>
+      <span class="day-date">10/10 (五)</span>
+    </div>
+    <div class="day-theme">回程</div>
+    <div class="day-items">
+      <span class="time">08:30</span> Check-out、寄放行李取回<br>
+      <span class="time">09:00</span> 忠武路 → 地鐵4號線 → 首爾站（約 8 分鐘）<br>
+      <span class="time">09:15</span> 搭 <span class="highlight">AREX 機場快線</span>（約 43 分鐘）<br>
+      <span class="time">10:00</span> 抵達仁川機場（Smart Pass 刷臉出境）<br>
+      <span class="time">12:35</span> 起飛
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <h2>實用提醒</h2>
+
+  <div class="tip-box">
+    <strong>必裝 APP</strong><br>
+    Naver Map（導航）、Catchtable（訂位）、Subway Korea（地鐵路線）、Kakao T（叫車）、INMEDIC（醫療）
+  </div>
+
+  <div class="tip-box">
+    <strong>省錢技巧</strong><br>
+    1. 免稅店報酷柏團號 → 回國拿現金回饋<br>
+    2. CHAAKAN 出示按讚 Reels → 8 折優惠<br>
+    3. KLOOK 訂房碼「Jessielovefood」→ 95 折
+  </div>
+
+  <div class="tip-box">
+    <strong>機場通關</strong><br>
+    SeS：入境前申請快速通關<br>
+    Smart Pass：出境刷臉通關，省排隊時間
+  </div>
+
+  <div class="tip-box">
+    <strong>首爾地鐵（지하철）</strong><br>
+    首爾的地鐵跟台北捷運一樣是地下鐵路系統，用顏色和號碼區分路線：<br>
+    ● 地鐵3號線（橘線）：忠武路 → 高陽方向（演唱會+汗蒸幕）<br>
+    ● 地鐵4號線（藍線）：忠武路 → 明洞 / 首爾站<br>
+    ● 地鐵2號線（綠線）：弘大 ↔ 聖水<br>
+    ⏰ <strong>營運時間約 05:30~23:40</strong>，末班車後請用 Kakao T 叫車
+  </div>
+
+  <div class="tip-box">
+    <strong>演唱會回程注意</strong><br>
+    地鐵末班車約 <strong>23:20~23:40</strong> 從高陽方向發車<br>
+    演唱會約 22:00 結束，正常來得及搭末班車<br>
+    但若安可延長或人潮擁擠，建議備好 <strong>Kakao T</strong>（叫車 APP）<br>
+    計程車回忠武路約 ₩25,000~35,000（約 NT$600~850）
+  </div>
+
+  <div class="tip-box">
+    <strong>交通卡</strong><br>
+    出發前先辦好交通卡（兼購物優惠），到韓國直接感應搭地鐵和公車
+  </div>
+</div>
+
+<div id="map"></div>
+
+<script>
+const map = L.map('map', { zoomControl: false }).setView([37.555, 126.95], 11);
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+}).addTo(map);
+
+// --- Icon helpers ---
+function createIcon(color, size = 12, label = '') {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;
+      background:${color};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);
+      display:flex;align-items:center;justify-content:center;font-size:${size*0.5}px;color:#fff;font-weight:700;
+    ">${label}</div>`,
+    iconSize: [size, size], iconAnchor: [size/2, size/2], popupAnchor: [0, -size/2 - 2]
+  });
+}
+function createHighlightIcon(color, size = 22, label = '') {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;
+      background:${color};border:3px solid #fff;
+      box-shadow:0 0 12px 4px ${color}88, 0 0 24px 8px ${color}44;
+      display:flex;align-items:center;justify-content:center;font-size:${size*0.45}px;color:#fff;font-weight:700;
+      z-index:9999;
+    ">${label}<div class="pulse-ring" style="background:${color}"></div></div>`,
+    iconSize: [size, size], iconAnchor: [size/2, size/2], popupAnchor: [0, -size/2 - 2]
+  });
+}
+function createStarIcon(color, highlight = false) {
+  const s = highlight ? 28 : 20;
+  const shadow = highlight ? `box-shadow:0 0 16px 6px ${color}88, 0 0 30px 10px ${color}44;` : `box-shadow:0 2px 8px rgba(0,0,0,0.5);`;
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="width:${s}px;height:${s}px;border-radius:50%;
+      background:${color};border:3px solid #fff;${shadow}
+      display:flex;align-items:center;justify-content:center;
+      font-size:${s*0.5}px;color:#fff;z-index:9999;
+    ">★${highlight ? '<div class="pulse-ring" style="background:'+color+'"></div>' : ''}</div>`,
+    iconSize: [s, s], iconAnchor: [s/2, s/2], popupAnchor: [0, -s/2 - 2]
+  });
+}
+
+// --- All markers with day tags ---
+const allMarkers = {};
+function addMarker(id, pos, color, size, popup, days, label) {
+  const m = L.marker(pos, { icon: createIcon(color, size, label || '') }).bindPopup(popup).addTo(map);
+  allMarkers[id] = { marker: m, pos, color, size, popup, days, label: label || '', origIcon: createIcon(color, size, label || '') };
+  return m;
+}
+
+// Airport
+addMarker('airport', [37.4602, 126.4407], '#9b59b6', 16,
+  '<b>仁川國際機場</b><br>抵達：10/6 19:35<br>離開：10/10 12:35<br><br><b>交通</b>：AREX 機場快線到首爾站約 43 分鐘', [1,5]);
+
+// Hotel (recommended)
+addMarker('hotel', [37.5614, 126.9946], '#ffd369', 18,
+  '<b>忠武路站公寓式飯店 ⭐ 首選</b><br>地鐵3號線直達高陽（演唱會+汗蒸幕）<br>地鐵4號線到明洞一站<br>3人2間房 四晚估 $20,000~27,000<br>忠武路站 5 號出口直達', [1,2,3,4,5], '宿');
+
+// Other hotels
+addMarker('stanford', [37.5650, 126.9830], '#e94560', 12,
+  '<b>明洞斯坦福飯店</b><br>備選<br>乙支路入口站步行 2 分鐘<br>樓下就是明洞商圈<br>樂天百貨/免稅店對面', []);
+addMarker('klaven', [37.5650, 126.9770], '#e94560', 12,
+  '<b>Klaven Hotel 市廳站</b><br>KLOOK 折扣碼「Jessielovefood」享 95 折', []);
+addMarker('sheraton', [37.4851, 126.8960], '#e94560', 12,
+  '<b>福朋喜來登九老區</b><br>Four Points by Sheraton<br>구로구 디지털로32길 72<br>門口有機場巴士站<br>位置偏南，離高陽較遠', []);
+addMarker('simpleroom', [37.5620, 127.0050], '#e94560', 12,
+  '<b>台灣老闆娘民宿 @simpleroom.kr</b><br>一晚最低 $800/人<br>地鐵走路 2 分鐘<br>附近有新堂辣雞爪、24H 豬肉湯飯', []);
+
+// Shopping
+addMarker('chaakan_ss', [37.5446, 127.0540], '#4a90d9', 12,
+  '<b>CHAAKAN 聖水店</b><br>착한구두 성수 스페이스점<br>성수이로 58<br>地鐵2號線 聖水站 3 號出口<br>⏰ 11:00-21:00<br>出示按讚 Reels 享 8 折', [2]);
+addMarker('chaakan_hd', [37.5510, 126.9210], '#4a90d9', 12,
+  '<b>CHAAKAN 弘大店</b><br>서교동 332-14<br>平價國民女鞋<br>鞋子不到 NT$1,000、靴子 NT$2,000 有找', [2]);
+addMarker('hongdae', [37.5570, 126.9260], '#4a90d9', 12,
+  '<b>弘大平價服飾區</b><br>MIXXO / 8SECONDS / SPAO / MUSINSA STANDARD<br>四間都在弘大可一次逛完', [2]);
+addMarker('myeongdong', [37.5636, 126.9860], '#4a90d9', 14,
+  '<b>明洞購物區</b><br>Olive Young、SPAO、大創等連鎖店<br>價格各店差不多<br>注意藥局/個人店家可能較貴', [1,2,4]);
+addMarker('lotte', [37.5656, 126.9810], '#4a90d9', 12,
+  '<b>樂天百貨/免稅店 明洞</b><br>樂天百貨 + 免稅店<br>報酷柏團號可拿現金回饋<br>新世界百貨步行約 10 分鐘', [4]);
+
+// Attractions
+addMarker('aquafield', [37.6530, 126.8920], '#27ae60', 16,
+  '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>扁柏木/多媒體藝術/雲端熱療室<br>5-9月有水上樂園', [3]);
+
+// Concert
+const concertMarker = L.marker([37.636, 126.832], { icon: createStarIcon('#e74c3c') })
+  .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40')
+  .addTo(map);
+allMarkers['concert'] = { marker: concertMarker, pos: [37.636, 126.832], color: '#e74c3c', size: 20, days: [3], isStar: true };
+
+// Food
+addMarker('sindang', [37.5640, 127.0140], '#f39c12', 12,
+  '<b>新堂辣雞爪街</b><br>新堂站附近知名美食<br>地鐵6號線 新堂站', [4]);
+addMarker('kkalkkal', [37.4870, 126.8980], '#f39c12', 12,
+  '<b>깔깔거리 (九老)</b><br>當地人下班後造訪的餐廳與酒館街<br>福朋喜來登附近', []);
+
+// --- Route lines (per day) ---
+const routeLines = {};
+routeLines[1] = L.polyline([[37.4602, 126.4407], [37.5547, 126.9706], [37.5614, 126.9946]],
+  { color: '#9b59b6', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 1：機場 → 首爾站 → 忠武路').addTo(map);
+routeLines[3] = L.polyline([[37.5614, 126.9946], [37.6530, 126.8920], [37.636, 126.832]],
+  { color: '#e74c3c', weight: 3, dashArray: '8,6', opacity: 0.7 }).bindPopup('Day 3：忠武路 → 三松(汗蒸幕) → 高陽(演唱會)<br><b>全程地鐵3號線直達！</b>').addTo(map);
+routeLines[0] = L.polyline([[37.5614, 126.9946], [37.5636, 126.9860]],
+  { color: '#ffd369', weight: 2, opacity: 0.5 }).bindPopup('忠武路 → 明洞：步行 5~8 分鐘 / 地鐵4號線一站').addTo(map);
+routeLines[5] = L.polyline([[37.5614, 126.9946], [37.5547, 126.9706], [37.4602, 126.4407]],
+  { color: '#9b59b6', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 5：忠武路 → 首爾站 → 機場').addTo(map);
+
+// --- Day highlight system ---
+const dayViews = {
+  1: { center: [37.51, 126.72], zoom: 10 },
+  2: { center: [37.555, 126.97], zoom: 13 },
+  3: { center: [37.61, 126.90], zoom: 12 },
+  4: { center: [37.560, 126.99], zoom: 14 },
+  5: { center: [37.51, 126.72], zoom: 10 },
+};
+
+let activeDay = null;
+
+window.flyToDay = function(day) {
+  // Toggle active day card
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+  const card = document.querySelectorAll('.day-card')[day - 1];
+  if (card) card.classList.add('active');
+
+  // Reset all markers to original
+  Object.values(allMarkers).forEach(m => {
+    if (m.isStar) {
+      m.marker.setIcon(createStarIcon(m.color, false));
+    } else {
+      m.marker.setIcon(m.origIcon);
+    }
+    m.marker.setOpacity(0.3);
+  });
+
+  // Highlight markers for this day
+  Object.values(allMarkers).forEach(m => {
+    if (m.days.includes(day)) {
+      if (m.isStar) {
+        m.marker.setIcon(createStarIcon(m.color, true));
+      } else {
+        m.marker.setIcon(createHighlightIcon(m.color, Math.max(m.size * 1.5, 20), m.label));
+      }
+      m.marker.setOpacity(1);
+      m.marker.setZIndexOffset(1000);
+    } else {
+      m.marker.setZIndexOffset(0);
+    }
+  });
+
+  // Highlight/dim route lines
+  Object.entries(routeLines).forEach(([d, line]) => {
+    const dNum = parseInt(d);
+    if (dNum === day || dNum === 0) {
+      line.setStyle({ opacity: 0.9, weight: 4 });
+    } else {
+      line.setStyle({ opacity: 0.15, weight: 1 });
+    }
+  });
+
+  // Fly to view
+  const v = dayViews[day];
+  map.flyTo(v.center, v.zoom, { duration: 1.2 });
+  activeDay = day;
+};
+
+// Reset on map click
+map.on('click', function() {
+  if (activeDay) {
+    activeDay = null;
+    document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+    Object.values(allMarkers).forEach(m => {
+      if (m.isStar) {
+        m.marker.setIcon(createStarIcon(m.color, false));
+      } else {
+        m.marker.setIcon(m.origIcon);
+      }
+      m.marker.setOpacity(1);
+      m.marker.setZIndexOffset(0);
+    });
+    Object.values(routeLines).forEach(line => {
+      line.setStyle({ opacity: 0.6, weight: 2 });
+    });
+    routeLines[3] && routeLines[3].setStyle({ opacity: 0.7, weight: 3 });
+  }
+});
+
+// --- Distance labels ---
+function addDistanceLabel(from, to, text, offset) {
+  const midLat = (from[0] + to[0]) / 2 + (offset ? offset[0] : 0);
+  const midLng = (from[1] + to[1]) / 2 + (offset ? offset[1] : 0);
+  L.marker([midLat, midLng], {
+    icon: L.divIcon({
+      className: 'dist-label',
+      html: `<div style="background:rgba(0,0,0,0.75);color:#fff;padding:2px 8px;
+        border-radius:4px;font-size:11px;white-space:nowrap;font-family:-apple-system,sans-serif;
+        box-shadow:0 1px 3px rgba(0,0,0,0.3);">${text}</div>`,
+      iconSize: [0, 0], iconAnchor: [0, 0]
+    })
+  }).addTo(map);
+}
+
+addDistanceLabel([37.5614, 126.9946], [37.6530, 126.8920], '地鐵3號線 約50分', [0.005, 0.01]);
+addDistanceLabel([37.6530, 126.8920], [37.636, 126.832], '約15分', [0.008, 0]);
+addDistanceLabel([37.5614, 126.9946], [37.5636, 126.9860], '步行5分', [-0.003, 0]);
+addDistanceLabel([37.4602, 126.4407], [37.5547, 126.9706], 'AREX 43分', [0.01, 0]);
+</script>
+
+</body>
+</html>

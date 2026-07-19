@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓國首爾 4天3夜行程規劃</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #fbbf24;
+    --blue: #60a5fa; --green: #34d399; --red: #f87171; --orange: #fb923c; --purple: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    max-width: 800px; margin: 0 auto; padding: 24px 20px 60px;
+  }
+  h1 { font-size: 26px; color: #fff; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .subtitle span { background: var(--surface2); padding: 2px 10px; border-radius: 12px; margin-right: 6px; font-size: 12px; }
+  h2 {
+    font-size: 18px; color: var(--accent); margin: 32px 0 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--surface2);
+  }
+  h3 { font-size: 16px; color: var(--blue); margin: 20px 0 10px; }
+
+  .card {
+    background: var(--surface); border-radius: 12px; padding: 18px; margin: 12px 0;
+  }
+  .card.highlight { border-left: 4px solid var(--accent); }
+  .card.day { border-left: 4px solid var(--blue); }
+  .card.warning { border-left: 4px solid var(--red); background: #1a1520; }
+  .card .label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent); margin-bottom: 6px;
+  }
+  .card .day-label { color: var(--blue); }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--surface2); }
+  td { padding: 8px; border-bottom: 1px solid #1e293b; vertical-align: top; }
+  td:first-child { color: var(--blue); font-weight: 600; white-space: nowrap; width: 70px; }
+  td:last-child { color: var(--muted); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 10px;
+    margin: 2px 2px; font-weight: 600;
+  }
+  .tag-orange { background: #7c2d12; color: var(--orange); }
+  .tag-blue { background: #1e3a5f; color: var(--blue); }
+  .tag-green { background: #064e3b; color: var(--green); }
+  .tag-yellow { background: #422006; color: var(--accent); }
+
+  .note {
+    background: #1a2332; border-radius: 8px; padding: 12px 14px; margin: 10px 0;
+    font-size: 13px; color: var(--muted); line-height: 1.8;
+    border-left: 3px solid var(--surface2);
+  }
+  .note strong { color: var(--text); }
+  .note.danger { border-left-color: var(--red); }
+  .note.success { border-left-color: var(--green); }
+
+  .metro-tree {
+    background: var(--surface); border-radius: 12px; padding: 18px;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px;
+    line-height: 2; color: var(--muted); overflow-x: auto;
+  }
+  .metro-tree .station { color: #fff; font-weight: 600; }
+  .metro-tree .line-orange { color: var(--orange); }
+  .metro-tree .line-blue { color: var(--blue); }
+  .metro-tree .line-green { color: var(--green); }
+
+  .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .app-item {
+    background: var(--surface); border-radius: 8px; padding: 10px 12px;
+    font-size: 13px;
+  }
+  .app-item .app-name { font-weight: 700; color: #fff; }
+  .app-item .app-desc { color: var(--muted); font-size: 12px; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 6px 0; font-size: 14px;
+    border-bottom: 1px solid var(--surface);
+  }
+  .checklist li::before { content: '☐ '; color: var(--muted); }
+
+  .tip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .tip-card {
+    background: var(--surface); border-radius: 8px; padding: 12px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .tip-card .tip-title { font-weight: 700; color: var(--accent); margin-bottom: 4px; font-size: 12px; }
+  .tip-card .tip-text { color: var(--muted); }
+
+  .source { font-size: 12px; color: var(--surface2); margin-top: 32px; text-align: center; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .nav-link {
+    display: inline-block; background: var(--accent); color: var(--bg);
+    padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 14px;
+    margin: 10px 4px 0 0; text-decoration: none;
+  }
+  .nav-link:hover { opacity: 0.9; text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .app-grid, .tip-grid { grid-template-columns: 1fr; }
+    body { padding: 16px 14px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>韓國首爾 4 天 3 夜行程規劃</h1>
+<div class="subtitle">
+  <span>10/6 (一) 19:35 抵達</span>
+  <span>10/10 (五) 12:35 離開</span>
+  <span>3人 2間房</span>
+</div>
+<a class="nav-link" href="index.html">查看互動地圖</a>
+
+<!-- 住宿推薦 -->
+<h2>住宿推薦</h2>
+
+<div class="card highlight">
+  <div class="label">首選推薦</div>
+  <h3 style="margin-top:0">忠武路站公寓式飯店</h3>
+  <table>
+    <tr><td>位置</td><td colspan="2">地鐵忠武路站 5 號出口直達</td></tr>
+    <tr><td>價格</td><td colspan="2">3人2間房（三人房+雙人房）四晚估 NT$20,000~27,000</td></tr>
+    <tr><td>設施</td><td colspan="2">廚房、轉接頭、行李秤、掛燙機、1樓免費寄放行李</td></tr>
+  </table>
+  <div style="margin-top:10px">
+    <span class="tag tag-orange">地鐵3號線 直達高陽</span>
+    <span class="tag tag-blue">地鐵4號線 明洞一站</span>
+    <span class="tag tag-green">高 CP 值</span>
+  </div>
+  <div class="note success" style="margin-top:12px">
+    <strong>為什麼選這間？</strong><br>
+    地鐵3號線（橘線）直達三松站（汗蒸幕）和高陽（演唱會），<b>全程不需轉車</b><br>
+    地鐵4號線（藍線）到明洞只要一站，購物超方便<br>
+    到仁川機場：忠武路 → 首爾站（地鐵4號線 4站）→ AREX 機場快線
+  </div>
+</div>
+
+<div class="card">
+  <div class="label" style="color:var(--muted)">備選</div>
+  <h3 style="margin-top:0">明洞斯坦福飯店</h3>
+  <p style="font-size:14px;color:var(--muted)">
+    乙支路入口站步行 2 分鐘｜樓下就是明洞商圈｜樂天百貨/免稅店對面<br>
+    缺點：到高陽需轉車（地鐵2號線 → 地鐵3號線）
+  </p>
+</div>
+
+<!-- 每日行程 -->
+<h2>每日行程</h2>
+
+<!-- Day 1 -->
+<div class="card day">
+  <div class="label day-label">DAY 1 — 10/6 (一)</div>
+  <h3 style="margin-top:0">抵達首爾 + 明洞夜逛</h3>
+  <table>
+    <tr><td>19:35</td><td>抵達仁川機場（辦 SeS 快速通關）</td><td>—</td></tr>
+    <tr><td>20:30</td><td>搭 AREX 機場快線</td><td>AREX → 首爾站（43分鐘）</td></tr>
+    <tr><td>21:15</td><td>首爾站 → 忠武路站</td><td>地鐵4號線（8分鐘）</td></tr>
+    <tr><td>21:30</td><td>Check-in 飯店、放行李</td><td>—</td></tr>
+    <tr><td>22:00</td><td><strong>明洞夜逛 + 消夜</strong></td><td>步行 5 分鐘</td></tr>
+  </table>
+  <div class="note">提醒：在機場下載 Smart Pass、Naver Map、Catchtable</div>
+</div>
+
+<!-- Day 2 -->
+<div class="card day">
+  <div class="label day-label">DAY 2 — 10/7 (二)</div>
+  <h3 style="margin-top:0">購物日：明洞 → 弘大 → 聖水</h3>
+  <table>
+    <tr><td>10:00</td><td><strong>明洞逛街</strong>（Olive Young、免稅店報酷柏團號）</td><td>步行到明洞</td></tr>
+    <tr><td>12:00</td><td>明洞午餐</td><td>—</td></tr>
+    <tr><td>13:30</td><td>前往弘大</td><td>地鐵4號線 → 轉地鐵2號線（約20分鐘）</td></tr>
+    <tr><td>14:00</td><td><strong>弘大購物</strong>（CHAAKAN、MIXXO、8SECONDS、SPAO、MUSINSA）</td><td>—</td></tr>
+    <tr><td>17:00</td><td>前往聖水</td><td>地鐵2號線（約30分鐘）</td></tr>
+    <tr><td>17:30</td><td><strong>聖水散步</strong> + CHAAKAN 聖水店</td><td>聖水站3號出口</td></tr>
+    <tr><td>19:30</td><td>聖水晚餐 → 回飯店</td><td>—</td></tr>
+  </table>
+  <div class="note">CHAAKAN 優惠：出示按讚 Reels 享 8 折（至 2026.12.31）</div>
+</div>
+
+<!-- Day 3 -->
+<div class="card day" style="border-left-color: var(--red);">
+  <div class="label" style="color:var(--red)">DAY 3 — 10/8 (三) 演唱會日</div>
+  <h3 style="margin-top:0">汗蒸幕 + The Weeknd 演唱會</h3>
+  <table>
+    <tr><td>10:00</td><td>睡到自然醒、飯店附近早午餐</td><td>—</td></tr>
+    <tr><td>12:00</td><td>前往 AQUAFIELD</td><td>地鐵3號線 忠武路→三松站（約50分鐘）</td></tr>
+    <tr><td>12:50</td><td><strong>AQUAFIELD 高陽店汗蒸幕</strong>（鹽磚房必體驗！）</td><td>三松站3號出口</td></tr>
+    <tr><td>16:30</td><td>離開 AQUAFIELD</td><td>—</td></tr>
+    <tr><td>17:00</td><td>前往高陽體育館</td><td>地鐵3號線（約10-15分鐘）</td></tr>
+    <tr><td>17:30</td><td>高陽體育館附近晚餐</td><td>—</td></tr>
+    <tr><td>19:45</td><td><strong>The Weeknd 演唱會</strong></td><td>—</td></tr>
+    <tr><td>~22:00</td><td>演唱會結束</td><td>地鐵3號線回忠武路（約50分鐘）</td></tr>
+  </table>
+  <div class="note success">
+    <strong>全程地鐵3號線（橘線）直達</strong>：忠武路 → 三松（汗蒸幕）→ 高陽（演唱會），不用轉車！
+  </div>
+  <div class="note danger">
+    <strong>末班車注意</strong>：地鐵3號線末班車從高陽方向約 <strong>23:20~23:40</strong> 發車。<br>
+    演唱會約 22:00 結束，正常有 1 小時以上緩衝。<br>
+    若安可延長或散場人潮太多 → 用 <strong>Kakao T</strong>（韓版 Uber）叫計程車<br>
+    回忠武路約 ₩25,000~35,000（NT$600~850），3人分攤很划算。
+  </div>
+</div>
+
+<!-- Day 4 -->
+<div class="card day">
+  <div class="label day-label">DAY 4 — 10/9 (四)</div>
+  <h3 style="margin-top:0">最後衝刺 + 打包</h3>
+  <table>
+    <tr><td>10:00</td><td><strong>明洞免稅店</strong>最後補貨（樂天/新世界百貨）</td><td>步行到明洞</td></tr>
+    <tr><td>12:00</td><td>午餐</td><td>—</td></tr>
+    <tr><td>13:30</td><td><strong>新堂辣雞爪</strong></td><td>地鐵6號線 新堂站（約10分鐘）</td></tr>
+    <tr><td>15:00</td><td>回飯店整理行李、打包</td><td>—</td></tr>
+    <tr><td>18:00</td><td>最後晚餐（24H 豬肉湯飯 或 明洞美食）</td><td>—</td></tr>
+    <tr><td>20:00</td><td>自由活動 / 早點休息</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- Day 5 -->
+<div class="card day" style="border-left-color: var(--purple);">
+  <div class="label" style="color:var(--purple)">DAY 5 — 10/10 (五)</div>
+  <h3 style="margin-top:0">回程</h3>
+  <table>
+    <tr><td>08:30</td><td>Check-out、1樓取行李</td><td>—</td></tr>
+    <tr><td>09:00</td><td>忠武路 → 首爾站</td><td>地鐵4號線（8分鐘）</td></tr>
+    <tr><td>09:15</td><td>搭 AREX 機場快線</td><td>AREX 直達車（43分鐘）</td></tr>
+    <tr><td>10:00</td><td>抵達仁川機場（Smart Pass 刷臉出境）</td><td>—</td></tr>
+    <tr><td>12:35</td><td>起飛</td><td>—</td></tr>
+  </table>
+  <div class="note">12:35 的飛機，建議至少 10:00 前到機場</div>
+</div>
+
+<!-- 交通路線 -->
+<h2>交通路線總覽</h2>
+
+<div class="note" style="margin-bottom:12px">
+  <strong>首爾地鐵（지하철）= 台北捷運</strong>，地下鐵路系統，用號碼和顏色區分路線。<br>
+  營運時間：約 <strong>05:30~23:40</strong>，末班車後請用 Kakao T 叫車。
+</div>
+
+<div class="metro-tree">
+  <span class="station">忠武路站</span>（<span class="line-orange">地鐵3號線 橘線</span> / <span class="line-blue">地鐵4號線 藍線</span>）<br>
+  │<br>
+  ├── <span class="line-blue">地鐵4號線</span> → 明洞站（1站 2分鐘）→ 購物<br>
+  ├── <span class="line-blue">地鐵4號線</span> → 首爾站（4站 8分鐘）→ AREX 機場快線<br>
+  ├── <span class="line-orange">地鐵3號線</span> → 三松站（約50分鐘）→ AQUAFIELD 汗蒸幕<br>
+  ├── <span class="line-orange">地鐵3號線</span> → 高陽（約55分鐘）→ 演唱會<br>
+  │<br>
+  └── 轉乘<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;├── → <span class="line-green">地鐵2號線</span> 弘大入口（約20分鐘）→ 弘大購物<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;└── → <span class="line-green">地鐵2號線</span> 聖水（約35分鐘）→ 聖水逛街
+</div>
+
+<!-- 必裝 APP -->
+<h2>必裝 APP</h2>
+<div class="app-grid">
+  <div class="app-item"><div class="app-name">Naver Map</div><div class="app-desc">韓國導航（Google Maps 在韓國不準）</div></div>
+  <div class="app-item"><div class="app-name">Catchtable</div><div class="app-desc">餐廳預約 / 線上候位</div></div>
+  <div class="app-item"><div class="app-name">Subway Korea</div><div class="app-desc">地鐵路線規劃</div></div>
+  <div class="app-item"><div class="app-name">Kakao T</div><div class="app-desc">叫車（演唱會結束太晚用）</div></div>
+  <div class="app-item"><div class="app-name">kulikuli</div><div class="app-desc">拍照翻譯</div></div>
+  <div class="app-item"><div class="app-name">INMEDIC</div><div class="app-desc">全中文醫療（搜診所+視訊口譯）</div></div>
+  <div class="app-item"><div class="app-name">Smart Pass</div><div class="app-desc">機場出境刷臉通關</div></div>
+</div>
+
+<!-- 省錢技巧 -->
+<h2>省錢技巧</h2>
+<div class="tip-grid">
+  <div class="tip-card"><div class="tip-title">酷柏返點</div><div class="tip-text">Line 搜尋「酷柏國際返點」→ 免稅店報團號 → 回國拿現金回饋</div></div>
+  <div class="tip-card"><div class="tip-title">CHAAKAN 8折</div><div class="tip-text">到門市出示按讚 Reels 即享 8 折（至 2026.12.31）</div></div>
+  <div class="tip-card"><div class="tip-title">KLOOK 訂房</div><div class="tip-text">折扣碼「Jessielovefood」享 95 折，最高省 $300</div></div>
+  <div class="tip-card"><div class="tip-title">明洞連鎖店</div><div class="tip-text">SPAO、Olive Young、大創各分店價格一樣，不用怕明洞比較貴</div></div>
+</div>
+
+<!-- 打包清單 -->
+<h2>打包清單</h2>
+<ul class="checklist">
+  <li>護照</li>
+  <li>交通卡（出發前先辦好）</li>
+  <li>轉接頭（飯店有提供但建議自帶）</li>
+  <li>下載所有 APP</li>
+  <li>酷柏返點 LINE 加好友</li>
+  <li>CHAAKAN Reels 先按讚</li>
+  <li>KLOOK 訂房折扣碼記錄</li>
+</ul>
+
+<div class="source">
+  資料來源：17 篇 IG 貼文整理（@yocindy101、@chenchijhen、@tiffanysss123、@uuuleiii、@white91_81、@coolbau_return、@jessielovefood、@angelbibi、@lisababe.tw、@cheahnanyi、@landygokr、@tzu.dailyy、@tw.kr_daily、@errorhea、@baubau.foodie、@sawfun_w.ifood）
+</div>
+
+</body>
+</html>
