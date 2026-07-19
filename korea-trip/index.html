@@ -116,6 +116,7 @@
     <div class="legend-item"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
     <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>機場</div>
     <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div>演唱會</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e84393"></div>其他推薦（醫美/潮牌）</div>
   </div>
 
   <!-- Hotel Recommendation -->
@@ -371,6 +372,12 @@ const concertMarker = L.marker([37.636, 126.832], { icon: createStarIcon('#e74c3
   .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40')
   .addTo(map);
 allMarkers['concert'] = { marker: concertMarker, pos: [37.636, 126.832], color: '#e74c3c', size: 20, days: [3], isStar: true };
+
+// Extra spots (not in daily itinerary but worth visiting)
+addMarker('rejuel', [37.4985, 127.0268], '#e84393', 14,
+  '<b>Dr. Rejuel 리쥬엘皮膚科（江南店）</b><br>Skin Care Rejuel Clinic Gangnam Branch<br>📍서울 서초구 강남대로 403 6층<br>⭐ 4.9 (582 評論)<br>⏰ ~21:00<br><br>地鐵2號線 江南站附近', []);
+addMarker('markgonzales', [37.5670, 127.0070], '#e84393', 14,
+  '<b>MARK GONZALES 小飛人潮牌</b><br>📍을지로264 B1<br>⭐ 5.0 (56 評論)<br>⏰ ~21:00<br><br>地鐵2/4/5號線 東大門歷史文化公園站附近', []);
 
 // Food
 addMarker('sindang', [37.5640, 127.0140], '#f39c12', 12,
