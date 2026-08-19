@@ -9,4 +9,5 @@ window.SUPABASE_CONFIG = {
   table: 'places',
   pendingTable: 'pending_places',   // 快速登錄暫存表（時間 + 短網址 + 備註）
   bucket: 'place-photos',   // Supabase Storage bucket（放照片）
+  queueTable: 'pending_url_queue',   // 短網址解析失敗待處理佇列
 };

@@ -169,6 +169,18 @@ textarea { resize: vertical; }
 
 .form-actions { display: flex; gap: 10px; }
 
+/* ---------- 短網址待處理佇列 ---------- */
+#queue-card { margin-top: 20px; }
+.queue-list { display: flex; flex-direction: column; gap: 8px; }
+.queue-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: #fffdfb;
+}
+.queue-item-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.queue-item-info a { word-break: break-all; }
+.queue-item-time { font-size: 12px; color: var(--muted); }
+.queue-item-del { flex-shrink: 0; }
+
 /* 表單分區：新增=完整展開（其他資料在前、評價類在後）；編輯=評價類置頂、其他收合 */
 #place-form { display: flex; flex-direction: column; }
 #more-fields { order: 1; }

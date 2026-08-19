@@ -49,6 +49,29 @@ create policy "public update" on public.places for update using (true) with chec
 create policy "public delete" on public.places for delete using (true);
 
 -- ============================================================
+--  待處理佇列：短網址自動解析失敗時暫存，之後手動用 LLM 處理
+-- ============================================================
+create table if not exists public.pending_url_queue (
+  id          bigint generated always as identity primary key,
+  created_at  timestamptz not null default now(),
+  google_url  text not null,
+  note        text   -- 記錄失敗原因，方便之後人工判斷
+);
+
+create index if not exists pending_url_queue_created_at_idx
+  on public.pending_url_queue (created_at desc);
+
+alter table public.pending_url_queue enable row level security;
+
+drop policy if exists "public read"   on public.pending_url_queue;
+drop policy if exists "public insert" on public.pending_url_queue;
+drop policy if exists "public delete" on public.pending_url_queue;
+
+create policy "public read"   on public.pending_url_queue for select using (true);
+create policy "public insert" on public.pending_url_queue for insert with check (true);
+create policy "public delete" on public.pending_url_queue for delete using (true);
+
+-- ============================================================
 --  Storage：放照片用的 bucket（公開）
 -- ============================================================
 insert into storage.buckets (id, name, public)

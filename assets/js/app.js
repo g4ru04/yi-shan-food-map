@@ -5,6 +5,7 @@ const CFG = window.SUPABASE_CONFIG;
 const sb = supabase.createClient(CFG.url, CFG.key);
 const TABLE = CFG.table || 'places';
 const BUCKET = CFG.bucket || 'place-photos';
+const QUEUE_TABLE = CFG.queueTable || 'pending_url_queue';
 const TAIWAN = [23.97, 120.97];
 // 地圖預設視野（Google Maps 網址格式：@24.1515728,120.6461127,11.8z）
 const DEFAULT_VIEW = { center: [24.1515728, 120.6461127], zoom: 11.8 };
@@ -245,6 +246,41 @@ async function resolveShortUrl(shortUrl) {
   const lastMsg = errors.length ? errors[errors.length - 1].message : '未知錯誤';
   return { textToParse: null, error: new Error(lastMsg) };
 }
+
+// ---------- 待處理佇列（短網址解析失敗）----------
+async function enqueueFailedUrl(url, note) {
+  return sb.from(QUEUE_TABLE).insert({ google_url: url, note });
+}
+
+async function loadQueue() {
+  const box = $('#queue-list');
+  if (!box) return;
+  const { data, error } = await sb.from(QUEUE_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) { box.innerHTML = `<p class="hint">佇列載入失敗：${error.message}</p>`; return; }
+  if (!data || !data.length) { box.innerHTML = '<p class="hint">目前沒有待處理的短網址</p>'; return; }
+
+  box.innerHTML = data.map(row => `
+    <div class="queue-item" data-id="${row.id}">
+      <div class="queue-item-info">
+        <span class="queue-item-time">${new Date(row.created_at).toLocaleString('zh-TW')}</span>
+        <a href="${row.google_url}" target="_blank" rel="noopener">${row.google_url}</a>
+        ${row.note ? `<span class="hint">${row.note}</span>` : ''}
+      </div>
+      <button type="button" class="btn small queue-item-del">已處理，移除</button>
+    </div>
+  `).join('');
+}
+
+$('#queue-list')?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.queue-item-del');
+  if (!btn) return;
+  const id = btn.closest('.queue-item').dataset.id;
+  const { error } = await sb.from(QUEUE_TABLE).delete().eq('id', id);
+  if (error) { toast('移除失敗：' + error.message); return; }
+  loadQueue();
+});
+
+loadQueue();
 
 // ---------- 導覽 ----------
 function showView(name) {
@@ -769,16 +805,18 @@ $('#btn-parse-url').addEventListener('click', async () => {
   if (!url) { hint.textContent = '請先貼上 Google Maps 網址'; hint.hidden = false; return; }
 
   let textToParse = url;
-  const isShort = /^https?:\/\/maps\.app\.goo\.gl\//i.test(url);
+  const isShort = /^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(url);
 
   // 短網址：透過 CORS proxy 取得重導向後的完整網址
   if (isShort) {
     hint.textContent = '正在解析短網址…'; hint.hidden = false;
     const { textToParse: resolved, error } = await resolveShortUrl(url);
     if (error || !resolved) {
-      hint.textContent = '短網址解析失敗：' + (error ? error.message : '未知錯誤')
-        + '。請在 Google Maps 開啟該地點，複製瀏覽器網址列的完整網址後重試。';
+      await enqueueFailedUrl(url, '展開短網址失敗：' + (error ? error.message : '未知錯誤'));
+      loadQueue();
+      hint.textContent = '短網址解析失敗，已加入待處理佇列，可稍後手動處理（或現在自行輸入座標）。';
       hint.hidden = false;
+      toast('已加入待處理佇列');
       return;
     }
     textToParse = resolved;
@@ -804,6 +842,12 @@ $('#btn-parse-url').addEventListener('click', async () => {
     hint.textContent = `已自動填入：${filled.join('、')}`;
     hint.hidden = false;
     toast(`已從網址帶入${filled.join('、')}`);
+  } else if (isShort) {
+    await enqueueFailedUrl(url, '已展開網址但無法擷取座標');
+    loadQueue();
+    hint.textContent = '短網址已展開，但無法擷取座標，已加入待處理佇列，可稍後手動處理。';
+    hint.hidden = false;
+    toast('已加入待處理佇列');
   } else {
     hint.textContent = '無法從此網址擷取座標，請確認是 Google Maps 網址';
     hint.hidden = false;

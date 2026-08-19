@@ -195,6 +195,13 @@
               </form>
             </div>
           </details>
+
+          <!-- 短網址待處理佇列 -->
+          <div class="card" id="queue-card">
+            <h3>⏳ 短網址待處理佇列</h3>
+            <p class="hint">自動填入時，短網址解析失敗會先放進這裡，之後可自行拿網址到本地用 LLM 處理。</p>
+            <div id="queue-list" class="queue-list"></div>
+          </div>
         </div>
       </section>
     </main>
