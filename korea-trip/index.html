@@ -440,6 +440,32 @@ routeLines[0] = L.polyline([[37.5713, 126.9909], [37.5636, 126.9860]],
   { color: '#ffd369', weight: 2, opacity: 0.5 }).bindPopup('鐘路3街 → 明洞：步行約 15 分鐘 / 計程車 5 分鐘').addTo(map);
 routeLines[5] = L.polyline([[37.5713, 126.9909], [37.5547, 126.9706], [37.4602, 126.4407]],
   { color: '#9b59b6', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 5：鐘路3街 → 首爾站（1號線）→ 機場').addTo(map);
+routeLines[2] = L.polyline([[37.5713, 126.9909], [37.5636, 126.9860], [37.5570, 126.9260], [37.5621, 126.9470], [37.5444, 127.0560], [37.5713, 126.9909]],
+  { color: '#4a90d9', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 2：飯店 → ①明洞 → ②弘大 → ③梨大 → ④聖水 → 回飯店').addTo(map);
+routeLines[4] = L.polyline([[37.5713, 126.9909], [37.5636, 126.9860], [37.5640, 127.0140], [37.5741, 126.9931], [37.5589, 126.9781], [37.5713, 126.9909]],
+  { color: '#f39c12', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 4：飯店 → ①明洞 → ②新堂辣雞爪 → ③益善洞 → ④南大門市場 → 回飯店').addTo(map);
+
+// --- 商圈區域標示（淡色範圍 + 地名） ---
+function addZone(center, radius, name) {
+  L.circle(center, { radius, color: '#5a7bb0', weight: 1.5, dashArray: '4,5',
+    opacity: 0.45, fillColor: '#4a90d9', fillOpacity: 0.06, interactive: false }).addTo(map);
+  L.marker(center, {
+    interactive: false,
+    icon: L.divIcon({ className: 'zone-label',
+      html: `<div style="color:#33415c;font-size:12px;font-weight:700;white-space:nowrap;
+        text-shadow:0 1px 3px #fff,0 -1px 3px #fff,1px 0 3px #fff,-1px 0 3px #fff;
+        transform:translate(-50%,-50%);font-family:-apple-system,sans-serif;">${name}</div>`,
+      iconSize: [0, 0], iconAnchor: [0, 0] })
+  }).addTo(map);
+}
+addZone([37.5620, 126.9855], 400, '明洞');
+addZone([37.5675, 127.0085], 450, '東大門');
+addZone([37.5545, 126.9235], 550, '弘大');
+addZone([37.5598, 126.9458], 300, '梨大');
+addZone([37.5435, 127.0555], 500, '聖水');
+addZone([37.5745, 126.9862], 280, '益善洞・仁寺洞');
+addZone([37.5655, 127.0175], 300, '新堂');
+addZone([37.5592, 126.9775], 250, '南大門');
 
 // --- Day highlight system ---
 const dayViews = {
