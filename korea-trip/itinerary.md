@@ -39,18 +39,18 @@
 ### Agoda 住宿候選（明洞周邊，10/6-10/10 查價）
 
 > 價格為 2 房 3 人「合計每晚價」，未含稅；條件：住客評分 9+、每晚 ≤NT$4,000、**私人房間（已排除宿舍床位型青旅）**
-> 地圖上以青色（#00cec9）標記「住宿候選」類別
+> 地圖上以青色（#00cec9）標記「住宿候選」類別（僅列 5 間：✅ 三間 + Philstay + STEP INN）
 
 | 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
 |:---|:---|---:|:---|:---|:---|
-| **New Residence 明洞1臥室公寓** ✅ | 9.5 (112) | 3,758 | 一整間公寓 27㎡ | 忠武路站 270m | [尚無評論](https://maps.google.com/?cid=18215224277514417073) |
-| **Hello Hostel 哈囉旅舍** ✅ | 9.0 (146) | 3,442 | 雙人房×2 | 鐘路3街站 166m | [4.7⭐(6)](https://maps.google.com/?cid=14596030933760014899) |
-| **Hi Seoul Hostel West 嗨青旅西樓** ✅ | 9.0 (215) | 3,773 | 標準雙床房×2（專用衛浴） | 明洞站 260m | [4.5⭐(4)](https://maps.google.com/?cid=12954755041017886097) |
+| **New Residence 明洞1臥室公寓** ✅ | [9.5 (112)](https://www.agoda.com/zh-tw/new-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,758 | 一整間公寓 27㎡ | 忠武路站 270m | [尚無評論](https://maps.google.com/?cid=18215224277514417073) |
+| **Hello Hostel 哈囉旅舍** ✅ | [9.0 (146)](https://www.agoda.com/zh-tw/hello-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,442 | 雙人房×2 | 鐘路3街站 166m | [4.7⭐(6)](https://maps.google.com/?cid=14596030933760014899) |
+| **Hi Seoul Hostel West 嗨青旅西樓** ✅ | [9.0 (215)](https://www.agoda.com/zh-tw/kkkkkkkk/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,773 | 標準雙床房×2（專用衛浴） | 明洞站 260m | [4.5⭐(4)](https://maps.google.com/?cid=12954755041017886097) |
 | Blueboat Hostel 藍船青旅 | 8.7 (1,450) | 2,171 | 四人房整間×2（⚠️共用衛浴） | 忠武路站 349m | [4.1⭐(105)](https://maps.google.com/?cid=3649670617261081019) |
 | Red Guesthouse 紅色民宿 | 8.7 (698) | 2,536 | 雙床房×2（⚠️共用衛浴） | 明洞步行街 597m | [4.2⭐(65)](https://maps.google.com/?cid=9310477123901132964) |
 | Sunshine Guesthouse 日出旅館 | 8.5 (5,605) | 2,877 | 無窗雙人房×2（含衛浴） | 明洞站 127m | [3.7⭐(95)](https://maps.google.com/?cid=16329441922843107233) |
-| Philstay Metro 菲斯得 | 8.6 (786) | 3,218 | 雙人房×2（專用衛浴，可連通） | 明洞站 235m | [3.7⭐(49)](https://maps.google.com/?cid=17705841993082386719) |
-| STEP INN 明洞1（含早餐） | 8.7 (8,144) | 3,297 | 上下舖雙床房×2（專用衛浴） | 乙支路入口站 326m | [4.1⭐(483)](https://maps.google.com/?cid=15412252306410982163) |
+| Philstay Metro 菲斯得 | [8.6 (786)](https://www.agoda.com/zh-tw/philstay-myeongdong-metro/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,218 | 雙人房×2（專用衛浴，可連通） | 明洞站 235m | [3.7⭐(49)](https://maps.google.com/?cid=17705841993082386719) |
+| STEP INN 明洞1（含早餐） | [8.7 (8,144)](https://www.agoda.com/zh-tw/step-inn-myeongdong-1/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,297 | 上下舖雙床房×2（專用衛浴） | 乙支路入口站 326m | [4.1⭐(483)](https://maps.google.com/?cid=15412252306410982163) |
 | U Stay Hotel 明洞U住宿 | 8.9 (1,305) | 3,751 | 私人房 | 明洞站 214m | [4.3⭐(34)](https://maps.google.com/?cid=17403616988266923246) |
 | Ehwa 明洞梨花飯店（超預算） | 8.8 (2,351) | 4,487 | 私人房 | 明洞站 356m | [4.2⭐(247)](https://maps.google.com/?cid=5220744055339351074) |
 
