@@ -158,10 +158,11 @@
     </div>
     <div class="day-theme">抵達首爾 + 明洞夜逛</div>
     <div class="day-items">
-      <span class="time">19:35</span> 抵達仁川機場（辦 SeS、下載 Smart Pass）<br>
-      <span class="time">20:30</span> 搭 AREX 機場快線 → 首爾站（約 43 分鐘）<br>
-      <span class="time">21:20</span> 首爾站 → 地鐵1號線 → 鐘路3街站（約 7 分鐘）<br>
-      <span class="time">21:35</span> Check-in M&LUCKY HOTEL、放行李<br>
+      <span class="time">16:00</span> 🛫 華航 CI162 桃園 T1 起飛（15:20 登機）<br>
+      <span class="time">19:35</span> 抵達仁川機場 T2（辦 SeS、下載 Smart Pass）<br>
+      <span class="time">20:30</span> 搭 AREX 機場快線 T2 → 首爾站（直達車約 51 分鐘）<br>
+      <span class="time">21:25</span> 首爾站 → 地鐵1號線 → 鐘路3街站（約 7 分鐘）<br>
+      <span class="time">21:40</span> Check-in M&LUCKY HOTEL、放行李<br>
       <span class="time">22:00</span> <span class="highlight">明洞夜逛</span>（步行約 15 分鐘或計程車）消夜覓食
     </div>
   </div>
@@ -233,9 +234,9 @@
     <div class="day-items">
       <span class="time">08:30</span> Check-out、寄放行李取回<br>
       <span class="time">09:00</span> 鐘路3街 → 地鐵1號線 → 首爾站（約 7 分鐘）<br>
-      <span class="time">09:15</span> 搭 <span class="highlight">AREX 機場快線</span>（約 43 分鐘）<br>
-      <span class="time">10:00</span> 抵達仁川機場（Smart Pass 刷臉出境）<br>
-      <span class="time">12:35</span> 起飛
+      <span class="time">09:15</span> 搭 <span class="highlight">AREX 機場快線</span> 直達車終點即 T2（約 51 分鐘）<br>
+      <span class="time">10:10</span> 抵達仁川機場 T2（Smart Pass 刷臉出境）<br>
+      <span class="time">12:35</span> 🛫 華航 CI161 起飛（11:55 登機）→ 14:10 桃園 T1
     </div>
   </div>
 
@@ -339,7 +340,7 @@ function addMarker(id, pos, color, size, popup, days, label) {
 
 // Airport
 addMarker('airport', [37.4602, 126.4407], '#9b59b6', 16,
-  '<b>仁川國際機場</b><br>抵達：10/6 19:35<br>離開：10/10 12:35<br><br><b>交通</b>：AREX 機場快線到首爾站約 43 分鐘<br><br><a href="https://maps.google.com/?cid=10181407952118529748" target="_blank">google-url</a> 4.5⭐️(33,091)', [1,5]);
+  '<b>仁川國際機場 T2</b><br>抵達：10/6 19:35（華航 CI162，16:00 桃園 T1 起飛）<br>離開：10/10 12:35（華航 CI161 → 14:10 桃園 T1）<br><br><b>交通</b>：AREX 直達車 T2 ↔ 首爾站約 51 分鐘<br><br><a href="https://maps.google.com/?cid=10181407952118529748" target="_blank">google-url</a> 4.5⭐️(33,091)', [1,5]);
 
 // Hotel (confirmed)
 addMarker('hotel', [37.5713, 126.9909], '#ffd369', 18,
@@ -580,7 +581,7 @@ function addDistanceLabel(from, to, text, offset) {
 addDistanceLabel([37.5614, 126.9946], [37.6530, 126.8920], '地鐵3號線 約50分', [0.005, 0.01]);
 addDistanceLabel([37.6530, 126.8920], [37.6745, 126.7418], '約15分', [0.008, 0]);
 addDistanceLabel([37.5614, 126.9946], [37.5636, 126.9860], '步行5分', [-0.003, 0]);
-addDistanceLabel([37.4602, 126.4407], [37.5547, 126.9706], 'AREX 43分', [0.01, 0]);
+addDistanceLabel([37.4602, 126.4407], [37.5547, 126.9706], 'AREX 直達 T2 約51分', [0.01, 0]);
 </script>
 
 </body>
