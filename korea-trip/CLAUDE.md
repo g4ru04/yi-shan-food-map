@@ -21,6 +21,16 @@
 - `itinerary-export.txt` 不 commit（使用者指定）
 - 發佈於 GitHub Pages：g4ru04.github.io/yi-shan-food-map
 
+## Instagram 貼文解析方式
+
+使用者常丟 IG 貼文連結要求整理旅遊資訊。IG 擋一般抓取，解析方法：
+
+1. 直接 WebFetch `https://www.instagram.com/p/<shortcode>/` → 幾乎必被擋
+2. 改抓 **embed 變體**：`https://www.instagram.com/p/<shortcode>/embed/captioned/` → 通常能拿到完整 caption（不需登入），14/14 篇實測成功
+3. `instagram.com/direct/t/...` 是**私訊對話串，任何工具都讀不到**，直接請使用者貼文字內容
+4. 多篇貼文時委派 general-purpose agent 批次處理；caption 讀不到就如實回報，**不可捏造內容**
+5. 貼文資訊寫入行程前，位置/店名矛盾的（如帳號說明洞但店名寫신당）先跳過或查證，勿直接採用
+
 ## 已知注意事項
 
 - CHAAKAN 明洞旗艦店的 Google 店家頁座標被標錯在誠信女大，連結一律使用地址搜尋（명동8나길 25），勿改回 CID 連結
