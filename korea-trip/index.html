@@ -117,6 +117,7 @@
   <!-- Legend (點擊類別可篩選地圖上的點，再點一次取消) -->
   <div class="legend">
     <div class="legend-item" onclick="filterByCategory(['#e94560','#ffd369'], this)"><div class="legend-dot" style="background:#e94560"></div>住宿選項</div>
+    <div class="legend-item" onclick="filterByCategory(['#00cec9'], this)"><div class="legend-dot" style="background:#00cec9"></div>住宿候選（Agoda 明洞周邊）</div>
     <div class="legend-item" onclick="filterByCategory(['#4a90d9'], this)"><div class="legend-dot" style="background:#4a90d9"></div>購物</div>
     <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>景點/體驗</div>
     <div class="legend-item" onclick="filterByCategory(['#f39c12'], this)"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
@@ -353,10 +354,32 @@ addMarker('stanford', [37.5650, 126.9830], '#e94560', 12,
   '<b>明洞斯坦福飯店</b><br>備選<br>乙支路入口站步行 2 分鐘<br>樓下就是明洞商圈<br>樂天百貨/免稅店對面<br><br><a href="https://maps.google.com/?cid=15602802977754142125" target="_blank">google-url</a> 4.3⭐️(553)', []);
 addMarker('klaven', [37.5650, 126.9770], '#e94560', 12,
   '<b>Klaven Hotel 市廳站</b><br>KLOOK 折扣碼「Jessielovefood」享 95 折<br><br><a href="https://www.google.com/maps/search/?api=1&query=Klaven+Hotel+Seoul" target="_blank">google-url</a>', []);
-addMarker('sheraton', [37.4851, 126.8960], '#e94560', 12,
-  '<b>福朋喜來登九老區</b><br>Four Points by Sheraton<br>구로구 디지털로32길 72<br>門口有機場巴士站<br>位置偏南，離高陽較遠<br><br><a href="https://maps.google.com/?cid=9177861114434521351" target="_blank">google-url</a> 4.3⭐️(911)', []);
 addMarker('simpleroom', [37.5620, 127.0050], '#e94560', 12,
   '<b>台灣老闆娘民宿 @simpleroom.kr</b><br>一晚最低 $800/人<br>地鐵走路 2 分鐘<br>附近有新堂辣雞爪、24H 豬肉湯飯', []);
+
+// --- Agoda 住宿候選（10/6-10/10 查價，價格=2房3人合計每晚，未稅）---
+addMarker('ag_newresidence', [37.5634, 126.9934], '#00cec9', 13,
+  '<b>New Residence 明洞1臥室公寓｜Agoda 9.5⭐(112)</b><br>💰 每晚 NT$3,758<br>📍 忠武路站 270m，公寓 27㎡<br>✅ 符合條件，Agoda 評分最高<br><br><a href="https://maps.google.com/?cid=18215224277514417073" target="_blank">google-url</a> Google 尚無評論（同棟另一列表 4.9⭐(48)）', []);
+addMarker('ag_hellohostel', [37.5689, 126.9920], '#00cec9', 12,
+  '<b>Hello Hostel 哈囉旅舍｜Agoda 9.0⭐(146)</b><br>💰 每晚 NT$3,442<br>📍 鐘路3街站 166m（稍偏北）<br>✅ 符合條件<br><br><a href="https://maps.google.com/?cid=14596030933760014899" target="_blank">google-url</a> 4.7⭐️(6)', []);
+addMarker('ag_namsan203', [37.5563, 126.9794], '#00cec9', 12,
+  '<b>Namsan203 南山203號旅館｜Agoda 9.0⭐(91)</b><br>💰 每晚 NT$1,416（最便宜）<br>📍 會賢站 263m，民宿型<br>✅ 符合條件<br><br><a href="https://maps.google.com/?cid=3129287489018447888" target="_blank">google-url</a> 5.0⭐️(6)', []);
+addMarker('ag_blueboat', [37.5631, 126.9906], '#00cec9', 11,
+  '<b>Blueboat Hostel 明洞藍船青旅｜Agoda 8.7⭐(1,450)</b><br>💰 每晚 NT$2,171<br>📍 忠武路站 349m<br><br><a href="https://maps.google.com/?cid=3649670617261081019" target="_blank">google-url</a> 4.1⭐️(105)', []);
+addMarker('ag_redguesthouse', [37.5584, 126.9848], '#00cec9', 11,
+  '<b>Red Guesthouse 紅色民宿｜Agoda 8.7⭐(698)</b><br>💰 每晚 NT$2,537<br>📍 明洞步行街 597m<br><br><a href="https://maps.google.com/?cid=9310477123901132964" target="_blank">google-url</a> 4.2⭐️(65)', []);
+addMarker('ag_sunshine', [37.5619, 126.9864], '#00cec9', 11,
+  '<b>Sunshine Guesthouse 明洞日出旅館｜Agoda 8.5⭐(5,605)</b><br>💰 每晚 NT$2,878<br>📍 明洞站 127m<br><br><a href="https://maps.google.com/?cid=16329441922843107233" target="_blank">google-url</a> 3.7⭐️(95)', []);
+addMarker('ag_stepinn', [37.5641, 126.9854], '#00cec9', 12,
+  '<b>STEP INN 明洞1｜Agoda 8.7⭐(8,144)</b><br>💰 每晚 NT$3,298，含自助早餐<br>📍 乙支路入口站 326m，步行街 231m<br>🏆 2024 Agoda 獲獎，CP 值高<br><br><a href="https://maps.google.com/?cid=15412252306410982163" target="_blank">google-url</a> 4.1⭐️(483)', []);
+addMarker('ag_ustay', [37.5628, 126.9855], '#00cec9', 11,
+  '<b>U Stay Hotel 明洞U住宿｜Agoda 8.9⭐(1,305)</b><br>💰 每晚 NT$3,751<br>📍 明洞站 214m<br><br><a href="https://maps.google.com/?cid=17403616988266923246" target="_blank">google-url</a> 4.3⭐️(34)', []);
+addMarker('ag_philstay', [37.5630, 126.9856], '#00cec9', 11,
+  '<b>Philstay Metro 菲斯得旅館｜Agoda 8.6⭐(786)</b><br>💰 每晚 NT$4,146（超預算）<br>📍 明洞站 235m<br>⚠️ 勿與 Philstay Myeongdong Station 混淆<br><br><a href="https://maps.google.com/?cid=17705841993082386719" target="_blank">google-url</a> 3.7⭐️(49)', []);
+addMarker('ag_hiseoul', [37.5620, 126.9884], '#00cec9', 11,
+  '<b>Hi Seoul Hostel West 嗨青旅西樓｜Agoda 9.0⭐(215)</b><br>💰 每晚 NT$4,431（超預算 431）<br>📍 明洞站 260m<br><br><a href="https://maps.google.com/?cid=12954755041017886097" target="_blank">google-url</a> 4.5⭐️(4)', []);
+addMarker('ag_ehwa', [37.5638, 126.9878], '#00cec9', 11,
+  '<b>Ehwa 明洞梨花飯店｜Agoda 8.8⭐(2,351)</b><br>💰 每晚 NT$4,487（超預算）<br>📍 明洞站 356m<br><br><a href="https://maps.google.com/?cid=5220744055339351074" target="_blank">google-url</a> 4.2⭐️(247)', []);
 
 // Shopping
 addMarker('chaakan_ss', [37.5446, 127.0540], '#4a90d9', 12,
@@ -397,8 +420,6 @@ addMarker('markgonzales', [37.5670, 127.0070], '#e84393', 14,
 // Food
 addMarker('sindang', [37.5640, 127.0140], '#f39c12', 12,
   '<b>新堂辣雞爪街</b><br>新堂站附近知名美食<br>地鐵6號線 新堂站<br><br><a href="https://maps.google.com/?cid=3157300139591794896" target="_blank">google-url</a> 3.8⭐️(522)', [4]);
-addMarker('kkalkkal', [37.4870, 126.8980], '#f39c12', 12,
-  '<b>깔깔거리 (九老)</b><br>當地人下班後造訪的餐廳與酒館街<br>福朋喜來登附近<br><br><a href="https://maps.google.com/?cid=17898014500586632131" target="_blank">google-url</a> 3.0⭐️(3)', []);
 
 // --- Recommended Attractions (not in current itinerary) ---
 // Color: #00b894 (teal green) to distinguish from itinerary spots
