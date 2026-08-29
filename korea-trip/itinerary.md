@@ -76,6 +76,20 @@
 
 > Step Inn 明洞1 也在此 Google 名單中（4.1⭐(483)），已列於上方 Agoda 候選表。未達門檻落選：Hostel Haru 4.4(93)、Star Hostel 4.3(93)、SeouliteINN 4.0(74)。
 
+### 旅行社常用飯店 + 自選 Agoda 候選（2房3人查價，每晚未稅）
+
+> 旅行社三間目前無 KKday/Klook/雄獅/可樂/東南住宿券通路，低價通常只在機加酒打包內。
+
+| 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
+|:---|:---|---:|:---|:---|:---|
+| 🧳 Travelodge 明洞南山 | [8.0 (2,892)](https://www.agoda.com/zh-tw/staz-hotel-myeongdong-2_6/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,572 | 2房（2024 改裝） | 忠武路站 302m、明洞站 400m | [4.5⭐(1,019)](https://maps.google.com/?cid=630322660078184563) |
+| 🧳 Sollago 明洞索拉格 | [8.5 (4,394)](https://www.agoda.com/zh-tw/h44922485/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,476 | 2房 | 忠武路站 187m（離明洞街 958m） | [4.2⭐(457)](https://maps.google.com/?cid=13123391320938265983) |
+| 🧳 Travelodge 明洞乙支路 | [8.2 (9,902)](https://www.agoda.com/zh-tw/holiday-inn-express-seoul-euljiro_2/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,753 | 2房（前身 Holiday Inn Express） | 乙支路3街站 154m | [4.1⭐(2,126)](https://maps.google.com/?cid=11498262102837988543) |
+| Hotel Gaon Golden Park 東大門高金園 | [8.0 (4,042)](https://www.agoda.com/zh-tw/hotel-gaon-golden-park-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 1,741 | 標準雙床房×2（4折） | 東大門站 6-7 分，4號線 2 站到忠武路 | [3.7⭐(214)](https://maps.google.com/?cid=3689539941657439496) ⚠️偏低 |
+| Hotel Dada 大大飯店景福宮 | [8.4 (1,344)](https://www.agoda.com/zh-tw/jongno-dada-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,837 | 標準雙人房×2 | 仁寺洞，鐘路3街/安國站 5 分 | [3.8⭐(86)](https://maps.google.com/?cid=10628606984505931687) |
+| M & Lucky Hotel 鐘路 | [8.2 (1,292)](https://www.agoda.com/zh-tw/jongno-m-lucky-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,018 | 豪華房×2（23-27㎡ 房間大） | 鐘路3街站 3-4 分 | [3.9⭐(61)](https://maps.google.com/?cid=11810786878959819886) |
+| Traveler's A 旅行者A韓國旅舍 | [8.4 (170)](https://www.agoda.com/zh-tw/travelersa-seoul-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,551 | 雙床房×2（10㎡ 小房，庫存緊） | 乙支路4街站 3-4 分 | [3.8⭐(95)](https://maps.google.com/?cid=7442437490337350749) |
+
 ---
 
 ## 每日行程
