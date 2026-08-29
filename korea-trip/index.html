@@ -58,7 +58,12 @@
   .day-card .day-items .highlight { color: #ffd369; }
 
   .legend { margin-top: 16px; }
-  .legend-item { display: flex; align-items: center; margin: 4px 0; font-size: 12px; }
+  .legend-item {
+    display: flex; align-items: center; margin: 4px 0; font-size: 12px;
+    cursor: pointer; padding: 3px 6px; border-radius: 6px; transition: background 0.2s;
+  }
+  .legend-item:hover { background: #16213e; }
+  .legend-item.active { background: #1f3a5f; color: #ffd369; font-weight: 700; }
   .legend-dot {
     width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; flex-shrink: 0;
   }
@@ -108,15 +113,16 @@
   <h1>首爾 4 天 3 夜旅遊地圖</h1>
   <div class="subtitle">10/6 (一) 19:35 抵達 → 10/10 (五) 12:35 離開 ｜ 3人 2間房</div>
 
-  <!-- Legend -->
+  <!-- Legend (點擊類別可篩選地圖上的點，再點一次取消) -->
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#e94560"></div>住宿選項</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div>購物</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div>景點/體驗</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>機場</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div>演唱會</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e84393"></div>其他推薦（醫美/潮牌）</div>
+    <div class="legend-item" onclick="filterByCategory(['#e94560','#ffd369'], this)"><div class="legend-dot" style="background:#e94560"></div>住宿選項</div>
+    <div class="legend-item" onclick="filterByCategory(['#4a90d9'], this)"><div class="legend-dot" style="background:#4a90d9"></div>購物</div>
+    <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>景點/體驗</div>
+    <div class="legend-item" onclick="filterByCategory(['#f39c12'], this)"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
+    <div class="legend-item" onclick="filterByCategory(['#9b59b6'], this)"><div class="legend-dot" style="background:#9b59b6"></div>機場</div>
+    <div class="legend-item" onclick="filterByCategory(['#e74c3c'], this)"><div class="legend-dot" style="background:#e74c3c"></div>演唱會</div>
+    <div class="legend-item" onclick="filterByCategory(['#e84393'], this)"><div class="legend-dot" style="background:#e84393"></div>其他推薦（醫美/潮牌）</div>
+    <div class="legend-item" onclick="filterByCategory(['#00b894'], this)"><div class="legend-dot" style="background:#00b894"></div>熱門景點推薦（可加入行程）</div>
   </div>
 
   <!-- Hotel Recommendation -->
@@ -335,7 +341,7 @@ function addMarker(id, pos, color, size, popup, days, label) {
 
 // Airport
 addMarker('airport', [37.4602, 126.4407], '#9b59b6', 16,
-  '<b>仁川國際機場</b><br>抵達：10/6 19:35<br>離開：10/10 12:35<br><br><b>交通</b>：AREX 機場快線到首爾站約 43 分鐘', [1,5]);
+  '<b>仁川國際機場</b><br>抵達：10/6 19:35<br>離開：10/10 12:35<br><br><b>交通</b>：AREX 機場快線到首爾站約 43 分鐘<br><br><a href="https://maps.google.com/?cid=10181407952118529748" target="_blank">google-url</a> 4.5⭐️(33,091)', [1,5]);
 
 // Hotel (recommended)
 addMarker('hotel', [37.5614, 126.9946], '#ffd369', 18,
@@ -343,53 +349,106 @@ addMarker('hotel', [37.5614, 126.9946], '#ffd369', 18,
 
 // Other hotels
 addMarker('stanford', [37.5650, 126.9830], '#e94560', 12,
-  '<b>明洞斯坦福飯店</b><br>備選<br>乙支路入口站步行 2 分鐘<br>樓下就是明洞商圈<br>樂天百貨/免稅店對面', []);
+  '<b>明洞斯坦福飯店</b><br>備選<br>乙支路入口站步行 2 分鐘<br>樓下就是明洞商圈<br>樂天百貨/免稅店對面<br><br><a href="https://maps.google.com/?cid=15602802977754142125" target="_blank">google-url</a> 4.3⭐️(553)', []);
 addMarker('klaven', [37.5650, 126.9770], '#e94560', 12,
-  '<b>Klaven Hotel 市廳站</b><br>KLOOK 折扣碼「Jessielovefood」享 95 折', []);
+  '<b>Klaven Hotel 市廳站</b><br>KLOOK 折扣碼「Jessielovefood」享 95 折<br><br><a href="https://www.google.com/maps/search/?api=1&query=Klaven+Hotel+Seoul" target="_blank">google-url</a>', []);
 addMarker('sheraton', [37.4851, 126.8960], '#e94560', 12,
-  '<b>福朋喜來登九老區</b><br>Four Points by Sheraton<br>구로구 디지털로32길 72<br>門口有機場巴士站<br>位置偏南，離高陽較遠', []);
+  '<b>福朋喜來登九老區</b><br>Four Points by Sheraton<br>구로구 디지털로32길 72<br>門口有機場巴士站<br>位置偏南，離高陽較遠<br><br><a href="https://maps.google.com/?cid=9177861114434521351" target="_blank">google-url</a> 4.3⭐️(911)', []);
 addMarker('simpleroom', [37.5620, 127.0050], '#e94560', 12,
   '<b>台灣老闆娘民宿 @simpleroom.kr</b><br>一晚最低 $800/人<br>地鐵走路 2 分鐘<br>附近有新堂辣雞爪、24H 豬肉湯飯', []);
 
 // Shopping
 addMarker('chaakan_ss', [37.5446, 127.0540], '#4a90d9', 12,
-  '<b>CHAAKAN 聖水店</b><br>착한구두 성수 스페이스점<br>성수이로 58<br>地鐵2號線 聖水站 3 號出口<br>⏰ 11:00-21:00<br>出示按讚 Reels 享 8 折', [2]);
+  '<b>CHAAKAN 聖水店</b><br>착한구두 성수 스페이스점<br>성수이로 58<br>地鐵2號線 聖水站 3 號出口<br>⏰ 11:00-21:00<br>出示按讚 Reels 享 8 折<br><br><a href="https://maps.google.com/?cid=5340588360578331407" target="_blank">google-url</a> 5.0⭐️(25)', [2]);
 addMarker('chaakan_hd', [37.5510, 126.9210], '#4a90d9', 12,
-  '<b>CHAAKAN 弘大店</b><br>서교동 332-14<br>平價國民女鞋<br>鞋子不到 NT$1,000、靴子 NT$2,000 有找', [2]);
+  '<b>CHAAKAN 弘大店</b><br>서교동 332-14<br>平價國民女鞋<br>鞋子不到 NT$1,000、靴子 NT$2,000 有找<br><br><a href="https://maps.google.com/?cid=2331305143891035196" target="_blank">google-url</a> 4.8⭐️(627)', [2]);
+addMarker('chaakan_yn', [37.5611, 126.9244], '#4a90d9', 12,
+  '<b>CHAAKAN 延南店</b><br>착한구두 서울 연남점<br>弘大入口站附近（延南洞）<br>出示按讚 Reels 享 8 折<br><br><a href="https://maps.google.com/?cid=3388213180839182877" target="_blank">google-url</a> 4.9⭐️(20)', []);
+addMarker('chaakan_kd', [37.5428, 127.0716], '#4a90d9', 12,
+  '<b>CHAAKAN 建大店</b><br>착한구두 서울 건대역점<br>地鐵2/7號線 建大入口站<br>出示按讚 Reels 享 8 折<br><br><a href="https://maps.google.com/?cid=13489912747818566690" target="_blank">google-url</a> 5.0⭐️(119)', []);
+addMarker('chaakan_md', [37.5630, 126.9850], '#4a90d9', 12,
+  '<b>CHAAKAN 明洞旗艦店</b><br>착한구두 명동 플래그십<br>중구 명동8나길 25（明洞商圈內）<br>出示按讚 Reels 享 8 折<br>⚠️ Google 列表與誠信女大店資料混用，地址以此為準<br><br><a href="https://maps.google.com/?cid=13919513510872552117" target="_blank">google-url</a> 5.0⭐️(6)', []);
+addMarker('chaakan_ss2', [37.5915, 127.0180], '#4a90d9', 12,
+  '<b>CHAAKAN 誠信女大店</b><br>착한구두 성신여대점<br>성북구 동소문로22길 36<br>地鐵4號線 誠信女大入口站<br>出示按讚 Reels 享 8 折<br><br><a href="https://www.google.com/maps/search/?api=1&query=착한구두+성신여대" target="_blank">google-url</a>（無獨立評分）', []);
 addMarker('hongdae', [37.5570, 126.9260], '#4a90d9', 12,
-  '<b>弘大平價服飾區</b><br>MIXXO / 8SECONDS / SPAO / MUSINSA STANDARD<br>四間都在弘大可一次逛完', [2]);
+  '<b>弘大平價服飾區</b><br>MIXXO / 8SECONDS / SPAO / MUSINSA STANDARD<br>四間都在弘大可一次逛完<br><br><a href="https://www.google.com/maps/search/?api=1&query=홍대+쇼핑거리" target="_blank">google-url</a>（商圈無單一評分）', [2]);
 addMarker('myeongdong', [37.5636, 126.9860], '#4a90d9', 14,
-  '<b>明洞購物區</b><br>Olive Young、SPAO、大創等連鎖店<br>價格各店差不多<br>注意藥局/個人店家可能較貴', [1,2,4]);
+  '<b>明洞購物區</b><br>Olive Young、SPAO、大創等連鎖店<br>價格各店差不多<br>注意藥局/個人店家可能較貴<br><br><a href="https://maps.google.com/?cid=5824659766126274338" target="_blank">google-url</a> 4.4⭐️(26,431)', [1,2,4]);
 addMarker('lotte', [37.5656, 126.9810], '#4a90d9', 12,
-  '<b>樂天百貨/免稅店 明洞</b><br>樂天百貨 + 免稅店<br>報酷柏團號可拿現金回饋<br>新世界百貨步行約 10 分鐘', [4]);
+  '<b>樂天百貨/免稅店 明洞</b><br>樂天百貨 + 免稅店<br>報酷柏團號可拿現金回饋<br>新世界百貨步行約 10 分鐘<br><br><a href="https://maps.google.com/?cid=8635654260314479284" target="_blank">google-url</a> 4.2⭐️(13,466)', [4]);
 
 // Attractions
 addMarker('aquafield', [37.6530, 126.8920], '#27ae60', 16,
-  '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>扁柏木/多媒體藝術/雲端熱療室<br>5-9月有水上樂園', [3]);
+  '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>扁柏木/多媒體藝術/雲端熱療室<br>5-9月有水上樂園<br><br><a href="https://maps.google.com/?cid=17404309354366294526" target="_blank">google-url</a> 4.3⭐️(3,784)', [3]);
 
 // Concert
-const concertMarker = L.marker([37.636, 126.832], { icon: createStarIcon('#e74c3c') })
-  .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40')
+const concertMarker = L.marker([37.6745, 126.7418], { icon: createStarIcon('#e74c3c') })
+  .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40<br><br><a href="https://maps.google.com/?cid=14855984331673672246" target="_blank">google-url</a> 4.5⭐️(1,195)')
   .addTo(map);
-allMarkers['concert'] = { marker: concertMarker, pos: [37.636, 126.832], color: '#e74c3c', size: 20, days: [3], isStar: true };
+allMarkers['concert'] = { marker: concertMarker, pos: [37.6745, 126.7418], color: '#e74c3c', size: 20, days: [3], isStar: true };
 
 // Extra spots (not in daily itinerary but worth visiting)
 addMarker('rejuel', [37.4985, 127.0268], '#e84393', 14,
-  '<b>Dr. Rejuel 리쥬엘皮膚科（江南店）</b><br>Skin Care Rejuel Clinic Gangnam Branch<br>📍서울 서초구 강남대로 403 6층<br>⭐ 4.9 (582 評論)<br>⏰ ~21:00<br><br>地鐵2號線 江南站附近', []);
+  '<b>Dr. Rejuel 리쥬엘皮膚科（江南店）</b><br>Skin Care Rejuel Clinic Gangnam Branch<br>📍서울 서초구 강남대로 403 6층<br>⭐ 4.9 (582 評論)<br>⏰ ~21:00<br><br>地鐵2號線 江南站附近<br><br><a href="https://www.google.com/maps/search/?api=1&query=리쥬엘의원+강남점" target="_blank">google-url</a> 4.9⭐️(582)', []);
 addMarker('markgonzales', [37.5670, 127.0070], '#e84393', 14,
-  '<b>MARK GONZALES 小飛人潮牌</b><br>📍을지로264 B1<br>⭐ 5.0 (56 評論)<br>⏰ ~21:00<br><br>地鐵2/4/5號線 東大門歷史文化公園站附近', []);
+  '<b>MARK GONZALES 小飛人潮牌</b><br>📍을지로264 B1<br>⭐ 5.0 (56 評論)<br>⏰ ~21:00<br><br>地鐵2/4/5號線 東大門歷史文化公園站附近<br><br><a href="https://www.google.com/maps/search/?api=1&query=MARK+GONZALES+을지로264" target="_blank">google-url</a> 5.0⭐️(56)', []);
 
 // Food
 addMarker('sindang', [37.5640, 127.0140], '#f39c12', 12,
-  '<b>新堂辣雞爪街</b><br>新堂站附近知名美食<br>地鐵6號線 新堂站', [4]);
+  '<b>新堂辣雞爪街</b><br>新堂站附近知名美食<br>地鐵6號線 新堂站<br><br><a href="https://maps.google.com/?cid=3157300139591794896" target="_blank">google-url</a> 3.8⭐️(522)', [4]);
 addMarker('kkalkkal', [37.4870, 126.8980], '#f39c12', 12,
-  '<b>깔깔거리 (九老)</b><br>當地人下班後造訪的餐廳與酒館街<br>福朋喜來登附近', []);
+  '<b>깔깔거리 (九老)</b><br>當地人下班後造訪的餐廳與酒館街<br>福朋喜來登附近<br><br><a href="https://maps.google.com/?cid=17898014500586632131" target="_blank">google-url</a> 3.0⭐️(3)', []);
+
+// --- Recommended Attractions (not in current itinerary) ---
+// Color: #00b894 (teal green) to distinguish from itinerary spots
+
+addMarker('gyeongbokgung', [37.5796, 126.9770], '#00b894', 13,
+  '<b>景福宮 (경복궁)</b> ⭐ 聲量#1<br>📍地鐵3號線 景福宮站<br>🎫 ₩3,000（穿韓服免費入場）<br>⏰ 09:00-18:00（週二休）<br><br>💡 光化門換崗儀式 10:00/14:00<br>📸 IG必拍：慶會樓倒影、韓服<br>🏃 與北村韓屋村+三清洞同天走<br><br><a href="https://maps.google.com/?cid=10029593693201569270" target="_blank">google-url</a> 4.6⭐️(46,772)', []);
+
+addMarker('bukchon', [37.5826, 126.9830], '#00b894', 13,
+  '<b>北村韓屋村 (북촌한옥마을)</b> ⭐ 聲量#6<br>📍地鐵3號線 安國站 2號出口<br>🎫 免費<br><br>📸 北村8景、韓服拍照聖地<br>⚠️ 住宅區，請勿大聲喧嘩<br>🏃 與景福宮+三清洞同天<br><br><a href="https://maps.app.goo.gl/X5KuXGh1kbFuGGSeA" target="_blank">google-url</a> 4.6⭐️(3,885)', []);
+
+addMarker('samcheong', [37.5797, 126.9801], '#00b894', 13,
+  '<b>三清洞 (삼청동)</b> ⭐ 聲量#9<br>📍景福宮東側，步行可達<br>🎫 免費（消費自理）<br><br>🎨 藝廊、文創小店、特色咖啡廳<br>📸 石牆路、巷弄，氣質打卡<br>🏃 與景福宮+北村同天最佳<br><br><a href="https://maps.google.com/?cid=10736497183159822176" target="_blank">google-url</a> 4.3⭐️(2,176)', []);
+
+addMarker('changdeokgung', [37.5794, 126.9910], '#00b894', 13,
+  '<b>昌德宮秘苑 (창덕궁)</b> ⭐ 聲量#8<br>📍地鐵3號線 安國站 3號出口<br>🎫 宮殿₩3,000 秘苑₩8,000（需預約！）<br>⏰ 09:00-17:30（週一休）<br><br>🌏 聯合國世界文化遺產<br>🍁 秋天楓葉極美，10月最推<br>⚠️ 秘苑需官網預約，名額有限<br><br><a href="https://maps.google.com/?cid=18386345253664084072" target="_blank">google-url</a> 4.6⭐️(13,925)', []);
+
+addMarker('nseoultower', [37.5512, 126.9882], '#00b894', 13,
+  '<b>南山首爾塔 (N서울타워)</b> ⭐ 聲量#4<br>📍從明洞步行上山約20-30分 或搭纜車<br>🎫 纜車₩12,000 展望台₩21,000<br>⏰ 10:00-23:00<br><br>🔒 愛情鎖牆、360°夜景<br>📸 韓劇取景地、日落前最美<br>💡 從飯店步行40分可達<br><br><a href="https://maps.google.com/?cid=6699200636580889253" target="_blank">google-url</a> 4.5⭐️(67,921)', []);
+
+addMarker('gwangjang', [37.5697, 127.0040], '#f39c12', 13,
+  '<b>廣藏市場 (광장시장)</b> ⭐ 聲量#10<br>📍地鐵1/5號線 鐘路5街站 8號出口<br>🎫 免費入場（消費自理）<br>⏰ 08:00-22:00<br><br>🥘 綠豆煎餅（빈대떡）必吃<br>🥩 生拌牛肉（육회）特色料理<br>💡 Day2弘大→聖水途中可繞進來<br><br><a href="https://maps.google.com/?cid=15444711502569316164" target="_blank">google-url</a> 4.2⭐️(44,237)', []);
+
+addMarker('ddp', [37.5660, 127.0094], '#4a90d9', 13,
+  '<b>東大門 DDP (동대문)</b> ⭐ 聲量#7<br>📍地鐵2/4/5號線 東大門歷史文化公園站<br>🎫 DDP免費（部分展覽收費）<br>⏰ 市場 24H<br><br>🏗️ Zaha Hadid設計的未來感建築<br>🛍️ 批發市場越夜越熱鬧<br>💡 距離飯店地鐵約10分鐘<br><br><a href="https://maps.google.com/?cid=6639054745590107100" target="_blank">google-url</a> 4.4⭐️(31,925)', []);
+
+addMarker('deoksugung', [37.5654, 126.9747], '#00b894', 13,
+  '<b>德壽宮石牆路 (덕수궁)</b> ⭐ 聲量#15<br>📍地鐵1/2號線 市廳站 2號出口<br>🎫 ₩1,000<br>⏰ 09:00-21:00（週一休）<br><br>🍁 秋天楓葉銀杏超美（10月正好）<br>🏛️ 近代西式建築與韓式古蹟融合<br>💡 在飯店到明洞途中可順路<br><br><a href="https://maps.google.com/?cid=550234504920290008" target="_blank">google-url</a> 4.6⭐️(20,371)', []);
+
+addMarker('ikseon', [37.5741, 126.9931], '#00b894', 13,
+  '<b>益善洞 (익선동)</b> ⭐ 聲量#14<br>📍地鐵1/3/5號線 鐘路3街站 4號出口<br>🎫 免費（消費自理）<br>⏰ 咖啡廳多11:00起<br><br>📸 1920年代老韓屋改造文青咖啡廳<br>🎨 新舊交融，IG氛圍極佳<br>💡 距飯店地鐵2站，Day4塞得進<br><br><a href="https://maps.google.com/?cid=10117955504964711899" target="_blank">google-url</a> 4.3⭐️(8,481)', []);
+
+addMarker('seongsu', [37.5444, 127.0560], '#4a90d9', 13,
+  '<b>聖水洞 (성수동)</b> ⭐ 聲量#12<br>📍地鐵2號線 聖水站<br>🎫 免費（消費自理）<br><br>🏭 韓國布魯克林，工業風咖啡廳<br>👟 精品快閃旗艦店<br>✅ 已排入Day2行程<br><br><a href="https://maps.google.com/?cid=5016885874634732154" target="_blank">google-url</a> 4.4⭐️(58)', [2]);
+
+addMarker('ewha', [37.5621, 126.9470], '#00b894', 13,
+  '<b>梨花女子大學 (이화여대)</b> ⭐ 聲量#16<br>📍地鐵2號線 梨大站 2/3號出口<br>🎫 免費<br><br>🏛️ 歐式校園建築群<br>🍂 秋季銀杏大道（10月正好！）<br>💡 弘大站一站，Day2可加<br><br><a href="https://maps.google.com/?cid=17461418069866436621" target="_blank">google-url</a> 4.6⭐️(1,483)', []);
+
+addMarker('namdaemun', [37.5589, 126.9781], '#f39c12', 13,
+  '<b>南大門市場 (남대문시장)</b> ⭐ 聲量#17<br>📍地鐵4號線 會賢站 5號出口<br>🎫 免費<br>⏰ 早上較多攤開，下午部分休<br><br>🛍️ 首爾最大綜合傳統市場<br>👶 童裝批發超便宜<br>💡 在明洞旁，Day4逛完免稅店可走走<br><br><a href="https://maps.google.com/?cid=14787317685547704417" target="_blank">google-url</a> 4.2⭐️(28,320)', []);
+
+addMarker('cheonggyecheon', [37.5703, 126.9895], '#00b894', 11,
+  '<b>清溪川 (청계천)</b> ⭐ 聲量#19<br>📍 市廳站往東，光化門廣場旁<br>🎫 免費<br>⏰ 24H<br><br>💡 市中心河川步道，晚上燈光美<br>🚶 可步行從明洞方向散步過來<br><br><a href="https://maps.google.com/?cid=13656878272694669012" target="_blank">google-url</a> 4.6⭐️(10,980)', []);
+
+addMarker('lotteworld', [37.5113, 127.0980], '#00b894', 13,
+  '<b>樂天世界 / SEOUL SKY (롯데월드)</b> ⭐ 聲量#3/#18<br>📍地鐵2/8號線 蠶室站<br>🎫 樂天世界₩62,000 / SEOUL SKY₩29,000<br>⏰ 10:00-21:00<br><br>🎢 全球最大室內遊樂園<br>🏙️ SEOUL SKY：555m玻璃地板展望台<br>💡 較遠（地鐵約35分），需另排半天<br><br><a href="https://maps.google.com/?cid=4845295689137142680" target="_blank">google-url</a> 4.3⭐️(52,709)', []);
 
 // --- Route lines (per day) ---
 const routeLines = {};
 routeLines[1] = L.polyline([[37.4602, 126.4407], [37.5547, 126.9706], [37.5614, 126.9946]],
   { color: '#9b59b6', weight: 2, dashArray: '8,6', opacity: 0.6 }).bindPopup('Day 1：機場 → 首爾站 → 忠武路').addTo(map);
-routeLines[3] = L.polyline([[37.5614, 126.9946], [37.6530, 126.8920], [37.636, 126.832]],
+routeLines[3] = L.polyline([[37.5614, 126.9946], [37.6530, 126.8920], [37.6745, 126.7418]],
   { color: '#e74c3c', weight: 3, dashArray: '8,6', opacity: 0.7 }).bindPopup('Day 3：忠武路 → 三松(汗蒸幕) → 高陽(演唱會)<br><b>全程地鐵3號線直達！</b>').addTo(map);
 routeLines[0] = L.polyline([[37.5614, 126.9946], [37.5636, 126.9860]],
   { color: '#ffd369', weight: 2, opacity: 0.5 }).bindPopup('忠武路 → 明洞：步行 5~8 分鐘 / 地鐵4號線一站').addTo(map);
@@ -400,14 +459,69 @@ routeLines[5] = L.polyline([[37.5614, 126.9946], [37.5547, 126.9706], [37.4602, 
 const dayViews = {
   1: { center: [37.51, 126.72], zoom: 10 },
   2: { center: [37.555, 126.97], zoom: 13 },
-  3: { center: [37.61, 126.90], zoom: 12 },
+  3: { center: [37.62, 126.87], zoom: 11 },
   4: { center: [37.560, 126.99], zoom: 14 },
   5: { center: [37.51, 126.72], zoom: 10 },
 };
 
 let activeDay = null;
 
+// --- Legend category filter ---
+let activeFilter = null;
+
+function resetMarkers() {
+  Object.values(allMarkers).forEach(m => {
+    if (m.isStar) {
+      m.marker.setIcon(createStarIcon(m.color, false));
+    } else {
+      m.marker.setIcon(m.origIcon);
+    }
+    m.marker.setOpacity(1);
+    m.marker.setZIndexOffset(0);
+  });
+  Object.values(routeLines).forEach(line => line.setStyle({ opacity: 0.6, weight: 2 }));
+  routeLines[3] && routeLines[3].setStyle({ opacity: 0.7, weight: 3 });
+}
+
+function clearFilter() {
+  activeFilter = null;
+  document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
+}
+
+window.filterByCategory = function(colors, el) {
+  // 清掉日期選取狀態
+  activeDay = null;
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+
+  // 再點一次同類別 → 取消篩選
+  if (activeFilter === el) {
+    clearFilter();
+    resetMarkers();
+    return;
+  }
+  document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = el;
+
+  const bounds = [];
+  Object.values(allMarkers).forEach(m => {
+    const match = colors.includes(m.color);
+    if (m.isStar) {
+      m.marker.setIcon(createStarIcon(m.color, match));
+    } else {
+      m.marker.setIcon(match ? createHighlightIcon(m.color, Math.max((m.size || 12) * 1.5, 20), m.label) : m.origIcon);
+    }
+    m.marker.setOpacity(match ? 1 : 0.2);
+    m.marker.setZIndexOffset(match ? 1000 : 0);
+    if (match) bounds.push(m.pos);
+  });
+  Object.values(routeLines).forEach(line => line.setStyle({ opacity: 0.12, weight: 1 }));
+  if (bounds.length) map.flyToBounds(bounds, { padding: [60, 60], duration: 1.0, maxZoom: 14 });
+};
+
 window.flyToDay = function(day) {
+  // 清掉類別篩選狀態
+  clearFilter();
   // Toggle active day card
   document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
   const card = document.querySelectorAll('.day-card')[day - 1];
@@ -456,22 +570,11 @@ window.flyToDay = function(day) {
 
 // Reset on map click
 map.on('click', function() {
-  if (activeDay) {
+  if (activeDay || activeFilter) {
     activeDay = null;
     document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-    Object.values(allMarkers).forEach(m => {
-      if (m.isStar) {
-        m.marker.setIcon(createStarIcon(m.color, false));
-      } else {
-        m.marker.setIcon(m.origIcon);
-      }
-      m.marker.setOpacity(1);
-      m.marker.setZIndexOffset(0);
-    });
-    Object.values(routeLines).forEach(line => {
-      line.setStyle({ opacity: 0.6, weight: 2 });
-    });
-    routeLines[3] && routeLines[3].setStyle({ opacity: 0.7, weight: 3 });
+    clearFilter();
+    resetMarkers();
   }
 });
 
@@ -491,7 +594,7 @@ function addDistanceLabel(from, to, text, offset) {
 }
 
 addDistanceLabel([37.5614, 126.9946], [37.6530, 126.8920], '地鐵3號線 約50分', [0.005, 0.01]);
-addDistanceLabel([37.6530, 126.8920], [37.636, 126.832], '約15分', [0.008, 0]);
+addDistanceLabel([37.6530, 126.8920], [37.6745, 126.7418], '約15分', [0.008, 0]);
 addDistanceLabel([37.5614, 126.9946], [37.5636, 126.9860], '步行5分', [-0.003, 0]);
 addDistanceLabel([37.4602, 126.4407], [37.5547, 126.9706], 'AREX 43分', [0.01, 0]);
 </script>
