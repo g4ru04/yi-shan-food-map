@@ -117,7 +117,7 @@
   <!-- Legend (點擊類別可篩選地圖上的點，再點一次取消) -->
   <div class="legend">
     <div class="legend-item" onclick="filterByCategory(['#e94560','#ffd369'], this)"><div class="legend-dot" style="background:#e94560"></div>住宿選項</div>
-    <div class="legend-item" onclick="filterByCategory(['#00cec9'], this)"><div class="legend-dot" style="background:#00cec9"></div>住宿候選（Agoda 明洞周邊）</div>
+    <div class="legend-item" onclick="filterByCategory(['#00cec9'], this)"><div class="legend-dot" style="background:#00cec9"></div>住宿候選（Agoda / Google）</div>
     <div class="legend-item" onclick="filterByCategory(['#4a90d9'], this)"><div class="legend-dot" style="background:#4a90d9"></div>購物</div>
     <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>景點/體驗</div>
     <div class="legend-item" onclick="filterByCategory(['#f39c12'], this)"><div class="legend-dot" style="background:#f39c12"></div>美食</div>
@@ -368,6 +368,26 @@ addMarker('ag_philstay', [37.5630, 126.9856], '#00cec9', 11,
   '<b>Philstay Metro 菲斯得旅館｜Agoda 8.6⭐(786)</b><br>💰 每晚 NT$3,218（雙人房×2，專用衛浴，可連通）<br>📍 明洞站 235m<br>⚠️ 勿與 Philstay Myeongdong Station 混淆<br><br><a href="https://maps.google.com/?cid=17705841993082386719" target="_blank">google-url</a> 3.7⭐️(49)<br><a href="https://www.agoda.com/zh-tw/philstay-myeongdong-metro/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.6⭐️(786)', []);
 addMarker('ag_hiseoul', [37.5620, 126.9884], '#00cec9', 11,
   '<b>Hi Seoul Hostel West 嗨青旅西樓｜Agoda 9.0⭐(215)</b><br>💰 每晚 NT$3,773（標準雙床房×2，專用衛浴）<br>📍 明洞站 260m<br>✅ 符合條件，全私人房<br><br><a href="https://maps.google.com/?cid=12954755041017886097" target="_blank">google-url</a> 4.5⭐️(4)<br><a href="https://www.agoda.com/zh-tw/kkkkkkkk/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 9.0⭐️(215)', []);
+
+// --- Google 住宿候選（Google 4.0⭐+ 且 100 則評論以上，不列價格）---
+addMarker('gg_gridinn', [37.5697, 126.9913], '#00cec9', 12,
+  '<b>Grid Inn Hotel 格子旅館｜Google 4.5⭐(394)</b><br>📍 鐘路3街站附近<br>✅ 負評少且多為一年以上（建物老舊、房間小）<br><br><a href="https://maps.google.com/?cid=16007171005939749903" target="_blank">google-url</a> 4.5⭐️(394)<br><a href="https://www.agoda.com/zh-tw/grid-inn/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.8⭐️(4,223)', []);
+addMarker('gg_ara125', [37.5647, 126.9845], '#00cec9', 12,
+  '<b>ARA125｜Google 4.5⭐(124)</b><br>📍 明洞 9-gil，2/4 號線之間<br>✅ 負評少（建物老舊 CP 值疑慮，業主皆回覆）<br><br><a href="https://maps.google.com/?cid=17012858096202259162" target="_blank">google-url</a> 4.5⭐️(124)<br><a href="https://www.agoda.com/zh-tw/ara125/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 9.2⭐️(1,796)', []);
+addMarker('gg_towerville', [37.5580, 126.9857], '#00cec9', 11,
+  '<b>Seoul Tower Ville｜Google 4.3⭐(129)</b><br>📍 南山山腰，近明洞站<br>⚠️ 負評：清潔問題（床單/異味）、曾臨時取消訂單<br><br><a href="https://maps.google.com/?cid=13598028859656342416" target="_blank">google-url</a> 4.3⭐️(129)<br><a href="https://www.agoda.com/zh-tw/seoul-tower-ville/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.9⭐️(332)', []);
+addMarker('gg_tophotel', [37.5734, 126.9888], '#00cec9', 11,
+  '<b>Top Hotel & Residence｜Google 4.3⭐(170)</b><br>📍 鐘路3街站附近（仁寺洞）<br>⚠️ 負評：退款/改期不通融、連住不主動打掃<br><br><a href="https://maps.google.com/?cid=1682613842114438377" target="_blank">google-url</a> 4.3⭐️(170)<br><a href="https://www.agoda.com/zh-tw/top-hotel-n-residence-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.6⭐️(708)', []);
+addMarker('gg_coop', [37.5661, 127.0054], '#00cec9', 11,
+  '<b>乙支路高爺商業公寓｜Google 4.1⭐(923)</b><br>📍 東大門歷史文化公園站附近<br>⚠️ 負評：隔音差、打掃噪音與物品糾紛（皆為近期），樣本大仍算穩定<br><br><a href="https://maps.google.com/?cid=9791965815226934307" target="_blank">google-url</a> 4.1⭐️(923)<br><a href="https://www.agoda.com/zh-tw/uljiro-co-op-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.2⭐️(15,821)', []);
+addMarker('gg_mangrove', [37.5642, 127.0086], '#00cec9', 11,
+  '<b>Mangrove Dongdaemun｜Google 4.2⭐(111)</b><br>📍 東大門歷史文化公園站附近<br>⚠️ 負評：4 週前有臭蟲評論、冷氣不冷、退款政策爭議<br><br><a href="https://maps.google.com/?cid=5127845552124684421" target="_blank">google-url</a> 4.2⭐️(111)<br><a href="https://www.agoda.com/zh-tw/mangrove-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.9⭐️(7,626)', []);
+addMarker('gg_petercat', [37.5750, 126.9896], '#00cec9', 11,
+  '<b>Petercat Hotel Insadong｜Google 4.0⭐(156)</b><br>📍 仁寺洞/益善洞，近安國站<br>⚠️ 負評：地下室房潮濕霉味（近期重複提及）、實為青旅等級<br><br><a href="https://maps.google.com/?cid=11989291487100743675" target="_blank">google-url</a> 4.0⭐️(156)<br><a href="https://www.agoda.com/zh-tw/petercat-hotel-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.2⭐️(1,098)', []);
+addMarker('gg_hotelless', [37.5586, 126.9743], '#00cec9', 11,
+  '<b>Hotel Less Seoul｜Google 4.4⭐(336)</b><br>📍 首爾站/南大門旁<br>⚠️ 負評：近 3-5 個月 1 星密集（房小異味、浴室發霉、無櫃檯）<br><br><a href="https://maps.google.com/?cid=17565249391402494944" target="_blank">google-url</a> 4.4⭐️(336)<br><a href="https://www.agoda.com/zh-tw/seoul-station-youke-h10574925/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.0⭐️(2,141)', []);
+addMarker('gg_hanriver', [37.5360, 126.9454], '#00cec9', 11,
+  '<b>HAN River Residence & Guesthouse｜Google 4.2⭐(209)</b><br>📍 麻浦區，近孔德站（偏西）<br>⚠️ 負評：發霉毛髮衛生差、陡坡離地鐵遠<br><br><a href="https://maps.google.com/?cid=11607509092162957771" target="_blank">google-url</a> 4.2⭐️(209)<br><a href="https://www.agoda.com/zh-tw/han-river-residence-guesthouse-in-seoul/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD" target="_blank">agoda-url</a> 8.3⭐️(916)', []);
 
 // Shopping
 addMarker('chaakan_ss', [37.5446, 127.0540], '#4a90d9', 12,

@@ -57,6 +57,25 @@
 > ✅ = 完全符合條件。已排除：Namsan203 南山203（該日期只剩宿舍床位）；Hi Stay Myeongdong（9.0、離步行街 90m）已售完。
 > Agoda 價格會浮動，以上為查詢當下報價。
 
+### Google 住宿候選（Google 4.0⭐+ 且評論 ≥100 則）
+
+> 來自 Google Maps 住宿搜尋（10/6-10/10）。不列價格——Google 顯示價為 2 人 1 房，與 3 人 2 房需求不可直接比較，請點 Agoda 連結查實價。
+> 負評 = 各飯店「評分最低」前三則的重點整理。地圖上同為青色「住宿候選」類別。
+
+| 飯店 | Google 評分 | Agoda 評分 | 位置 | 最低評分負評重點 |
+|:---|:---|:---|:---|:---|
+| **Grid Inn Hotel 格子旅館** | [4.5⭐(394)](https://maps.google.com/?cid=16007171005939749903) | [8.8 (4,223)](https://www.agoda.com/zh-tw/grid-inn/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ✅ 負評少且多為一年以上（老舊、房小、曾被加價換房） |
+| **ARA125** | [4.5⭐(124)](https://maps.google.com/?cid=17012858096202259162) | [9.2 (1,796)](https://www.agoda.com/zh-tw/ara125/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 明洞 9-gil | ✅ 負評少（老舊 CP 值疑慮、曾臨時取消），業主皆回覆 |
+| Seoul Tower Ville | [4.3⭐(129)](https://maps.google.com/?cid=13598028859656342416) | [8.9 (332)](https://www.agoda.com/zh-tw/seoul-tower-ville/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 南山山腰，近明洞站 | ⚠️ 清潔問題（床單/異味）、曾臨時取消/趕客 |
+| Top Hotel & Residence | [4.3⭐(170)](https://maps.google.com/?cid=1682613842114438377) | [8.6 (708)](https://www.agoda.com/zh-tw/top-hotel-n-residence-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ⚠️ 退款/改期不通融、連住不主動打掃、淋浴無乾濕分離 |
+| 乙支路高爺商業公寓 | [4.1⭐(923)](https://maps.google.com/?cid=9791965815226934307) | [8.2 (15,821)](https://www.agoda.com/zh-tw/uljiro-co-op-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 隔音差、打掃噪音與物品糾紛（近期）；樣本大仍算穩定 |
+| Mangrove Dongdaemun | [4.2⭐(111)](https://maps.google.com/?cid=5127845552124684421) | [8.9 (7,626)](https://www.agoda.com/zh-tw/mangrove-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 4 週前有臭蟲評論、冷氣不冷、退款政策爭議 |
+| Petercat Hotel Insadong | [4.0⭐(156)](https://maps.google.com/?cid=11989291487100743675) | [8.2 (1,098)](https://www.agoda.com/zh-tw/petercat-hotel-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 仁寺洞，近安國站 | ⚠️ 地下室房潮濕霉味（近期重複提及）、實為青旅等級 |
+| Hotel Less Seoul | [4.4⭐(336)](https://maps.google.com/?cid=17565249391402494944) | [8.0 (2,141)](https://www.agoda.com/zh-tw/seoul-station-youke-h10574925/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 首爾站/南大門旁 | ⚠️ 近 3-5 個月 1 星密集（房小異味、浴室發霉、無櫃檯） |
+| HAN River Residence & Guesthouse | [4.2⭐(209)](https://maps.google.com/?cid=11607509092162957771) | [8.3 (916)](https://www.agoda.com/zh-tw/han-river-residence-guesthouse-in-seoul/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 麻浦區，近孔德站（偏西） | ⚠️ 發霉毛髮衛生差、陡坡離地鐵遠 |
+
+> Step Inn 明洞1 也在此 Google 名單中（4.1⭐(483)），已列於上方 Agoda 候選表。未達門檻落選：Hostel Haru 4.4(93)、Star Hostel 4.3(93)、SeouliteINN 4.0(74)。
+
 ---
 
 ## 每日行程
