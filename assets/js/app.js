@@ -72,10 +72,25 @@ async function uploadImage(file) {
   return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// 從公開網址刪除 bucket 內的原圖與縮圖（外部網址略過）；失敗不擋流程
+async function removeStoredImage(url) {
+  const marker = `/${BUCKET}/`;
+  const i = url ? url.indexOf(marker) : -1;
+  if (i === -1) return;
+  const path = url.slice(i + marker.length);
+  if (path.startsWith('thumbs/')) return;
+  try {
+    await sb.storage.from(BUCKET).remove([path, `thumbs/${path}`]);
+  } catch (err) {
+    console.warn('刪除舊圖失敗：', err);
+  }
+}
+
 let places = [];
 let mainMap, markerLayer;
 let pickMap, pickMarker;
 let editingId = null;
+let removeImageFlag = false;   // 編輯時按了「移除照片」
 let pendingImport = null;
 let onlyRestaurants = false;   // 篩選：只顯示餐廳
 let pickModeActive = false;    // 主地圖選座標模式
@@ -460,8 +475,10 @@ function renderList() {
 
 window.deletePlace = async function (id) {
   if (!confirm('確定要刪除這筆紀錄？')) return;
+  const p = places.find(x => x.id === id);
   const { error } = await sb.from(TABLE).delete().eq('id', id);
   if (error) return toast('刪除失敗：' + error.message, true);
+  if (p?.image_url) removeStoredImage(p.image_url);   // 連同 Storage 的原圖 + 縮圖一起刪
   closeDetail();
   toast('已刪除');
   loadPlaces();
@@ -499,8 +516,19 @@ document.querySelector('[name="review"]').addEventListener('input', e => {
 document.querySelector('[name="image"]').addEventListener('change', e => {
   const file = e.target.files[0];
   const prev = $('#image-preview');
-  if (file) { prev.src = URL.createObjectURL(file); prev.hidden = false; }
+  if (file) { prev.src = URL.createObjectURL(file); prev.hidden = false; removeImageFlag = false; }
   else { prev.hidden = true; prev.removeAttribute('src'); }
+  $('#btn-remove-image').hidden = prev.hidden;
+});
+
+// 移除照片：清掉已選檔案與預覽；編輯模式下存檔時會清空 image_url 並刪除舊圖檔
+$('#btn-remove-image').addEventListener('click', () => {
+  $('#place-form').image.value = '';
+  removeImageFlag = true;
+  const prev = $('#image-preview');
+  prev.hidden = true;
+  prev.removeAttribute('src');
+  $('#btn-remove-image').hidden = true;
 });
 
 $('#place-form').addEventListener('submit', async e => {
@@ -525,9 +553,10 @@ $('#place-form').addEventListener('submit', async e => {
     return toast('店名、緯度、經度為必填（在「其他資料」裡）', true);
   }
 
-  // 照片：有選新檔就上傳；編輯時沒選新檔則沿用舊圖
+  // 照片：有選新檔就上傳；編輯時沒選新檔則沿用舊圖；按過「移除照片」則清空
   const file = f.image.files[0];
-  if (editingId) rec.image_url = places.find(x => x.id === editingId)?.image_url ?? null;
+  const oldUrl = editingId ? (places.find(x => x.id === editingId)?.image_url ?? null) : null;
+  rec.image_url = removeImageFlag ? null : oldUrl;
   if (file) {
     const btn = $('#submit-btn');
     btn.disabled = true; btn.textContent = '上傳圖片中…';
@@ -543,6 +572,8 @@ $('#place-form').addEventListener('submit', async e => {
     ({ error } = await sb.from(TABLE).insert({ ...rec, author: currentUser() }));
   }
   if (error) return toast('儲存失敗：' + error.message, true);
+  // 照片被移除或替換：把舊的原圖 + 縮圖從 Storage 刪掉，避免佔空間
+  if (oldUrl && rec.image_url !== oldUrl) removeStoredImage(oldUrl);
   toast(editingId ? '已更新' : '已新增');
   resetForm();
   await loadPlaces();
@@ -560,6 +591,8 @@ function resetForm() {
   $('#cancel-edit').hidden = true;
   $('#image-preview').hidden = true;
   $('#image-preview').removeAttribute('src');
+  $('#btn-remove-image').hidden = true;
+  removeImageFlag = false;
   $('#place-form').classList.remove('editing');   // 回到新增模式（完整展開）
   $('#rating-row').prepend($('#rating-field'));    // 我的星等回到與 Google 星等同列
   $('#more-fields').open = true;
@@ -615,9 +648,11 @@ window.editPlace = async function (id) {
   f.is_restaurant.checked = p.is_restaurant !== false;   // null/undefined 視為餐廳
   f.is_closed.checked = p.is_closed === true;
   f.image.value = '';
+  removeImageFlag = false;
   const prev = $('#image-preview');
   if (p.image_url) { prev.src = p.image_url; prev.hidden = false; }
   else { prev.hidden = true; prev.removeAttribute('src'); }
+  $('#btn-remove-image').hidden = prev.hidden;
   $('#review-count').textContent = (p.review ?? '').length;
   editingId = id;
   f.classList.add('editing');        // 編輯模式：評價類置頂、其他資料收合

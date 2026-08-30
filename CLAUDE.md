@@ -17,6 +17,7 @@
 - DB 的 `image_url` 只存**原圖**網址；縮圖網址由 `thumbUrl()` 依路徑慣例推導（插入 `thumbs/`），**不要**為縮圖加 DB 欄位。
 - 列表與地圖 popup 的 `<img>` 一律：縮圖 src + `loading="lazy"` + `onerror` fallback 回原圖（`data-full` 屬性）。原圖只在詳細視窗載入。
 - 批次匯入的外部 `image_url` 沒有縮圖，靠 onerror fallback 自動退回原圖，不需特別處理。
+- **移除或替換照片、刪除紀錄時**，必須用 `removeStoredImage()` 把 bucket 裡的原圖與縮圖一併刪除，避免孤兒檔案佔空間。
 - 若發現 bucket 有缺縮圖的舊圖，跑 `bash scripts/generate-thumbs.sh` 補產（冪等，可重複執行）。
 
 背景：2026-08 曾因列表直接載入 200+ 張 full-size 圖（共 136MB）導致 render 極慢，故建立此機制。
