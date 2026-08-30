@@ -146,8 +146,10 @@
     <div class="legend-item" onclick="filterByCategory(['#4a90d9','#f39c12'], this)"><div class="legend-dot" style="background:#4a90d9"></div><div class="legend-dot" style="background:#f39c12"></div>購物 / 美食 ▾</div>
     <div class="sub-list" id="shopFoodList"></div>
     <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>岩盤浴</div>
-    <div class="legend-item" onclick="filterByCategory(['#e84393'], this)"><div class="legend-dot" style="background:#e84393"></div>指定購物（小飛人、CHAAKAN）</div>
-    <div class="legend-item" onclick="filterByCategory(['#00b894'], this)"><div class="legend-dot" style="background:#00b894"></div>熱門景點推薦（可加入行程）</div>
+    <div class="legend-item" onclick="filterByCategory(['#e84393'], this)"><div class="legend-dot" style="background:#e84393"></div>指定購物（小飛人、CHAAKAN）▾</div>
+    <div class="sub-list" id="designatedList"></div>
+    <div class="legend-item" onclick="filterByCategory(['#00b894'], this)"><div class="legend-dot" style="background:#00b894"></div>熱門景點推薦（可加入行程）▾</div>
+    <div class="sub-list" id="attractionList"></div>
   </div>
 
   <!-- Hotel (confirmed) -->
@@ -623,6 +625,10 @@ const priceLevels = {
   dakhanmari: '$$', honamjip: '$$', changhwadang: '$', goldpig: '$$',
   mddonkatsu: '$$', baekje: '$$', yeongyang: '$$', wangbijip: '$$$', yoogane: '$$',
   chungmu: '$$', isaac: '$', sulbing: '$$',
+  // 指定購物
+  chaakan_ss: '$', chaakan_hd: '$', chaakan_yn: '$', chaakan_kd: '$', chaakan_md: '$', chaakan_ss2: '$', markgonzales: '$$',
+  // 景點（有門票/消費的）
+  gyeongbokgung: '$', changdeokgung: '$', deoksugung: '$', nseoultower: '$$', changgyeong: '$', nanta: '$$$',
 };
 
 function markerName(m) {
@@ -630,16 +636,26 @@ function markerName(m) {
   return match ? match[1].replace(/<[^>]*>/g, '') : '';
 }
 
+// 各類別的二層列表容器
+const subLists = [
+  { colors: SHOP_FOOD_COLORS, id: 'shopFoodList' },
+  { colors: ['#00b894'], id: 'attractionList' },
+  { colors: ['#e84393'], id: 'designatedList' },
+];
+
 function hideSubList() {
-  const list = document.getElementById('shopFoodList');
-  list.classList.remove('open');
-  list.innerHTML = '';
+  subLists.forEach(({ id }) => {
+    const list = document.getElementById(id);
+    list.classList.remove('open');
+    list.innerHTML = '';
+  });
 }
 
 function renderSubList(colors) {
-  const list = document.getElementById('shopFoodList');
-  // 只有「購物 / 美食」類別顯示二層列表
-  if (!colors.some(c => SHOP_FOOD_COLORS.includes(c))) { hideSubList(); return; }
+  hideSubList();
+  const entry = subLists.find(e => colors.some(c => e.colors.includes(c)));
+  if (!entry) return;
+  const list = document.getElementById(entry.id);
   list.innerHTML = '';
   Object.entries(allMarkers)
     .filter(([, m]) => colors.includes(m.color))
