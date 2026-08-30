@@ -117,8 +117,8 @@
   <!-- Legend (點擊類別可篩選地圖上的點，再點一次取消) -->
   <div class="legend">
     <div class="legend-item" onclick="filterByCategory(['#ffd369'], this)"><div class="legend-dot" style="background:#ffd369"></div>我的住宿（M&LUCKY）</div>
-    <div class="legend-item" onclick="filterByCategory(['#9b59b6','#e74c3c'], this)"><div class="legend-dot" style="background:#9b59b6"></div><div class="legend-dot" style="background:#e74c3c"></div>機場/高陽體育館</div>
-    <div class="legend-item" onclick="filterByCategory(['#4a90d9','#f39c12'], this)"><div class="legend-dot" style="background:#4a90d9"></div><div class="legend-dot" style="background:#f39c12"></div>購物/美食</div>
+    <div class="legend-item" onclick="filterByCategory(['#9b59b6'], this)"><div class="legend-dot" style="background:#9b59b6"></div>機場 / 高陽體育館</div>
+    <div class="legend-item" onclick="filterByCategory(['#4a90d9','#f39c12'], this)"><div class="legend-dot" style="background:#4a90d9"></div><div class="legend-dot" style="background:#f39c12"></div>購物 / 美食</div>
     <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>岩盤浴</div>
     <div class="legend-item" onclick="filterByCategory(['#e84393'], this)"><div class="legend-dot" style="background:#e84393"></div>指定購物（小飛人、CHAAKAN）</div>
     <div class="legend-item" onclick="filterByCategory(['#00b894'], this)"><div class="legend-dot" style="background:#00b894"></div>熱門景點推薦（可加入行程）</div>
@@ -370,10 +370,10 @@ addMarker('aquafield', [37.6530, 126.8920], '#27ae60', 16,
   '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>扁柏木/多媒體藝術/雲端熱療室<br>5-9月有水上樂園<br><br><a href="https://maps.google.com/?cid=17404309354366294526" target="_blank">google-url</a> 4.3⭐️(3,784)', [3]);
 
 // Concert
-const concertMarker = L.marker([37.6745, 126.7418], { icon: createStarIcon('#e74c3c') })
+const concertMarker = L.marker([37.6745, 126.7418], { icon: createStarIcon('#9b59b6') })
   .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40<br><br><a href="https://maps.google.com/?cid=14855984331673672246" target="_blank">google-url</a> 4.5⭐️(1,195)')
   .addTo(map);
-allMarkers['concert'] = { marker: concertMarker, pos: [37.6745, 126.7418], color: '#e74c3c', size: 20, days: [3], isStar: true };
+allMarkers['concert'] = { marker: concertMarker, pos: [37.6745, 126.7418], color: '#9b59b6', size: 20, days: [3], isStar: true };
 
 // Extra spots (not in daily itinerary but worth visiting)
 addMarker('markgonzales', [37.5670, 127.0070], '#e84393', 14,
