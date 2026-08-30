@@ -140,7 +140,7 @@
 
 > CHAAKAN 優惠：出示按讚 Reels 享 8 折（至 2026.12.31）
 >
-> 🛍️ **明洞逛街補充**：品牌都集中在商圈內——Olive Young、大創、SPAO、MLB、Emis、Kodak、Åland、Butter、ABC Mart；下午茶可衝 **Hello Kitty Apple Café**（明洞站 6 號出口步行 3-5 分，10:00-22:00，3 樓有三麗鷗周邊店）
+> 🛍️ **明洞逛街補充**：品牌都集中在商圈內——Olive Young、大創、SPAO、MLB、Emis、Kodak、Åland、Butter、ABC Mart；下午茶可衝 **Hello Kitty Apple Café**（명동6길 15，明洞站 6 號出口步行 3-5 分，10:00-22:00，3 樓有三麗鷗周邊店）[3.9⭐(202)](https://maps.google.com/?cid=8375444824916994493)
 > 🛍️ 想買質感小眾包：**FERIA**（延南洞，Y2K 粉嫩系、約台幣萬元內）離弘大不遠可順路
 > 🍨 聖水甜點站：**Maman Gelato**（마망젤라또 성수점，연무장9길 8）義式冰淇淋 [地圖](https://www.google.com/maps/search/?api=1&query=마망젤라또+성수)
 > 🍽️ **明洞午餐口袋名單**：
