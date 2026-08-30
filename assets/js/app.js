@@ -42,7 +42,13 @@ async function compressImage(file, maxDim = 1600, quality = 0.82) {
   }
 }
 
-// 上傳圖片到 Supabase Storage，回傳公開網址
+// 原圖網址 → 縮圖網址（thumbs/ 路徑慣例）；外部網址沒有縮圖，原樣回傳
+function thumbUrl(url) {
+  if (!url || !url.includes(`/${BUCKET}/`) || url.includes(`/${BUCKET}/thumbs/`)) return url;
+  return url.replace(`/${BUCKET}/`, `/${BUCKET}/thumbs/`);
+}
+
+// 上傳圖片到 Supabase Storage（原圖 + thumbs/ 縮圖），回傳原圖公開網址
 async function uploadImage(file) {
   const out = await compressImage(file);
   const ext = (out.name.split('.').pop() || 'jpg').toLowerCase();
@@ -51,6 +57,18 @@ async function uploadImage(file) {
     cacheControl: '3600', upsert: false, contentType: out.type,
   });
   if (error) throw error;
+
+  // 縮圖（列表 / 地圖 popup 用）：失敗不擋流程，前端會 fallback 回原圖
+  try {
+    const thumb = await compressImage(file, 480, 0.75);
+    const { error: thumbErr } = await sb.storage.from(BUCKET).upload(`thumbs/${path}`, thumb, {
+      cacheControl: '3600', upsert: false, contentType: thumb.type,
+    });
+    if (thumbErr) console.warn('縮圖上傳失敗：', thumbErr.message);
+  } catch (err) {
+    console.warn('縮圖產生失敗：', err);
+  }
+
   return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
@@ -376,7 +394,7 @@ function renderMap() {
     m.bindPopup(`
       <div class="popup-name">${esc(p.name)}${p.category ? ` <span class="popup-cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="popup-cat closed">已歇業</span>' : ''}</div>
       <div class="popup-meta">乙珊評分 ${p.rating ?? '—'}★ · Google ${p.google_rating ?? '—'}★${p.author ? ` · ✍️ ${esc(p.author)}` : ''}</div>
-      ${p.image_url ? `<img class="popup-img" src="${esc(p.image_url)}" alt="${esc(p.name)}" />` : ''}
+      ${p.image_url ? `<img class="popup-img" src="${esc(thumbUrl(p.image_url))}" data-full="${esc(p.image_url)}" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.full" alt="${esc(p.name)}" />` : ''}
       <button class="btn small primary" onclick="openDetail(${p.id})">看詳細</button>
     `);
     m.addTo(markerLayer);
@@ -422,7 +440,7 @@ function renderList() {
   }
   c.innerHTML = list.map(p => `
     <div class="place-card">
-      ${p.image_url ? `<img class="pc-thumb" src="${esc(p.image_url)}" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
+      ${p.image_url ? `<img class="pc-thumb" src="${esc(thumbUrl(p.image_url))}" data-full="${esc(p.image_url)}" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.full" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
       <div class="pc-main">
         <h3>${esc(p.name)}${p.category ? ` <span class="badge cat">${esc(p.category)}</span>` : ''}${p.is_closed ? ' <span class="badge closed">已永久歇業</span>' : ''}</h3>
         <div class="pc-meta">
