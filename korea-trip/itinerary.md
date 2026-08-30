@@ -31,64 +31,6 @@
 
 > ⚠️ **注意**：飯店在巷弄內較難找、夜間巷子較暗，第一次前往建議跟著地圖走。
 
-<details>
-<summary><b>📁 其他住宿候選比較記錄（已定案，點擊展開）</b></summary>
-
-### Agoda 住宿候選（明洞周邊，10/6-10/10 查價）
-
-> 價格為 2 房 3 人「合計每晚價」，未含稅；條件：住客評分 9+、每晚 ≤NT$4,000、**私人房間（已排除宿舍床位型青旅）**
-> 住宿已定案為 M&LUCKY HOTEL，候選標記已從地圖移除。
-
-| 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
-|:---|:---|---:|:---|:---|:---|
-| **New Residence 明洞1臥室公寓** ✅ | [9.5 (112)](https://www.agoda.com/zh-tw/new-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,758 | 一整間公寓 27㎡ | 忠武路站 270m | [尚無評論](https://maps.google.com/?cid=18215224277514417073) |
-| **Hello Hostel 哈囉旅舍** ✅ | [9.0 (146)](https://www.agoda.com/zh-tw/hello-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,442 | 雙人房×2 | 鐘路3街站 166m | [4.7⭐(6)](https://maps.google.com/?cid=14596030933760014899) |
-| **Hi Seoul Hostel West 嗨青旅西樓** ✅ | [9.0 (215)](https://www.agoda.com/zh-tw/kkkkkkkk/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,773 | 標準雙床房×2（專用衛浴） | 明洞站 260m | [4.5⭐(4)](https://maps.google.com/?cid=12954755041017886097) |
-| Blueboat Hostel 藍船青旅 | 8.7 (1,450) | 2,171 | 四人房整間×2（⚠️共用衛浴） | 忠武路站 349m | [4.1⭐(105)](https://maps.google.com/?cid=3649670617261081019) |
-| Red Guesthouse 紅色民宿 | 8.7 (698) | 2,536 | 雙床房×2（⚠️共用衛浴） | 明洞步行街 597m | [4.2⭐(65)](https://maps.google.com/?cid=9310477123901132964) |
-| Sunshine Guesthouse 日出旅館 | 8.5 (5,605) | 2,877 | 無窗雙人房×2（含衛浴） | 明洞站 127m | [3.7⭐(95)](https://maps.google.com/?cid=16329441922843107233) |
-| Philstay Metro 菲斯得 | [8.6 (786)](https://www.agoda.com/zh-tw/philstay-myeongdong-metro/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,218 | 雙人房×2（專用衛浴，可連通） | 明洞站 235m | [3.7⭐(49)](https://maps.google.com/?cid=17705841993082386719) |
-| STEP INN 明洞1（含早餐） | [8.7 (8,144)](https://www.agoda.com/zh-tw/step-inn-myeongdong-1/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,297 | 上下舖雙床房×2（專用衛浴） | 乙支路入口站 326m | [4.1⭐(483)](https://maps.google.com/?cid=15412252306410982163) |
-| U Stay Hotel 明洞U住宿 | 8.9 (1,305) | 3,751 | 私人房 | 明洞站 214m | [4.3⭐(34)](https://maps.google.com/?cid=17403616988266923246) |
-| Ehwa 明洞梨花飯店（超預算） | 8.8 (2,351) | 4,487 | 私人房 | 明洞站 356m | [4.2⭐(247)](https://maps.google.com/?cid=5220744055339351074) |
-
-> ✅ = 完全符合條件。已排除：Namsan203 南山203（該日期只剩宿舍床位）；Hi Stay Myeongdong（9.0、離步行街 90m）已售完。
-> Agoda 價格會浮動，以上為查詢當下報價。
-
-### Google 住宿候選（Google 4.0⭐+ 且評論 ≥100 則）
-
-> 來自 Google Maps 住宿搜尋（10/6-10/10）。不列價格——Google 顯示價為 2 人 1 房，與 3 人 2 房需求不可直接比較，請點 Agoda 連結查實價。
-> 負評 = 各飯店「評分最低」前三則的重點整理。
-
-| 飯店 | Google 評分 | Agoda 評分 | 位置 | 最低評分負評重點 |
-|:---|:---|:---|:---|:---|
-| **Grid Inn Hotel 格子旅館** | [4.5⭐(394)](https://maps.google.com/?cid=16007171005939749903) | [8.8 (4,223)](https://www.agoda.com/zh-tw/grid-inn/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ✅ 負評少且多為一年以上（老舊、房小、曾被加價換房） |
-| **ARA125** | [4.5⭐(124)](https://maps.google.com/?cid=17012858096202259162) | [9.2 (1,796)](https://www.agoda.com/zh-tw/ara125/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 明洞 9-gil | ✅ 負評少（老舊 CP 值疑慮、曾臨時取消），業主皆回覆 |
-| Seoul Tower Ville | [4.3⭐(129)](https://maps.google.com/?cid=13598028859656342416) | [8.9 (332)](https://www.agoda.com/zh-tw/seoul-tower-ville/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 南山山腰，近明洞站 | ⚠️ 清潔問題（床單/異味）、曾臨時取消/趕客 |
-| Top Hotel & Residence | [4.3⭐(170)](https://maps.google.com/?cid=1682613842114438377) | [8.6 (708)](https://www.agoda.com/zh-tw/top-hotel-n-residence-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ⚠️ 退款/改期不通融、連住不主動打掃、淋浴無乾濕分離 |
-| 乙支路高爺商業公寓 | [4.1⭐(923)](https://maps.google.com/?cid=9791965815226934307) | [8.2 (15,821)](https://www.agoda.com/zh-tw/uljiro-co-op-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 隔音差、打掃噪音與物品糾紛（近期）；樣本大仍算穩定 |
-| Mangrove Dongdaemun | [4.2⭐(111)](https://maps.google.com/?cid=5127845552124684421) | [8.9 (7,626)](https://www.agoda.com/zh-tw/mangrove-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 4 週前有臭蟲評論、冷氣不冷、退款政策爭議 |
-| Petercat Hotel Insadong | [4.0⭐(156)](https://maps.google.com/?cid=11989291487100743675) | [8.2 (1,098)](https://www.agoda.com/zh-tw/petercat-hotel-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 仁寺洞，近安國站 | ⚠️ 地下室房潮濕霉味（近期重複提及）、實為青旅等級 |
-| Hotel Less Seoul | [4.4⭐(336)](https://maps.google.com/?cid=17565249391402494944) | [8.0 (2,141)](https://www.agoda.com/zh-tw/seoul-station-youke-h10574925/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 首爾站/南大門旁 | ⚠️ 近 3-5 個月 1 星密集（房小異味、浴室發霉、無櫃檯） |
-| HAN River Residence & Guesthouse | [4.2⭐(209)](https://maps.google.com/?cid=11607509092162957771) | [8.3 (916)](https://www.agoda.com/zh-tw/han-river-residence-guesthouse-in-seoul/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 麻浦區，近孔德站（偏西） | ⚠️ 發霉毛髮衛生差、陡坡離地鐵遠 |
-
-> Step Inn 明洞1 也在此 Google 名單中（4.1⭐(483)），已列於上方 Agoda 候選表。未達門檻落選：Hostel Haru 4.4(93)、Star Hostel 4.3(93)、SeouliteINN 4.0(74)。
-
-### 旅行社常用飯店 + 自選 Agoda 候選（2房3人查價，每晚未稅）
-
-> 旅行社三間目前無 KKday/Klook/雄獅/可樂/東南住宿券通路，低價通常只在機加酒打包內。
-
-| 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
-|:---|:---|---:|:---|:---|:---|
-| 🧳 Travelodge 明洞南山 | [8.0 (2,892)](https://www.agoda.com/zh-tw/staz-hotel-myeongdong-2_6/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,572 | 2房（2024 改裝） | 忠武路站 302m、明洞站 400m | [4.5⭐(1,019)](https://maps.google.com/?cid=630322660078184563) |
-| 🧳 Sollago 明洞索拉格 | [8.5 (4,394)](https://www.agoda.com/zh-tw/h44922485/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,476 | 2房 | 忠武路站 187m（離明洞街 958m） | [4.2⭐(457)](https://maps.google.com/?cid=13123391320938265983) |
-| 🧳 Travelodge 明洞乙支路 | [8.2 (9,902)](https://www.agoda.com/zh-tw/holiday-inn-express-seoul-euljiro_2/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,753 | 2房（前身 Holiday Inn Express） | 乙支路3街站 154m | [4.1⭐(2,126)](https://maps.google.com/?cid=11498262102837988543) |
-| Hotel Gaon Golden Park 東大門高金園 | [8.0 (4,042)](https://www.agoda.com/zh-tw/hotel-gaon-golden-park-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 1,741 | 標準雙床房×2（4折） | 東大門站 6-7 分，4號線 2 站到忠武路 | [3.7⭐(214)](https://maps.google.com/?cid=3689539941657439496) ⚠️偏低 |
-| Hotel Dada 大大飯店景福宮 | [8.4 (1,344)](https://www.agoda.com/zh-tw/jongno-dada-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,837 | 標準雙人房×2 | 仁寺洞，鐘路3街/安國站 5 分 | [3.8⭐(86)](https://maps.google.com/?cid=10628606984505931687) |
-| M & Lucky Hotel 鐘路 | [8.2 (1,292)](https://www.agoda.com/zh-tw/jongno-m-lucky-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,018 | 豪華房×2（23-27㎡ 房間大） | 鐘路3街站 3-4 分 | [3.9⭐(61)](https://maps.google.com/?cid=11810786878959819886) |
-| Traveler's A 旅行者A韓國旅舍 | [8.4 (170)](https://www.agoda.com/zh-tw/travelersa-seoul-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,551 | 雙床房×2（10㎡ 小房，庫存緊） | 乙支路4街站 3-4 分 | [3.8⭐(95)](https://maps.google.com/?cid=7442437490337350749) |
-
-</details>
 
 ---
 
@@ -282,26 +224,6 @@
 
 ---
 
-## 交通路線總覽
-
-> 首爾地鐵（지하철）= 台北捷運，用號碼和顏色區分路線
-> 營運時間：約 **05:30~23:40**，末班車後請用 Kakao T 叫車
-
-```
-鐘路3街站（地鐵1號線 深藍 / 3號線 橘線 / 5號線 紫線）
-│
-├── 步行約 15 分鐘 → 明洞 → 購物（或計程車 5 分鐘）
-├── 地鐵1號線（深藍線）→ 首爾站（3 站 7 分鐘）→ AREX 機場快線
-├── 地鐵3號線（橘線）→ 三松站（約 45 分鐘）→ AQUAFIELD 汗蒸幕
-├── 地鐵3號線（橘線）→ 鼎缽山站（約 50 分鐘）→ 高陽演唱會
-│
-└── 轉乘
-    ├── → 1號線至市廳轉 地鐵2號線（綠線）弘大入口（約 25 分鐘）→ 弘大購物
-    └── → 地鐵2號線（綠線）聖水（約 30 分鐘）→ 聖水逛街
-```
-
----
-
 ## 必裝 APP
 
 | APP | 用途 |
@@ -342,12 +264,115 @@
 
 - [ ] 護照
 - [ ] e-Arrival Card 電子入境卡（出發前 3 天內線上填，3 人都要）
-- [ ] 交通卡（出發前先辦好）
+- [ ] 交通卡：T-money 或 WOWPASS（抵達機場/地鐵站再辦即可，儲值只收現金）
 - [ ] 轉接頭（飯店有提供但建議自帶）
 - [ ] 下載所有 APP
 - [ ] 酷柏返點 LINE 加好友
 - [ ] CHAAKAN Reels 先按讚
 - [ ] KLOOK 訂房折扣碼記錄
+
+---
+
+## 其他資訊
+
+<details>
+<summary><b>🚇 交通（工具總覽、交通卡 T-money/WOWPASS、路線圖，點擊展開）</b></summary>
+
+### 交通工具總覽
+
+| 工具 | 說明 | 本次使用 |
+|------|------|----------|
+| 地鐵 🚇 | 首爾主力，像台北捷運，號碼＋顏色分線；營運約 05:30~23:40 | ✅ 主力（鐘路3街站 1/3/5 號線交會） |
+| 公車 🚌 | 路網很密，但站名多韓文、報站快，觀光客較難上手 | 🔺 本次行程全地鐵可達，用不到 |
+| 計程車 🚕 | 起跳約 ₩4,800，比台灣略貴；用 **Kakao T** 叫車免韓文溝通 | ✅ 演唱會散場備案、明洞短程 |
+| AREX 機場快線 ✈️ | 首爾站 ↔ 仁川機場直達車，對號座（至 T2 約 51 分） | ✅ Day 1 / Day 5 |
+
+### 交通卡：T-money / WOWPASS（韓版悠遊卡）
+
+- **T-money（티머니）**：嗶卡搭地鐵/公車/計程車、便利商店小額支付，用法同悠遊卡；機場、地鐵站售票機、CU/GS25 便利商店可買（空卡約 ₩2,500-4,000）
+- ⚠️ **儲值只收現金**（韓元）——和悠遊卡最大的差別
+- 地鐵 ↔ 公車 30 分內轉乘有優惠（免再付起跳費）
+- 💡 **建議直接辦 WOWPASS**（已列必裝 APP）：正面是台幣現金直接換韓元的儲值消費卡，背面內建 T-money——一張搞定換匯＋刷卡＋搭車；機場與主要地鐵站（含鐘路3街站）都有機台
+- 進出站都要嗶卡；車廂粉紅色博愛座空著也別坐（韓國人非常忌諱）
+
+### 路線總覽
+
+> 首爾地鐵（지하철）= 台北捷運，用號碼和顏色區分路線
+> 營運時間：約 **05:30~23:40**，末班車後請用 Kakao T 叫車
+
+```
+鐘路3街站（地鐵1號線 深藍 / 3號線 橘線 / 5號線 紫線）
+│
+├── 步行約 15 分鐘 → 明洞 → 購物（或計程車 5 分鐘）
+├── 地鐵1號線（深藍線）→ 首爾站（3 站 7 分鐘）→ AREX 機場快線
+├── 地鐵3號線（橘線）→ 三松站（約 45 分鐘）→ AQUAFIELD 汗蒸幕
+├── 地鐵3號線（橘線）→ 鼎缽山站（約 50 分鐘）→ 高陽演唱會
+│
+└── 轉乘
+    ├── → 1號線至市廳轉 地鐵2號線（綠線）弘大入口（約 25 分鐘）→ 弘大購物
+    └── → 地鐵2號線（綠線）聖水（約 30 分鐘）→ 聖水逛街
+```
+
+</details>
+
+<details>
+<summary><b>📁 住宿候選比較記錄（已定案，點擊展開）</b></summary>
+
+### Agoda 住宿候選（明洞周邊，10/6-10/10 查價）
+
+> 價格為 2 房 3 人「合計每晚價」，未含稅；條件：住客評分 9+、每晚 ≤NT$4,000、**私人房間（已排除宿舍床位型青旅）**
+> 住宿已定案為 M&LUCKY HOTEL，候選標記已從地圖移除。
+
+| 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
+|:---|:---|---:|:---|:---|:---|
+| **New Residence 明洞1臥室公寓** ✅ | [9.5 (112)](https://www.agoda.com/zh-tw/new-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,758 | 一整間公寓 27㎡ | 忠武路站 270m | [尚無評論](https://maps.google.com/?cid=18215224277514417073) |
+| **Hello Hostel 哈囉旅舍** ✅ | [9.0 (146)](https://www.agoda.com/zh-tw/hello-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,442 | 雙人房×2 | 鐘路3街站 166m | [4.7⭐(6)](https://maps.google.com/?cid=14596030933760014899) |
+| **Hi Seoul Hostel West 嗨青旅西樓** ✅ | [9.0 (215)](https://www.agoda.com/zh-tw/kkkkkkkk/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,773 | 標準雙床房×2（專用衛浴） | 明洞站 260m | [4.5⭐(4)](https://maps.google.com/?cid=12954755041017886097) |
+| Blueboat Hostel 藍船青旅 | 8.7 (1,450) | 2,171 | 四人房整間×2（⚠️共用衛浴） | 忠武路站 349m | [4.1⭐(105)](https://maps.google.com/?cid=3649670617261081019) |
+| Red Guesthouse 紅色民宿 | 8.7 (698) | 2,536 | 雙床房×2（⚠️共用衛浴） | 明洞步行街 597m | [4.2⭐(65)](https://maps.google.com/?cid=9310477123901132964) |
+| Sunshine Guesthouse 日出旅館 | 8.5 (5,605) | 2,877 | 無窗雙人房×2（含衛浴） | 明洞站 127m | [3.7⭐(95)](https://maps.google.com/?cid=16329441922843107233) |
+| Philstay Metro 菲斯得 | [8.6 (786)](https://www.agoda.com/zh-tw/philstay-myeongdong-metro/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,218 | 雙人房×2（專用衛浴，可連通） | 明洞站 235m | [3.7⭐(49)](https://maps.google.com/?cid=17705841993082386719) |
+| STEP INN 明洞1（含早餐） | [8.7 (8,144)](https://www.agoda.com/zh-tw/step-inn-myeongdong-1/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,297 | 上下舖雙床房×2（專用衛浴） | 乙支路入口站 326m | [4.1⭐(483)](https://maps.google.com/?cid=15412252306410982163) |
+| U Stay Hotel 明洞U住宿 | 8.9 (1,305) | 3,751 | 私人房 | 明洞站 214m | [4.3⭐(34)](https://maps.google.com/?cid=17403616988266923246) |
+| Ehwa 明洞梨花飯店（超預算） | 8.8 (2,351) | 4,487 | 私人房 | 明洞站 356m | [4.2⭐(247)](https://maps.google.com/?cid=5220744055339351074) |
+
+> ✅ = 完全符合條件。已排除：Namsan203 南山203（該日期只剩宿舍床位）；Hi Stay Myeongdong（9.0、離步行街 90m）已售完。
+> Agoda 價格會浮動，以上為查詢當下報價。
+
+### Google 住宿候選（Google 4.0⭐+ 且評論 ≥100 則）
+
+> 來自 Google Maps 住宿搜尋（10/6-10/10）。不列價格——Google 顯示價為 2 人 1 房，與 3 人 2 房需求不可直接比較，請點 Agoda 連結查實價。
+> 負評 = 各飯店「評分最低」前三則的重點整理。
+
+| 飯店 | Google 評分 | Agoda 評分 | 位置 | 最低評分負評重點 |
+|:---|:---|:---|:---|:---|
+| **Grid Inn Hotel 格子旅館** | [4.5⭐(394)](https://maps.google.com/?cid=16007171005939749903) | [8.8 (4,223)](https://www.agoda.com/zh-tw/grid-inn/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ✅ 負評少且多為一年以上（老舊、房小、曾被加價換房） |
+| **ARA125** | [4.5⭐(124)](https://maps.google.com/?cid=17012858096202259162) | [9.2 (1,796)](https://www.agoda.com/zh-tw/ara125/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 明洞 9-gil | ✅ 負評少（老舊 CP 值疑慮、曾臨時取消），業主皆回覆 |
+| Seoul Tower Ville | [4.3⭐(129)](https://maps.google.com/?cid=13598028859656342416) | [8.9 (332)](https://www.agoda.com/zh-tw/seoul-tower-ville/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 南山山腰，近明洞站 | ⚠️ 清潔問題（床單/異味）、曾臨時取消/趕客 |
+| Top Hotel & Residence | [4.3⭐(170)](https://maps.google.com/?cid=1682613842114438377) | [8.6 (708)](https://www.agoda.com/zh-tw/top-hotel-n-residence-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 鐘路3街站附近 | ⚠️ 退款/改期不通融、連住不主動打掃、淋浴無乾濕分離 |
+| 乙支路高爺商業公寓 | [4.1⭐(923)](https://maps.google.com/?cid=9791965815226934307) | [8.2 (15,821)](https://www.agoda.com/zh-tw/uljiro-co-op-residence/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 隔音差、打掃噪音與物品糾紛（近期）；樣本大仍算穩定 |
+| Mangrove Dongdaemun | [4.2⭐(111)](https://maps.google.com/?cid=5127845552124684421) | [8.9 (7,626)](https://www.agoda.com/zh-tw/mangrove-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 東大門歷史文化公園站 | ⚠️ 4 週前有臭蟲評論、冷氣不冷、退款政策爭議 |
+| Petercat Hotel Insadong | [4.0⭐(156)](https://maps.google.com/?cid=11989291487100743675) | [8.2 (1,098)](https://www.agoda.com/zh-tw/petercat-hotel-insadong/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 仁寺洞，近安國站 | ⚠️ 地下室房潮濕霉味（近期重複提及）、實為青旅等級 |
+| Hotel Less Seoul | [4.4⭐(336)](https://maps.google.com/?cid=17565249391402494944) | [8.0 (2,141)](https://www.agoda.com/zh-tw/seoul-station-youke-h10574925/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 首爾站/南大門旁 | ⚠️ 近 3-5 個月 1 星密集（房小異味、浴室發霉、無櫃檯） |
+| HAN River Residence & Guesthouse | [4.2⭐(209)](https://maps.google.com/?cid=11607509092162957771) | [8.3 (916)](https://www.agoda.com/zh-tw/han-river-residence-guesthouse-in-seoul/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 麻浦區，近孔德站（偏西） | ⚠️ 發霉毛髮衛生差、陡坡離地鐵遠 |
+
+> Step Inn 明洞1 也在此 Google 名單中（4.1⭐(483)），已列於上方 Agoda 候選表。未達門檻落選：Hostel Haru 4.4(93)、Star Hostel 4.3(93)、SeouliteINN 4.0(74)。
+
+### 旅行社常用飯店 + 自選 Agoda 候選（2房3人查價，每晚未稅）
+
+> 旅行社三間目前無 KKday/Klook/雄獅/可樂/東南住宿券通路，低價通常只在機加酒打包內。
+
+| 飯店 | Agoda 評分 | 每晚 | 房型 | 位置 | Google 評分 |
+|:---|:---|---:|:---|:---|:---|
+| 🧳 Travelodge 明洞南山 | [8.0 (2,892)](https://www.agoda.com/zh-tw/staz-hotel-myeongdong-2_6/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,572 | 2房（2024 改裝） | 忠武路站 302m、明洞站 400m | [4.5⭐(1,019)](https://maps.google.com/?cid=630322660078184563) |
+| 🧳 Sollago 明洞索拉格 | [8.5 (4,394)](https://www.agoda.com/zh-tw/h44922485/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,476 | 2房 | 忠武路站 187m（離明洞街 958m） | [4.2⭐(457)](https://maps.google.com/?cid=13123391320938265983) |
+| 🧳 Travelodge 明洞乙支路 | [8.2 (9,902)](https://www.agoda.com/zh-tw/holiday-inn-express-seoul-euljiro_2/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 6,753 | 2房（前身 Holiday Inn Express） | 乙支路3街站 154m | [4.1⭐(2,126)](https://maps.google.com/?cid=11498262102837988543) |
+| Hotel Gaon Golden Park 東大門高金園 | [8.0 (4,042)](https://www.agoda.com/zh-tw/hotel-gaon-golden-park-dongdaemun/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 1,741 | 標準雙床房×2（4折） | 東大門站 6-7 分，4號線 2 站到忠武路 | [3.7⭐(214)](https://maps.google.com/?cid=3689539941657439496) ⚠️偏低 |
+| Hotel Dada 大大飯店景福宮 | [8.4 (1,344)](https://www.agoda.com/zh-tw/jongno-dada-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,837 | 標準雙人房×2 | 仁寺洞，鐘路3街/安國站 5 分 | [3.8⭐(86)](https://maps.google.com/?cid=10628606984505931687) |
+| M & Lucky Hotel 鐘路 | [8.2 (1,292)](https://www.agoda.com/zh-tw/jongno-m-lucky-hotel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 3,018 | 豪華房×2（23-27㎡ 房間大） | 鐘路3街站 3-4 分 | [3.9⭐(61)](https://maps.google.com/?cid=11810786878959819886) |
+| Traveler's A 旅行者A韓國旅舍 | [8.4 (170)](https://www.agoda.com/zh-tw/travelersa-seoul-hostel/hotel/seoul-kr.html?checkIn=2026-10-06&checkOut=2026-10-10&rooms=2&adults=3&children=0&currencyCode=TWD) | 2,551 | 雙床房×2（10㎡ 小房，庫存緊） | 乙支路4街站 3-4 分 | [3.8⭐(95)](https://maps.google.com/?cid=7442437490337350749) |
+
+</details>
 
 ---
 
