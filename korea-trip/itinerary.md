@@ -224,6 +224,29 @@
 
 ---
 
+## 購物 / 美食推薦（未排入行程）
+
+> 2026 熱門新增，都在既有行程的區域內可順路；地圖上點「購物 / 美食」類別可展開店家列表
+
+| 店家 | 類型 | 區域 | 招牌 / 價位 | 營業時間 | 地圖 |
+|:---|:---|:---|:---|:---|:---|
+| TAMBURINS 聖水旗艦店 | 🛍️ 香氛美妝 | 聖水 | Jennie 代言：護手霜 ₩24,000、香水 ₩120,000+ | 12:00-21:00 無休 | [連結](https://www.google.com/maps/search/?api=1&query=탬버린즈+성수) |
+| ADER ERROR 聖水空間 | 🛍️ 潮流服飾 | 聖水 | 帽 T ₩100,000+、小物 ₩30,000+ | 11:00-21:00 | [連結](https://www.google.com/maps/search/?api=1&query=아더+성수스페이스) |
+| Point of View | 🛍️ 文創文具 | 聖水 | 筆記本/鋼筆/香氛蠟 ₩5,000-50,000 | 12:00-20:00 | [連結](https://www.google.com/maps/search/?api=1&query=포인트오브뷰+성수) |
+| Object 西橋店 | 🛍️ 文創選物 | 弘大 | 4 層樓獨立作家貼紙/袋物 ₩3,000-40,000 | 12:00-21:00 | [連結](https://www.google.com/maps/search/?api=1&query=오브젝트+서교점) |
+| DOOTA Mall | 🛍️ 夜間商場 | 東大門 | K-fashion/美妝，開到午夜 | 約 10:30-24:00 | [連結](https://www.google.com/maps/search/?api=1&query=두타몰) |
+| 大林倉庫 | ☕ 倉庫咖啡 | 聖水 | 咖啡 ₩7,000-17,000，4.2⭐(2,000+) | 11:00-22:00 | [連結](https://www.google.com/maps/search/?api=1&query=대림창고) |
+| 倫敦貝果博物館 安國店 | 🥯 爆紅貝果 | 安國（飯店步行圈） | 蔥花奶油貝果 ₩4,500-7,500，4.2⭐ | 07:30-19:00 ⚠️要排隊 | [連結](https://www.google.com/maps/search/?api=1&query=런던베이글뮤지엄+안국) |
+| Cafe Knotted 安國店 | 🍩 奶油甜甜圈 | 安國 | ₩3,000-3,800/個 | 10:00-21:00 | [連結](https://www.google.com/maps/search/?api=1&query=카페노티드+안국) |
+| 溫泉集 益善店 | 🍲 韓屋壽喜燒 | 益善洞（飯店旁） | 壽喜燒 ₩25,000-33,000/人，溫泉造景好拍 | 11:30-21:30（休 15-17 時）建議預約 | [連結](https://www.google.com/maps/search/?api=1&query=온천집+익선) |
+| Cafe Layered 延南店 | 🫖 英式司康 | 延南（弘大順路） | 司康 ₩5,200 起 | 約 10:00-22:00 | [連結](https://www.google.com/maps/search/?api=1&query=카페+레이어드+연남점) |
+| 加美谷手工王餃子 | 🥟 40 年老店 | 南大門 | 王餃子 5 個約 ₩5,000-6,000 | 約 08:00-19:30 ⚠️週日休 | [連結](https://www.google.com/maps/search/?api=1&query=가메골손왕만두) |
+
+> 💡 聖水 4 家（TAMBURINS、ADER ERROR、Point of View、大林倉庫）都在연무장길步行圈，可和 Day 2 꿉당/CHAAKAN 聖水店排同個半天。
+> ⚠️ NUDAKE 聖水店已歇業（只剩島山店），勿前往。
+
+---
+
 ## 必裝 APP
 
 | APP | 用途 |

@@ -67,6 +67,19 @@
     width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; flex-shrink: 0;
   }
 
+  /* 二層店家列表（購物/美食） */
+  .sub-list { display: none; margin: 4px 0 8px 20px; border-left: 2px solid #1f3a5f; }
+  .sub-list.open { display: block; }
+  .sub-item {
+    display: flex; align-items: center; font-size: 12px; color: #bbb;
+    padding: 4px 8px; cursor: pointer; border-radius: 6px; transition: background 0.2s;
+  }
+  .sub-item:hover { background: #16213e; color: #fff; }
+  .sub-item.active { background: #1f3a5f; color: #ffd369; font-weight: 700; }
+  .sub-item .sub-dot {
+    width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink: 0;
+  }
+
   .tip-box {
     background: #0f3460; border-radius: 8px; padding: 12px; margin: 8px 0;
     font-size: 12px; line-height: 1.7; color: #ccc;
@@ -126,7 +139,8 @@
   <div class="legend">
     <div class="legend-item" onclick="filterByCategory(['#ffd369'], this)"><div class="legend-dot" style="background:#ffd369"></div>我的住宿（M&LUCKY）</div>
     <div class="legend-item" onclick="filterByCategory(['#9b59b6'], this)"><div class="legend-dot" style="background:#9b59b6"></div>機場 / 高陽體育館</div>
-    <div class="legend-item" onclick="filterByCategory(['#4a90d9','#f39c12'], this)"><div class="legend-dot" style="background:#4a90d9"></div><div class="legend-dot" style="background:#f39c12"></div>購物 / 美食</div>
+    <div class="legend-item" onclick="filterByCategory(['#4a90d9','#f39c12'], this)"><div class="legend-dot" style="background:#4a90d9"></div><div class="legend-dot" style="background:#f39c12"></div>購物 / 美食 ▾</div>
+    <div class="sub-list" id="shopFoodList"></div>
     <div class="legend-item" onclick="filterByCategory(['#27ae60'], this)"><div class="legend-dot" style="background:#27ae60"></div>岩盤浴</div>
     <div class="legend-item" onclick="filterByCategory(['#e84393'], this)"><div class="legend-dot" style="background:#e84393"></div>指定購物（小飛人、CHAAKAN）</div>
     <div class="legend-item" onclick="filterByCategory(['#00b894'], this)"><div class="legend-dot" style="background:#00b894"></div>熱門景點推薦（可加入行程）</div>
@@ -439,6 +453,30 @@ addMarker('namdaemun', [37.5589, 126.9781], '#f39c12', 13,
 addMarker('cheonggyecheon', [37.5703, 126.9895], '#00b894', 11,
   '<b>清溪川 (청계천)</b> ⭐ 聲量#19<br>📍 市廳站往東，光化門廣場旁<br>🎫 免費<br>⏰ 24H<br><br>💡 市中心河川步道，晚上燈光美<br>✅ 已排入 Day 3 上午散步 / Day 4 夜燈選項（飯店步行 5 分）<br><br><a href="https://maps.google.com/?cid=13656878272694669012" target="_blank">google-url</a> 4.6⭐️(10,980)', [3,4]);
 
+// 購物 / 美食推薦（未排入行程，2026 研究新增）
+addMarker('tamburins', [37.5423, 127.0517], '#4a90d9', 12,
+  '<b>TAMBURINS 聖水旗艦店</b><br>탬버린즈 성수<br>Jennie 代言香氛美妝：護手霜約 ₩24,000、香水 ₩120,000+<br>⏰ 12:00-21:00 無休<br>📍 연무장5길 8（꿉당/大林倉庫同街區）<br><br><a href="https://www.google.com/maps/search/?api=1&query=탬버린즈+성수" target="_blank">google-url</a>', []);
+addMarker('adererror', [37.5410, 127.0568], '#4a90d9', 12,
+  '<b>ADER ERROR 聖水空間</b><br>아더 성수스페이스<br>潮流服飾：帽 T ₩100,000+、小物 ₩30,000+<br>⏰ 11:00-21:00<br>📍 성수이로 82<br><br><a href="https://www.google.com/maps/search/?api=1&query=아더+성수스페이스" target="_blank">google-url</a>', []);
+addMarker('pointofview', [37.5419, 127.0532], '#4a90d9', 11,
+  '<b>Point of View 聖水</b><br>포인트오브뷰<br>文創文具選物：筆記本/鋼筆/香氛蠟 ₩5,000-50,000<br>⏰ 12:00-20:00（每月最後週一休）<br>📍 연무장길 18<br><br><a href="https://www.google.com/maps/search/?api=1&query=포인트오브뷰+성수" target="_blank">google-url</a>', []);
+addMarker('objectseogyo', [37.5553, 126.9230], '#4a90d9', 11,
+  '<b>Object 西橋店（弘大）</b><br>오브젝트 서교점<br>4 層樓文創選物：獨立作家貼紙/袋物/雜貨 ₩3,000-40,000<br>⏰ 12:00-21:00<br>📍 와우산로35길 13<br><br><a href="https://www.google.com/maps/search/?api=1&query=오브젝트+서교점" target="_blank">google-url</a>', []);
+addMarker('doota', [37.5689, 127.0090], '#4a90d9', 12,
+  '<b>DOOTA Mall（東大門）</b><br>두타몰<br>夜間綜合商場：K-fashion/美妝，開到午夜<br>⏰ 約 10:30-24:00<br>💡 東大門夜逛以 DOOTA 為主（apM 已改批發）<br><br><a href="https://www.google.com/maps/search/?api=1&query=두타몰" target="_blank">google-url</a>', []);
+addMarker('daelim', [37.5416, 127.0559], '#f39c12', 12,
+  '<b>大林倉庫（聖水）</b><br>대림창고<br>倉庫改建咖啡＋藝廊，聖水地標<br>咖啡 ₩7,000-17,000<br>⏰ 11:00-22:00<br><br><a href="https://www.google.com/maps/search/?api=1&query=대림창고" target="_blank">google-url</a> 4.2⭐️(2,000+)', []);
+addMarker('londonbagel', [37.5789, 126.9850], '#f39c12', 12,
+  '<b>倫敦貝果博物館 安國店</b><br>런던베이글뮤지엄 안국<br>爆紅貝果：蔥花奶油/鹽麵包貝果 ₩4,500-7,500<br>⏰ 07:30-19:00（售完提早關）⚠️要排隊，建議開店前到<br><br><a href="https://www.google.com/maps/search/?api=1&query=런던베이글뮤지엄+안국" target="_blank">google-url</a> 4.2⭐️(3,000+)', []);
+addMarker('knotted', [37.5770, 126.9850], '#f39c12', 11,
+  '<b>Cafe Knotted 安國店</b><br>카페노티드 안국<br>IG 爆紅奶油甜甜圈 ₩3,000-3,800/個<br>⏰ 10:00-21:00（LO 20:30）<br><br><a href="https://www.google.com/maps/search/?api=1&query=카페노티드+안국" target="_blank">google-url</a>', []);
+addMarker('oncheonjip', [37.5741, 126.9902], '#f39c12', 12,
+  '<b>溫泉集 益善店</b><br>온천집 익선<br>韓屋日式涮涮鍋/壽喜燒（溫泉造景超好拍）<br>壽喜燒 ₩25,000-33,000/人<br>⏰ 11:30-21:30（休 15:00-17:00）建議 Catchtable 預約<br>📍 飯店旁益善洞內<br><br><a href="https://www.google.com/maps/search/?api=1&query=온천집+익선" target="_blank">google-url</a>', []);
+addMarker('layered', [37.5629, 126.9256], '#f39c12', 11,
+  '<b>Cafe Layered 延南店</b><br>카페 레이어드 연남점<br>英式司康 ₩5,200 起、蛋糕 ₩8,000+<br>⏰ 約 10:00-22:00<br>📍 延南洞（弘大順路）<br><br><a href="https://www.google.com/maps/search/?api=1&query=카페+레이어드+연남점" target="_blank">google-url</a>', []);
+addMarker('gamegol', [37.5595, 126.9776], '#f39c12', 11,
+  '<b>加美谷手工王餃子（南大門）</b><br>가메골손왕만두<br>40 年老店：王餃子 5 個約 ₩5,000-6,000<br>⏰ 約 08:00-19:30 ⚠️週日休（10/9 週五 OK）<br><br><a href="https://www.google.com/maps/search/?api=1&query=가메골손왕만두" target="_blank">google-url</a>', []);
+
 // --- Route lines (per day) ---
 const routeLines = {};
 routeLines[1] = L.polyline([[37.4602, 126.4407], [37.5547, 126.9706], [37.5713, 126.9909]],
@@ -507,6 +545,45 @@ function resetMarkers() {
 function clearFilter() {
   activeFilter = null;
   document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
+  hideSubList();
+}
+
+// --- 二層店家列表（購物/美食） ---
+const SHOP_FOOD_COLORS = ['#4a90d9', '#f39c12'];
+
+function markerName(m) {
+  const match = (m.popup || '').match(/<b>(.*?)<\/b>/);
+  return match ? match[1].replace(/<[^>]*>/g, '') : '';
+}
+
+function hideSubList() {
+  const list = document.getElementById('shopFoodList');
+  list.classList.remove('open');
+  list.innerHTML = '';
+}
+
+function renderSubList(colors) {
+  const list = document.getElementById('shopFoodList');
+  // 只有「購物 / 美食」類別顯示二層列表
+  if (!colors.some(c => SHOP_FOOD_COLORS.includes(c))) { hideSubList(); return; }
+  list.innerHTML = '';
+  Object.entries(allMarkers)
+    .filter(([, m]) => colors.includes(m.color))
+    .sort((a, b) => a[1].color === b[1].color ? markerName(a[1]).localeCompare(markerName(b[1]), 'zh-Hant') : (a[1].color === '#4a90d9' ? -1 : 1))
+    .forEach(([id, m]) => {
+      const item = document.createElement('div');
+      item.className = 'sub-item';
+      item.innerHTML = `<div class="sub-dot" style="background:${m.color}"></div>${markerName(m)}`;
+      item.onclick = (e) => {
+        e.stopPropagation();
+        list.querySelectorAll('.sub-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        map.flyTo(m.pos, 16, { duration: 0.8 });
+        m.marker.openPopup();
+      };
+      list.appendChild(item);
+    });
+  list.classList.add('open');
 }
 
 window.filterByCategory = function(colors, el) {
@@ -537,6 +614,7 @@ window.filterByCategory = function(colors, el) {
     if (match) bounds.push(m.pos);
   });
   Object.values(routeLines).forEach(line => line.setStyle({ opacity: 0.12, weight: 1 }));
+  renderSubList(colors);
   if (bounds.length) map.flyToBounds(bounds, { padding: [60, 60], duration: 1.0, maxZoom: 14 });
 };
 
