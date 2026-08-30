@@ -98,6 +98,16 @@
   /* Map */
   #map { flex: 1; height: 100vh; }
 
+  /* Locate button (仿 Google Maps) */
+  .locate-btn {
+    width: 40px; height: 40px; background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .locate-btn:hover { background: #f5f5f5; }
+  .locate-btn svg { width: 22px; height: 22px; fill: #666; }
+  .locate-btn.active svg { fill: #4285f4; }
+
   /* Responsive */
   @media (max-width: 900px) {
     body { flex-direction: column; }
@@ -606,6 +616,38 @@ addDistanceLabel([37.5614, 126.9946], [37.6530, 126.8920], '地鐵3號線 約50�
 addDistanceLabel([37.6530, 126.8920], [37.6745, 126.7418], '約15分', [0.008, 0]);
 addDistanceLabel([37.5614, 126.9946], [37.5636, 126.9860], '步行5分', [-0.003, 0]);
 addDistanceLabel([37.4602, 126.4407], [37.5547, 126.9706], 'AREX 直達 T2 約51分', [0.01, 0]);
+
+// --- 我的位置（仿 Google Maps 定位鈕，右下角） ---
+let userMarker = null, userCircle = null;
+const locateControl = L.control({ position: 'bottomright' });
+locateControl.onAdd = function() {
+  const btn = L.DomUtil.create('div', 'locate-btn');
+  btn.title = '顯示我的位置';
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
+  L.DomEvent.disableClickPropagation(btn);
+  L.DomEvent.on(btn, 'click', () => {
+    btn.classList.add('active');
+    map.locate({ setView: true, maxZoom: 15, enableHighAccuracy: true });
+  });
+  return btn;
+};
+locateControl.addTo(map);
+
+map.on('locationfound', e => {
+  if (userMarker) map.removeLayer(userMarker);
+  if (userCircle) map.removeLayer(userCircle);
+  userCircle = L.circle(e.latlng, {
+    radius: Math.min(e.accuracy, 500), color: '#4285f4', weight: 1,
+    opacity: 0.4, fillColor: '#4285f4', fillOpacity: 0.12, interactive: false
+  }).addTo(map);
+  userMarker = L.circleMarker(e.latlng, {
+    radius: 8, color: '#fff', weight: 3, fillColor: '#4285f4', fillOpacity: 1
+  }).addTo(map).bindPopup('📍 你的位置');
+});
+map.on('locationerror', e => {
+  document.querySelector('.locate-btn')?.classList.remove('active');
+  alert('無法取得位置：請確認已允許瀏覽器取得定位權限');
+});
 </script>
 
 </body>
