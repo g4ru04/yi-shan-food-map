@@ -108,6 +108,7 @@
 - [ ] 交通卡：T-money 或 WOWPASS（抵達機場/地鐵站再辦即可，儲值只收現金）
 - [ ] 轉接頭
 - [ ] 下載所有 APP
+- [ ] Catchtable 註冊（韓國餐廳訂位，需手機驗證，台灣先辦好）
 - [ ] 酷柏返點 LINE 加好友
 - [ ] CHAAKAN Reels 先按讚
 - [ ] KLOOK 折扣碼「Jessielovefood」95 折
