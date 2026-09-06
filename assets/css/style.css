@@ -109,7 +109,7 @@ body {
 .badge.closed { background: #fdecec; color: #c0392b; }
 
 /* ---------- List ---------- */
-.list-container { padding: 0 24px 32px; display: flex; flex-direction: column; gap: 12px; }
+.list-container { padding: 0 24px 32px; display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
 .place-card {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 14px; padding: 16px 18px;
@@ -136,8 +136,12 @@ body {
   border-radius: 16px;
 }
 .section-card > summary::-webkit-details-marker { display: none; }
-.section-card > summary::before { content: '▸'; color: var(--primary); font-size: 13px; }
-.section-card[open] > summary::before { content: '▾'; }
+/* 收合箭頭：展開時轉 90 度指下 */
+.section-card > summary::before {
+  content: '▶'; color: var(--primary); font-size: 15px; line-height: 1;
+  display: inline-block; transform-origin: 50% 50%; transition: transform .18s ease;
+}
+.section-card[open] > summary::before { transform: rotate(90deg); }
 .section-card[open] > summary { border-bottom: 1px solid var(--border); border-radius: 16px 16px 0 0; }
 .section-card > summary:hover { background: #fffaf5; }
 .sec-title { font-size: 16px; font-weight: 700; }
@@ -224,22 +228,19 @@ textarea { resize: vertical; }
 .pending-actions { display: flex; gap: 6px; }
 .pending-actions .btn { margin: 0; }
 
-.pending-list { display: flex; flex-direction: column; gap: 8px; }
-.pending-item {
-  display: flex; align-items: center; gap: 10px;
-  border: 1px solid var(--border); border-radius: 10px;
-  padding: 8px 10px; background: #fffdfb;
+/* 待處理板：一行一筆的純文字，直接全選複製 */
+.pending-board {
+  width: 100%; margin: 0; padding: 12px 14px;
+  border: 1px solid var(--border); border-radius: 10px; background: #fffdfb;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px; line-height: 1.8; color: #5a4d40;
+  resize: vertical; white-space: pre; overflow-x: auto;
 }
-.pending-item .pi-main { flex: 1; min-width: 0; }
-.pending-item .pi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
-.pending-item .pi-time { font-size: 13px; font-weight: 600; color: var(--text); }
-.pending-item .pi-note { font-size: 12px; color: var(--muted); }
-.pending-item .pi-url {
-  display: block; font-size: 12px; color: #1a73e8; text-decoration: none;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.pending-item .pi-url:hover { text-decoration: underline; }
-.pending-item .btn { margin: 0; flex-shrink: 0; }
+.pending-board:focus { outline: none; border-color: var(--primary); }
+
+/* ---------- 造訪列表：年份 + 四季分區 ---------- */
+.season-group .section-body { display: flex; flex-direction: column; gap: 12px; }
+.season-group .sec-sub { margin-left: auto; }
 
 /* ---------- Modal ---------- */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }

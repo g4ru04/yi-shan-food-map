@@ -6,6 +6,8 @@ const sb = supabase.createClient(CFG.url, CFG.key);
 const TABLE = CFG.table || 'places';
 const BUCKET = CFG.bucket || 'place-photos';
 const TAIWAN = [23.97, 120.97];
+// 地圖預設視野（Google Maps 網址格式：@24.1515728,120.6461127,11.8z）
+const DEFAULT_VIEW = { center: [24.1515728, 120.6461127], zoom: 11.8 };
 
 // 上傳前壓縮：等比縮到最長邊 maxDim、重新編碼成 JPEG
 async function compressImage(file, maxDim = 1600, quality = 0.82) {
@@ -93,6 +95,7 @@ let editingId = null;
 let removeImageFlag = false;   // 編輯時按了「移除照片」
 let onlyRestaurants = false;   // 篩選：只顯示餐廳
 let pickModeActive = false;    // 主地圖選座標模式
+let firstMapRender = true;     // 第一次畫地圖不要 fitBounds（保留預設視野）
 
 // 套用篩選後要顯示的資料
 function visiblePlaces() {
@@ -387,7 +390,8 @@ $$('.filter-toggle').forEach(cb => cb.addEventListener('change', e => {
 
 // ---------- 1) 地圖 ----------
 function initMainMap() {
-  mainMap = L.map('map', { doubleClickZoom: false }).setView(TAIWAN, 7);
+  mainMap = L.map('map', { doubleClickZoom: false, zoomSnap: 0.1 })
+    .setView(DEFAULT_VIEW.center, DEFAULT_VIEW.zoom);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap',
@@ -450,7 +454,9 @@ function renderMap() {
     m.addTo(markerLayer);
     pts.push([p.lat, p.lon]);
   });
-  if (pts.length) mainMap.fitBounds(pts, { padding: [50, 50], maxZoom: 15 });
+  // 首次載入維持 DEFAULT_VIEW；之後重畫（切篩選、新增/刪除後）才自動框住所有點
+  if (pts.length && !firstMapRender) mainMap.fitBounds(pts, { padding: [50, 50], maxZoom: 15 });
+  firstMapRender = false;
 }
 
 // ---------- 詳細視窗 ----------
@@ -481,14 +487,23 @@ $('#detail-modal').addEventListener('click', e => {
 });
 
 // ---------- 2) 列表 ----------
-function renderList() {
-  const c = $('#list-container');
-  const list = visiblePlaces();
-  if (!list.length) {
-    c.innerHTML = `<p class="hint">${places.length ? '沒有符合「只顯示餐廳」的紀錄。' : '還沒有任何紀錄，去「新增 / 匯入」加第一筆吧！'}</p>`;
-    return;
-  }
-  c.innerHTML = list.map(p => `
+// 依「年份 + 四季」分組：春 3-5 月、夏 6-8 月、秋 9-11 月、冬 12-2 月
+// （冬季照該筆自己的年份算，所以 2026/12 是「2026 冬」、2027/1 是「2027 冬」）
+const SEASONS = ['冬', '春', '夏', '秋'];
+function seasonKey(p) {
+  const iso = p.visited_at || p.created_at;
+  if (!iso) return { key: 'unknown', label: '未填時間', sort: -1 };
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const s = Math.floor(((d.getMonth() + 1) % 12) / 3);   // 0=冬(12,1,2) 1=春 2=夏 3=秋
+  return { key: `${y}-${s}`, label: `${y} ${SEASONS[s]}`, sort: y * 10 + s };
+}
+
+// 記住哪些季節區塊是展開的（切篩選重畫時不要全部收回去）
+let openSeasons = null;
+
+function placeCardHtml(p) {
+  return `
     <div class="place-card">
       ${p.image_url ? `<img class="pc-thumb" src="${esc(thumbUrl(p.image_url))}" data-full="${esc(p.image_url)}" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.full" alt="${esc(p.name)}" onclick="openDetail(${p.id})" />` : ''}
       <div class="pc-main">
@@ -505,7 +520,42 @@ function renderList() {
         <a class="btn small" href="${googleMapsUrl(p)}" target="_blank" rel="noopener">Google</a>
         <button class="btn small danger" onclick="deletePlace(${p.id})">刪除</button>
       </div>
-    </div>`).join('');
+    </div>`;
+}
+
+function renderList() {
+  const c = $('#list-container');
+  const list = visiblePlaces();
+  if (!list.length) {
+    c.innerHTML = `<p class="hint">${places.length ? '沒有符合「只顯示餐廳」的紀錄。' : '還沒有任何紀錄，去「新增地點」加第一筆吧！'}</p>`;
+    return;
+  }
+
+  // 分組（list 已依造訪時間新到舊排好，組內順序直接沿用）
+  const groups = new Map();
+  list.forEach(p => {
+    const g = seasonKey(p);
+    if (!groups.has(g.key)) groups.set(g.key, { ...g, items: [] });
+    groups.get(g.key).items.push(p);
+  });
+  const sorted = [...groups.values()].sort((a, b) => b.sort - a.sort);   // 新到舊，未填時間排最後
+
+  // 第一次進來只展開最新那組；之後沿用使用者自己開合的狀態
+  if (openSeasons === null) openSeasons = new Set(sorted.length ? [sorted[0].key] : []);
+
+  c.innerHTML = sorted.map(g => `
+    <details class="section-card season-group" data-key="${g.key}"${openSeasons.has(g.key) ? ' open' : ''}>
+      <summary>
+        <span class="sec-title">${esc(g.label)}</span>
+        <span class="sec-sub">${g.items.length} 筆</span>
+      </summary>
+      <div class="section-body">${g.items.map(placeCardHtml).join('')}</div>
+    </details>`).join('');
+
+  // 記住展開狀態
+  $$('.season-group', c).forEach(d => d.addEventListener('toggle', () => {
+    d.open ? openSeasons.add(d.dataset.key) : openSeasons.delete(d.dataset.key);
+  }));
 }
 
 window.deletePlace = async function (id) {
@@ -805,19 +855,8 @@ async function loadPending() {
 
 function renderPending() {
   $('#pending-count').textContent = pendingRows.length;
-  $('#pending-list').innerHTML = pendingRows.length
-    ? pendingRows.map(r => `
-    <div class="pending-item">
-      <div class="pi-main">
-        <div class="pi-head">
-          <span class="pi-time">${esc(fmtDate(r.visited_at))}</span>
-          ${r.note ? `<span class="pi-note">${esc(r.note)}</span>` : ''}
-        </div>
-        <a class="pi-url" href="${esc(r.google_url)}" target="_blank" rel="noopener">${esc(r.google_url)}</a>
-      </div>
-      <button type="button" class="btn small danger" onclick="deletePending(${r.id})" title="刪除這筆">🗑️</button>
-    </div>`).join('')
-    : '<p class="hint">目前沒有待處理資料。</p>';
+  // 一行一筆，直接可全選複製；不換行（wrap=off），長網址橫向捲動
+  $('#pending-board').value = pendingCopyText();
 }
 
 $('#quick-form').addEventListener('submit', async e => {
@@ -842,14 +881,6 @@ $('#quick-form').addEventListener('submit', async e => {
   f.visited_at.value = nowLocalInput();   // 下一筆一樣預設現在
   await loadPending();
 });
-
-window.deletePending = async function (id) {
-  if (!confirm('確定要刪除這筆待處理資料？')) return;
-  const { error } = await sb.from(PENDING_TABLE).delete().eq('id', id);
-  if (error) return toast('刪除失敗：' + error.message, true);
-  toast('已刪除');
-  loadPending();
-};
 
 // 複製格式：每行一筆「時間 | 短網址 | 備註」（沒備註就只有兩段）
 function pendingCopyText() {
@@ -877,6 +908,9 @@ async function copyText(text) {
     return ok;
   }
 }
+
+$('#pending-board').addEventListener('focus', e => e.target.select());
+$('#pending-board').addEventListener('click', e => e.target.select());
 
 $('#pending-copy').addEventListener('click', async () => {
   if (!pendingRows.length) return toast('目前沒有待處理資料', true);

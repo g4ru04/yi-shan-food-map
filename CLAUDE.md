@@ -26,7 +26,7 @@
 
 「新增地點」頁（整頁有密碼鎖 `unlockAdd()`）由上到下是兩個 `<details>` 分區，**從側邊欄進來時兩個都收合**（`#sec-quick` / `#sec-full`）：
 
-- **⚡ 快速登錄**：只填「時間（預設現在）＋ Google 短網址＋備註」，寫進 `pending_places` 暫存表。刻意**不**解析短網址（不呼叫 `resolveShortUrl()`），原樣存。之後用「📋 複製全部」把清單複製成每行 `時間 | 短網址 | 備註`，交給 LLM 補齊欄位寫進 `places`；處理完用「🗑️ 清空全部」（兩段確認）清掉。
+- **⚡ 快速登錄**：只填「時間（預設現在）＋ Google 短網址＋備註」，寫進 `pending_places` 暫存表。刻意**不**解析短網址（不呼叫 `resolveShortUrl()`），原樣存。待處理資料呈現在唯讀 textarea `#pending-board`（一行一筆 `時間 | 短網址 | 備註`，點一下全選），交給 LLM 補齊欄位寫進 `places`；處理完用「🗑️ 清空全部」（兩段確認）清掉，沒有單筆刪除。
 - **➕ 一般新增**：完整欄位表單（`#place-form`），編輯地點也是走這個表單——`editPlace()` 會自動展開 `#sec-full`、收合 `#sec-quick`。
 
 注意事項：
@@ -34,6 +34,12 @@
 - `pending_places` 只是暫存，**沒有**任何欄位與 `places` 連動，也不會出現在地圖或列表。
 - 小地圖 `#pick-map` 在收合區裡，展開時要 `invalidateSize()`（`initPickMap()` 已對 `#sec-full` 與 `#more-fields` 掛好 toggle）。
 - 2026-09 已移除 CSV / JSON 批次匯入（含範例下載、`parseCSV`、`normalize`）；要批次寫入請直接讓 LLM 打 Supabase。
+
+## 地圖與列表
+
+- 地圖預設視野在 `DEFAULT_VIEW`（`app.js` 開頭，Google 網址格式 `@24.1515728,120.6461127,11.8z`）。小數 zoom 需要 `zoomSnap: 0.1`，拿掉就會被四捨五入。
+- **首次載入不 fitBounds**（`firstMapRender` 旗標），才留得住預設視野；之後切篩選 / 新增刪除重畫才會自動框住所有點。
+- 造訪列表依「年份 + 四季」分成 `.season-group` 收合區（春 3-5、夏 6-8、秋 9-11、冬 12-2，冬季照該筆自己的年份算）。預設只展開最新那組，展開狀態記在 `openSeasons`，切篩選重畫不會被重設。
 
 ## 彈窗與 prompt
 
