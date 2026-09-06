@@ -7,13 +7,35 @@
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/img/favicon.svg" />
 
+  <!-- 先握手，省掉之後的 DNS / TLS 時間 -->
+  <link rel="preconnect" href="https://gylxgpqdbhbuoxaxbazb.supabase.co" crossorigin />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin />
+
+  <!-- 地點資料越早發越好：不等 Leaflet / supabase-js 從 CDN 載完（省 ~200ms 以上）。
+       app.js 的 loadPlaces() 會接手這個 promise，失敗就退回 supabase-js 重打一次。 -->
+  <script src="assets/js/config.js"></script>
+  <script>
+    (() => {
+      const C = window.SUPABASE_CONFIG;
+      const url = `${C.url}/rest/v1/${C.table}`
+                + '?select=*&order=visited_at.desc.nullslast,created_at.desc';
+      window.__placesPromise = fetch(url, {
+        headers: { apikey: C.key, authorization: `Bearer ${C.key}` },
+      }).then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))));
+      window.__placesPromise.catch(() => {});   // 先接住，真正的錯誤處理在 app.js
+    })();
+  </script>
+
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="assets/css/style.css" />
+
 </head>
 <body>
-  <!-- 問候語（讀 cookie 顯示使用者名字，點一下可改名）-->
+  <!-- 問候語（顯示使用者名字，點一下可改名）-->
   <div id="greeting" class="greeting" title="點一下可改名字" hidden></div>
 
   <div class="app">
@@ -48,6 +70,7 @@
             <line x1="18" y1="12" x2="22" y2="12"/>
           </svg>
         </button>
+        <div id="map-loading" class="map-loading">🍜 讀取地點中…</div>
         <div id="pick-mode-bar" class="pick-mode-bar" hidden>
           <span>📍 點擊地圖選擇座標</span>
           <button type="button" id="pick-mode-cancel" class="btn small">取消</button>
@@ -246,7 +269,6 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- App -->
-  <script src="assets/js/config.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

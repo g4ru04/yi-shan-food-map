@@ -92,6 +92,16 @@ body {
 .pick-mode-bar .btn { margin: 0; background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); color: #fff; }
 #map.pick-mode { cursor: crosshair; }
 
+/* 地圖上的「讀取中」提示（資料回來就隱藏）*/
+.map-loading {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 600; background: rgba(43,33,24,.9); color: #fff;
+  padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25); pointer-events: none;
+  animation: fadeIn .2s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 .map-filter {
   position: absolute; top: 12px; left: 60px; z-index: 600;
   background: #fff; border: 1px solid var(--border); border-radius: 20px;

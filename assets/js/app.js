@@ -96,7 +96,7 @@ let editingId = null;
 let removeImageFlag = false;   // 編輯時按了「移除照片」
 let onlyRestaurants = false;   // 篩選：只顯示餐廳
 let pickModeActive = false;    // 主地圖選座標模式
-let firstMapRender = true;     // 第一次畫地圖不要 fitBounds（保留預設視野）
+let fitOnNextRender = false;   // 只有切「只顯示餐廳」時才自動框住所有點，其餘保持目前視野
 
 // 套用篩選後要顯示的資料
 function visiblePlaces() {
@@ -337,9 +337,26 @@ function renderGreeting(name) {
   g.textContent = `Hi, ${name} 👋`;
   g.hidden = false;
 }
+// 名字存 localStorage：用 file:// 直接開 HTML 時瀏覽器不會保存 cookie，
+// localStorage 則照存（「阿珊彈窗」的已讀旗標本來就在 localStorage，所以只有名字會忘）。
+const NAME_KEY = 'ashan_username';
+function getUserName() {
+  try {
+    const v = localStorage.getItem(NAME_KEY);
+    if (v) return v;
+  } catch { /* 隱私模式等 */ }
+  const c = getCookie('username');     // 舊版存在 cookie，讀到就搬過去
+  if (c) { setUserName(c); return c; }
+  return null;
+}
+function setUserName(name) {
+  try { localStorage.setItem(NAME_KEY, name); } catch { /* 忽略 */ }
+  setCookie('username', name, 365);    // http(s) 開啟時順便留一份 cookie
+}
+
 // 目前使用者名稱（給「建立者」用）
 function currentUser() {
-  return getCookie('username') || '訪客';
+  return getUserName() || '訪客';
 }
 // 名字輸入彈窗（取代 prompt；密碼仍走瀏覽器 prompt）
 // cancelable=false 時沒有取消鈕、Esc 也關不掉，一定要給名字
@@ -379,36 +396,70 @@ function askName({ title, value = '', cancelable = true }) {
 }
 
 async function initUserName() {
-  let name = getCookie('username');
+  let name = getUserName();
   if (!name) {
     name = (await askName({ title: '歡迎！請輸入你的名字', cancelable: false })) || '訪客';
-    setCookie('username', name, 365);
+    setUserName(name);
   }
   renderGreeting(name);
 }
 // 點問候語可改名字
 $('#greeting').addEventListener('click', async () => {
-  const name = await askName({ title: '修改名字', value: getCookie('username') || '' });
-  if (name) { setCookie('username', name, 365); renderGreeting(name); }
+  const name = await askName({ title: '修改名字', value: getUserName() || '' });
+  if (name) { setUserName(name); renderGreeting(name); }
 });
 
 // ---------- 讀取資料 ----------
+// 上一次的資料留一份在 localStorage，下次開頁先畫舊的，網路回來再換新的
+const CACHE_KEY = 'ashan_places_cache_v1';
+
+function readCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    return Array.isArray(c?.rows) && c.rows.length ? c.rows : null;
+  } catch { return null; }
+}
+function writeCache(rows) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), rows })); }
+  catch { /* 超過配額或隱私模式，忽略 */ }
+}
+
 async function loadPlaces() {
+  // 先用 <head> 裡提前發的請求（不必等 supabase-js 從 CDN 載完）
+  const early = window.__placesPromise;
+  window.__placesPromise = null;
+  if (early) {
+    try {
+      places = await early;
+      writeCache(places);
+      render();
+      return;
+    } catch (err) {
+      console.warn('提前載入失敗，改用 supabase-js 重試：', err);
+    }
+  }
+
   const { data, error } = await sb.from(TABLE)
     .select('*')
     .order('visited_at', { ascending: false, nullsFirst: false })  // 造訪時間新到舊（沒填的排後面）
     .order('created_at', { ascending: false });
   if (error) {
+    if (!places.length) {                       // 快取有東西就別把畫面洗掉
+      $('#list-container').innerHTML = '<p class="hint">讀取失敗，請檢查網路後重新整理。</p>';
+      $('#map-loading').hidden = true;
+    }
     toast('讀取失敗：' + error.message, true);
     console.error(error);
     return;
   }
   places = data || [];
+  writeCache(places);
   render();
 }
 
 // 套用目前篩選後重畫地圖與列表
 function render() {
+  $('#map-loading').hidden = true;
   const vis = visiblePlaces();
   $('#count-badge').textContent = onlyRestaurants
     ? `${vis.length} / ${places.length} 筆（只餐廳）`
@@ -421,6 +472,7 @@ function render() {
 $$('.filter-toggle').forEach(cb => cb.addEventListener('change', e => {
   onlyRestaurants = e.target.checked;
   $$('.filter-toggle').forEach(other => { other.checked = onlyRestaurants; });
+  fitOnNextRender = true;
   render();
 }));
 
@@ -490,9 +542,10 @@ function renderMap() {
     m.addTo(markerLayer);
     pts.push([p.lat, p.lon]);
   });
-  // 首次載入維持 DEFAULT_VIEW；之後重畫（切篩選、新增/刪除後）才自動框住所有點
-  if (pts.length && !firstMapRender) mainMap.fitBounds(pts, { padding: [50, 50], maxZoom: 15 });
-  firstMapRender = false;
+  // 載入 / 新增 / 刪除都保持使用者當下的視野（首次進來就是 DEFAULT_VIEW）；
+  // 只有切篩選時才自動框住剩下的點
+  if (pts.length && fitOnNextRender) mainMap.fitBounds(pts, { padding: [50, 50], maxZoom: 15 });
+  fitOnNextRender = false;
 }
 
 // ---------- 詳細視窗 ----------
@@ -1008,5 +1061,13 @@ initMainMap();
 initLocateBtn();
 initPickMode();
 initPickMap();
+
+// 有上次的快取就先畫出來（畫面立刻有東西），網路資料回來再覆蓋
+const cached = readCache();
+if (cached) { places = cached; render(); }
+else {
+  $('#count-badge').textContent = '讀取中…';
+  $('#list-container').innerHTML = '<p class="hint">讀取中…</p>';
+}
 loadPlaces();
 initPoster(initUserName);

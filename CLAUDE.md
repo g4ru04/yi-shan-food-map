@@ -41,6 +41,12 @@
 - **首次載入不 fitBounds**（`firstMapRender` 旗標），才留得住預設視野；之後切篩選 / 新增刪除重畫才會自動框住所有點。
 - 造訪列表依「年份 + 四季」分成 `.season-group` 收合區（春 2-4、夏 5-7、秋 8-10、冬 11-12+隔年1月，冬季算「11、12 月那一年」）。預設只展開最新那組，展開狀態記在 `openSeasons`，切篩選重畫不會被重設。
 
+## 載入速度與儲存
+
+- **提前發請求**：`index.html` 的 `<head>` 直接用 `fetch()` 打 `places` REST API（`window.__placesPromise`），不等 Leaflet / supabase-js 從 CDN 載完；`loadPlaces()` 會先接手這個 promise，失敗才退回 supabase-js。這段 `<script>` 必須放在 **stylesheet 之前**——等待中的 CSS 會擋住後面 script 的執行。
+- **快取先畫**：上一次的資料存在 localStorage `ashan_places_cache_v1`，開頁先用快取畫地圖與列表，網路回來再覆蓋。沒有快取時顯示「讀取中…」（`#map-loading` 提示 + 列表/計數文字）。
+- **名字存 localStorage**（`ashan_username`），不要改回 cookie：用 `file://` 直接開 HTML 時瀏覽器不保存 cookie，只有 localStorage 會留著。舊的 cookie 值會在 `getUserName()` 自動搬過去。
+
 ## 彈窗與 prompt
 
 名字輸入（首次進入、點問候語改名）走頁面內的 `#name-modal`（`askName()`）；**只有密碼**還是用瀏覽器原生 `prompt()`。要再加輸入框時沿用 `askName()`，不要退回 `prompt()`。
