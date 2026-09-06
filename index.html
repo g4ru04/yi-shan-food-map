@@ -26,7 +26,7 @@
       <nav class="nav">
         <button class="nav-btn active" data-view="map">🗺️ <span>地圖顯示</span></button>
         <button class="nav-btn" data-view="list">📋 <span>造訪列表</span></button>
-        <button class="nav-btn" data-view="add">➕ <span>新增 / 匯入</span></button>
+        <button class="nav-btn" data-view="add">➕ <span>新增地點</span></button>
       </nav>
       <div class="sidebar-foot">
         <span id="count-badge">— 筆紀錄</span>
@@ -65,153 +65,135 @@
         <div id="list-container" class="list-container"></div>
       </section>
 
-      <!-- 3) 新增 / 匯入 -->
+      <!-- 3) 新增（⚡ 快速登錄 / ➕ 一般新增，兩區收合）-->
       <section id="view-add" class="view">
         <div class="view-head">
           <h2 id="form-title">新增一個地點</h2>
         </div>
 
-        <div class="add-grid">
-          <!-- 表單 -->
-          <form id="place-form" class="card">
-            <!-- 我的星等 / 評價 / 照片（編輯時置頂；新增時照原順序排在後面）-->
-            <div id="priority-fields">
-              <label>文字評價（500 字內）
-                <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
-                <span class="counter"><span id="review-count">0</span> / 500</span>
-              </label>
+        <div class="add-stack">
+          <!-- A) 快速登錄：只記時間 + 短網址 + 備註，之後交給 LLM 補齊 -->
+          <details id="sec-quick" class="section-card">
+            <summary>
+              <span class="sec-title">⚡ 快速登錄</span>
+              <span class="sec-sub">時間 + Google 短網址，晚點再補齊</span>
+            </summary>
+            <div class="section-body">
+            <p class="hint">在外面吃完就先記一筆：時間預設現在，貼上 Google 分享的短網址即可。之後用「複製全部」把清單交給 LLM 補齊資料、寫進地圖。</p>
 
-              <!-- 編輯模式：我的星等(搬進 slot) 與 照片 同列；新增模式 slot 為空、照片佔整列 -->
-              <div class="row" id="rating-photo-row">
-                <div id="rating-slot"></div>
-                <label>照片（選填）
-                  <input type="file" name="image" accept="image/*" />
-                </label>
+            <form id="quick-form" class="quick-form">
+              <label>時間
+                <input type="datetime-local" name="visited_at" required />
+              </label>
+              <label>Google 短網址 *
+                <input type="url" name="google_url" placeholder="https://maps.app.goo.gl/..." required />
+              </label>
+              <label>備註（選填）
+                <input type="text" name="note" maxlength="200" placeholder="例：吃了牛肉麵，湯頭讚" />
+              </label>
+              <button type="submit" class="btn primary" id="quick-submit">⚡ 送出</button>
+            </form>
+
+            <div class="pending-head">
+              <h4>待處理 <span id="pending-count">—</span> 筆</h4>
+              <div class="pending-actions">
+                <button type="button" class="btn small" id="pending-copy">📋 複製全部</button>
+                <button type="button" class="btn small danger" id="pending-clear">🗑️ 清空全部</button>
               </div>
-              <img id="image-preview" class="image-preview" hidden alt="預覽" />
-              <button type="button" id="btn-remove-image" class="btn small danger" hidden>🗑️ 移除照片</button>
             </div>
+            <div id="pending-list" class="pending-list"></div>
+            </div>
+          </details>
 
-            <!-- 其他資料：新增時展開呈現一般表單；編輯時收合 -->
-            <details id="more-fields" class="more-fields" open>
-              <summary>其他資料（店名,類型,...）</summary>
+          <!-- B) 一般新增：完整欄位（編輯地點也是走這個表單）-->
+          <details id="sec-full" class="section-card">
+            <summary>
+              <span class="sec-title">➕ 一般新增</span>
+              <span class="sec-sub">完整欄位：店名、座標、評價、照片</span>
+            </summary>
+            <div class="section-body">
+              <form id="place-form">
+                <!-- 我的星等 / 評價 / 照片（編輯時置頂；新增時照原順序排在後面）-->
+                <div id="priority-fields">
+                  <label>文字評價（500 字內）
+                    <textarea name="review" maxlength="500" rows="4" placeholder="寫下你的心得…"></textarea>
+                    <span class="counter"><span id="review-count">0</span> / 500</span>
+                  </label>
 
-              <label>店家名稱 *
-                <input type="text" name="name" maxlength="100" placeholder="例：阿珊牛肉麵" />
-              </label>
-
-              <label>造訪時間（選填）
-                <input type="datetime-local" name="visited_at" />
-              </label>
-
-              <label>類型（選填）
-                <input type="text" name="category" maxlength="40" placeholder="例：意大利餐廳、咖啡廳、景點" />
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" name="is_restaurant" checked />
-                這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" name="is_closed" />
-                已永久歇業
-              </label>
-
-              <div class="row">
-                <label>緯度 lat *
-                  <input type="number" name="lat" step="any" placeholder="25.0330" />
-                </label>
-                <label>經度 lon *
-                  <input type="number" name="lon" step="any" placeholder="121.5654" />
-                </label>
-              </div>
-              <p class="hint">👉 不知道座標？點下方小地圖，或按「從大地圖選位置」。</p>
-              <button type="button" id="btn-pick-main" class="btn small">📍 從大地圖選位置</button>
-              <div id="pick-map"></div>
-
-              <div class="row" id="rating-row">
-                <label id="rating-field">乙珊評分（0~5）
-                  <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
-                </label>
-                <label>Google 星等（1~5）
-                  <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
-                </label>
-              </div>
-
-              <label>Google 連結 / place_id
-                <div class="url-input-row">
-                  <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
-                  <button type="button" id="btn-parse-url" class="btn small">自動填入</button>
+                  <!-- 編輯模式：我的星等(搬進 slot) 與 照片 同列；新增模式 slot 為空、照片佔整列 -->
+                  <div class="row" id="rating-photo-row">
+                    <div id="rating-slot"></div>
+                    <label>照片（選填）
+                      <input type="file" name="image" accept="image/*" />
+                    </label>
+                  </div>
+                  <img id="image-preview" class="image-preview" hidden alt="預覽" />
+                  <button type="button" id="btn-remove-image" class="btn small danger" hidden>🗑️ 移除照片</button>
                 </div>
-                <span class="hint" id="url-parse-hint" hidden></span>
-              </label>
-            </details>
 
-            <div class="form-actions">
-              <button type="submit" class="btn primary" id="submit-btn">儲存地點</button>
-              <button type="button" class="btn ghost" id="cancel-edit" hidden>取消編輯</button>
-            </div>
-          </form>
+                <!-- 其他資料：新增時展開呈現一般表單；編輯時收合 -->
+                <details id="more-fields" class="more-fields" open>
+                  <summary>其他資料（店名,類型,...）</summary>
 
-          <!-- 批次匯入（編輯模式隱藏）-->
-          <div class="card" id="import-card">
-            <div class="import-tabs">
-              <button type="button" class="import-tab active" data-mode="bulk">📦 批次匯入</button>
-              <button type="button" class="import-tab" data-mode="quick">⚡ 快速登錄</button>
-            </div>
+                  <label>店家名稱 *
+                    <input type="text" name="name" maxlength="100" placeholder="例：阿珊牛肉麵" />
+                  </label>
 
-            <!-- 模式 A：批次匯入（CSV / JSON，欄位齊全）-->
-            <div id="import-bulk">
-            <p class="hint">支援 <b>CSV</b> 或 <b>JSON</b> 檔。第一次用建議先下載範例照著填。</p>
-            <button type="button" class="btn" id="download-sample">⬇️ 下載 CSV 範例</button>
-            <button type="button" class="btn" id="download-sample-json">⬇️ 下載 JSON 範例</button>
+                  <label>造訪時間（選填）
+                    <input type="datetime-local" name="visited_at" />
+                  </label>
 
-            <label class="file-drop">
-              <input type="file" id="import-file" accept=".csv,.json,text/csv,application/json" hidden />
-              <span>點此選擇 CSV / JSON 檔</span>
-            </label>
-            <div id="import-preview" class="import-preview"></div>
-            <button type="button" class="btn primary" id="import-confirm" hidden>確認匯入</button>
+                  <label>類型（選填）
+                    <input type="text" name="category" maxlength="40" placeholder="例：意大利餐廳、咖啡廳、景點" />
+                  </label>
 
-            <details class="fmt">
-              <summary>檔案格式說明</summary>
-              <p>欄位（順序不限）：<code>name, lat, lon, review, rating, google_rating, google_url, author, image_url, visited_at, category, is_restaurant, is_closed</code></p>
-              <p><code>name / lat / lon</code> 必填，其餘可留空。</p>
-              <p><code>visited_at</code> 造訪時間填如 <code>2026-06-07 17:00</code>。</p>
-              <p><code>is_restaurant</code> 留空＝餐廳；非餐廳填 <code>false</code> 或 <code>否</code>。</p>
-              <p><code>is_closed</code> 留空＝營業中；已歇業填 <code>true</code> 或 <code>是</code>。</p>
-              <p>批次匯入的 <code>image_url</code> 請直接填圖片網址（批次無法上傳檔案，檔案上傳請用左邊表單）。</p>
-            </details>
-            </div>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="is_restaurant" checked />
+                    這是餐廳（取消勾選後可被「只顯示餐廳」篩選掉）
+                  </label>
 
-            <!-- 模式 B：快速登錄（只記時間 + 短網址 + 備註，之後交給 LLM 補齊）-->
-            <div id="import-quick" hidden>
-              <p class="hint">在外面吃完就先記一筆：時間預設現在，貼上 Google 分享的短網址即可。之後把下面的清單複製給 LLM 補齊資料，再用批次匯入寫進地圖。</p>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="is_closed" />
+                    已永久歇業
+                  </label>
 
-              <form id="quick-form" class="quick-form">
-                <label>時間
-                  <input type="datetime-local" name="visited_at" required />
-                </label>
-                <label>Google 短網址 *
-                  <input type="url" name="google_url" placeholder="https://maps.app.goo.gl/..." required />
-                </label>
-                <label>備註（選填）
-                  <input type="text" name="note" maxlength="200" placeholder="例：吃了牛肉麵，湯頭讚" />
-                </label>
-                <button type="submit" class="btn primary" id="quick-submit">⚡ 送出</button>
+                  <div class="row">
+                    <label>緯度 lat *
+                      <input type="number" name="lat" step="any" placeholder="25.0330" />
+                    </label>
+                    <label>經度 lon *
+                      <input type="number" name="lon" step="any" placeholder="121.5654" />
+                    </label>
+                  </div>
+                  <p class="hint">👉 不知道座標？點下方小地圖，或按「從大地圖選位置」。</p>
+                  <button type="button" id="btn-pick-main" class="btn small">📍 從大地圖選位置</button>
+                  <div id="pick-map"></div>
+
+                  <div class="row" id="rating-row">
+                    <label id="rating-field">乙珊評分（0~5）
+                      <input type="number" name="rating" min="0" max="5" step="0.5" placeholder="4.5" />
+                    </label>
+                    <label>Google 星等（1~5）
+                      <input type="number" name="google_rating" min="1" max="5" step="0.1" placeholder="4.2" />
+                    </label>
+                  </div>
+
+                  <label>Google 連結 / place_id
+                    <div class="url-input-row">
+                      <input type="text" name="google_url" placeholder="貼 Google Maps 網址、place_id，或留空用座標" />
+                      <button type="button" id="btn-parse-url" class="btn small">自動填入</button>
+                    </div>
+                    <span class="hint" id="url-parse-hint" hidden></span>
+                  </label>
+                </details>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn primary" id="submit-btn">儲存地點</button>
+                  <button type="button" class="btn ghost" id="cancel-edit" hidden>取消編輯</button>
+                </div>
               </form>
-
-              <div class="pending-head">
-                <h4>待處理 <span id="pending-count">—</span> 筆</h4>
-                <div class="pending-actions">
-                  <button type="button" class="btn small" id="pending-copy">📋 複製全部</button>
-                  <button type="button" class="btn small danger" id="pending-clear">🗑️ 清空全部</button>
-                </div>
-              </div>
-              <div id="pending-list" class="pending-list"></div>
             </div>
-          </div>
+          </details>
         </div>
       </section>
     </main>

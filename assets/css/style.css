@@ -126,7 +126,23 @@ body {
 .star { color: var(--star); }
 
 /* ---------- Add / Form ---------- */
-.add-grid { padding: 0 24px 40px; display: grid; grid-template-columns: 1.2fr .9fr; gap: 20px; align-items: start; }
+.add-stack { padding: 0 24px 40px; display: flex; flex-direction: column; gap: 14px; max-width: 720px; }
+
+/* 上下兩個收合分區（⚡ 快速登錄 / ➕ 一般新增）*/
+.section-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; }
+.section-card > summary {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 16px 20px; cursor: pointer; list-style: none; user-select: none;
+  border-radius: 16px;
+}
+.section-card > summary::-webkit-details-marker { display: none; }
+.section-card > summary::before { content: '▸'; color: var(--primary); font-size: 13px; }
+.section-card[open] > summary::before { content: '▾'; }
+.section-card[open] > summary { border-bottom: 1px solid var(--border); border-radius: 16px 16px 0 0; }
+.section-card > summary:hover { background: #fffaf5; }
+.sec-title { font-size: 16px; font-weight: 700; }
+.sec-sub { font-size: 12px; color: var(--muted); }
+.section-body { padding: 18px 20px 20px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
 .card h3 { margin: 0 0 6px; }
 form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 14px; color: #4a3d30; }
@@ -179,9 +195,8 @@ textarea { resize: vertical; }
 #rating-slot:empty { display: none; }
 #rating-photo-row > label { margin-bottom: 14px; }
 
-/* 編輯模式：隱藏批次匯入、表單佔滿整個寬度 */
-.add-grid:has(#place-form.editing) { grid-template-columns: 1fr; }
-.add-grid:has(#place-form.editing) #import-card { display: none; }
+/* 編輯模式：只留表單分區 */
+.add-stack:has(#place-form.editing) #sec-quick { display: none; }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -195,27 +210,6 @@ textarea { resize: vertical; }
 .btn.ghost { background: transparent; }
 .btn.small { padding: 4px 10px; font-size: 12px; border-radius: 7px; }
 .btn.danger { color: #d22; border-color: #f3cccc; }
-
-/* ---------- Import ---------- */
-.file-drop {
-  display: block; margin: 14px 0; padding: 22px; text-align: center;
-  border: 2px dashed var(--border); border-radius: 12px; color: var(--muted);
-  cursor: pointer; font-weight: 600;
-}
-.file-drop:hover { border-color: var(--primary); color: var(--primary); }
-.import-preview { font-size: 13px; color: #5a4d40; margin: 10px 0; line-height: 1.6; }
-.fmt { margin-top: 14px; font-size: 13px; color: var(--muted); }
-.fmt code { background: #f3ece2; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
-
-/* ---------- 匯入分頁（批次匯入 / 快速登錄）---------- */
-.import-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
-.import-tab {
-  border: 0; background: none; color: var(--muted); cursor: pointer;
-  font-family: inherit; font-size: 15px; font-weight: 600;
-  padding: 8px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px;
-}
-.import-tab:hover { color: var(--text); }
-.import-tab.active { color: var(--primary-dark); border-bottom-color: var(--primary); }
 
 /* ---------- 快速登錄 ---------- */
 .quick-form { display: flex; flex-direction: column; }
@@ -312,10 +306,11 @@ textarea { resize: vertical; }
   .nav-btn span { font-size: 11px; }
   .sidebar-foot { display: none; }
   .content { order: 1; flex: 1; }
-  .add-grid { grid-template-columns: 1fr; }
   .view-head { padding: 16px 16px 0; }
   .list-container { padding: 0 16px 24px; }
-  .add-grid { padding: 0 16px 24px; }
+  .add-stack { padding: 0 16px 24px; }
+  .section-card > summary { padding: 14px 16px; }
+  .section-body { padding: 16px; }
   .btn-locate { bottom: 16px; right: 12px; }
   .pick-mode-bar { bottom: 16px; }
   /* 手機版維持「圖左、資訊中、按鈕右」橫向排列，減少留白 */

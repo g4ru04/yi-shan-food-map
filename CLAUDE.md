@@ -16,20 +16,24 @@
 - **任何上傳圖片的功能都必須走 `uploadImage()`**（`assets/js/app.js`），它會自動同時上傳原圖與縮圖。不可繞過它只傳單一版本。
 - DB 的 `image_url` 只存**原圖**網址；縮圖網址由 `thumbUrl()` 依路徑慣例推導（插入 `thumbs/`），**不要**為縮圖加 DB 欄位。
 - 列表與地圖 popup 的 `<img>` 一律：縮圖 src + `loading="lazy"` + `onerror` fallback 回原圖（`data-full` 屬性）。原圖只在詳細視窗載入。
-- 批次匯入的外部 `image_url` 沒有縮圖，靠 onerror fallback 自動退回原圖，不需特別處理。
+- 外部（非本站上傳的）`image_url` 沒有縮圖，靠 onerror fallback 自動退回原圖，不需特別處理。
 - **移除或替換照片、刪除紀錄時**，必須用 `removeStoredImage()` 把 bucket 裡的原圖與縮圖一併刪除，避免孤兒檔案佔空間。
 - 若發現 bucket 有缺縮圖的舊圖，跑 `bash scripts/generate-thumbs.sh` 補產（冪等，可重複執行）。
 
 背景：2026-08 曾因列表直接載入 200+ 張 full-size 圖（共 136MB）導致 render 極慢，故建立此機制。
 
-## 匯入的兩種模式
+## 新增地點的兩種方式
 
-「新增 / 匯入」頁（整頁有密碼鎖 `unlockAdd()`）的匯入卡片有兩個分頁：
+「新增地點」頁（整頁有密碼鎖 `unlockAdd()`）由上到下是兩個 `<details>` 分區，**從側邊欄進來時兩個都收合**（`#sec-quick` / `#sec-full`）：
 
-- **📦 批次匯入**：CSV / JSON，欄位齊全，直接寫進 `places`。
-- **⚡ 快速登錄**：只填「時間（預設現在）＋ Google 短網址＋備註」，寫進 `pending_places` 暫存表。刻意**不**解析短網址（不呼叫 `resolveShortUrl()`），原樣存。之後用「📋 複製全部」把清單複製成每行 `時間 | 短網址 | 備註`，交給 LLM 補齊成完整欄位，再走批次匯入寫進 `places`；處理完用「🗑️ 清空全部」（兩段確認）清掉。
+- **⚡ 快速登錄**：只填「時間（預設現在）＋ Google 短網址＋備註」，寫進 `pending_places` 暫存表。刻意**不**解析短網址（不呼叫 `resolveShortUrl()`），原樣存。之後用「📋 複製全部」把清單複製成每行 `時間 | 短網址 | 備註`，交給 LLM 補齊欄位寫進 `places`；處理完用「🗑️ 清空全部」（兩段確認）清掉。
+- **➕ 一般新增**：完整欄位表單（`#place-form`），編輯地點也是走這個表單——`editPlace()` 會自動展開 `#sec-full`、收合 `#sec-quick`。
 
-`pending_places` 只是暫存，**沒有**任何欄位與 `places` 連動，也不會出現在地圖或列表。
+注意事項：
+
+- `pending_places` 只是暫存，**沒有**任何欄位與 `places` 連動，也不會出現在地圖或列表。
+- 小地圖 `#pick-map` 在收合區裡，展開時要 `invalidateSize()`（`initPickMap()` 已對 `#sec-full` 與 `#more-fields` 掛好 toggle）。
+- 2026-09 已移除 CSV / JSON 批次匯入（含範例下載、`parseCSV`、`normalize`）；要批次寫入請直接讓 LLM 打 Supabase。
 
 ## 彈窗與 prompt
 

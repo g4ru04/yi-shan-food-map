@@ -91,7 +91,6 @@ let mainMap, markerLayer;
 let pickMap, pickMarker;
 let editingId = null;
 let removeImageFlag = false;   // 編輯時按了「移除照片」
-let pendingImport = null;
 let onlyRestaurants = false;   // 篩選：只顯示餐廳
 let pickModeActive = false;    // 主地圖選座標模式
 
@@ -127,11 +126,6 @@ function fmtDate(iso) {
 }
 
 // 任意日期字串 → ISO（無法解析則回 null），給匯入用
-function parseDate(v) {
-  if (!v) return null;
-  const d = new Date(String(v).trim());
-  return isNaN(d.getTime()) ? null : d.toISOString();
-}
 
 // ISO 字串 → <input type="datetime-local"> 需要的本地時間字串
 function toLocalInput(iso) {
@@ -257,8 +251,12 @@ function showView(name) {
   if (name === 'add' && pickMap) setTimeout(() => pickMap.invalidateSize(), 50);
 }
 $$('.nav-btn').forEach(b => b.addEventListener('click', async () => {
-  // 進入「新增 / 匯入」頁需要密碼
-  if (b.dataset.view === 'add' && !(await unlockAdd())) return;
+  // 進入「新增」頁需要密碼；每次從側邊欄進來，兩個分區都預設收合
+  if (b.dataset.view === 'add') {
+    if (!(await unlockAdd())) return;
+    $('#sec-quick').open = false;
+    $('#sec-full').open = false;
+  }
   showView(b.dataset.view);
 }));
 
@@ -528,13 +526,16 @@ function initPickMap() {
     maxZoom: 19, attribution: '&copy; OpenStreetMap',
   }).addTo(pickMap);
   pickMap.on('click', e => setPick(e.latlng.lat, e.latlng.lng));
-  // 收合區展開時，地圖才有尺寸，需重算
-  $('#more-fields').addEventListener('toggle', e => {
-    if (e.target.open) setTimeout(() => {
+  // 收合區展開時，地圖才有尺寸，需重算（外層分區與內層「其他資料」都要）
+  const resizePick = e => {
+    if (!e.target.open) return;
+    setTimeout(() => {
       pickMap.invalidateSize();
       if (pickMarker) pickMap.setView(pickMarker.getLatLng(), 14);
     }, 60);
-  });
+  };
+  $('#more-fields').addEventListener('toggle', resizePick);
+  $('#sec-full').addEventListener('toggle', resizePick);
 }
 
 function setPick(lat, lon) {
@@ -695,6 +696,8 @@ window.editPlace = async function (id) {
   f.classList.add('editing');        // 編輯模式：評價類置頂、其他資料收合
   $('#rating-slot').appendChild($('#rating-field'));   // 我的星等搬到置頂
   $('#more-fields').open = false;
+  $('#sec-full').open = true;        // 編輯一定要看得到表單
+  $('#sec-quick').open = false;
   $('#form-title').textContent = `編輯：${p.name}`;
   $('#submit-btn').textContent = '更新地點';
   $('#cancel-edit').hidden = false;
@@ -757,128 +760,8 @@ $('#btn-parse-url').addEventListener('click', async () => {
   }
 });
 
-// ---------- 批次匯入 ----------
-const SAMPLE = [
-  { name: '阿珊牛肉麵', lat: 25.0330, lon: 121.5654, review: '湯頭濃郁，肉大塊！', rating: 4.5, google_rating: 4.2, google_url: 'https://maps.app.goo.gl/example', author: '阿珊', image_url: '', visited_at: '2026-06-07 17:00', category: '麵食', is_restaurant: true, is_closed: false },
-  { name: '彩虹眷村', lat: 24.1339, lon: 120.6107, review: '拍照景點', rating: 4, google_rating: 4.3, google_url: '', author: '阿珊', image_url: '', visited_at: '', category: '景點', is_restaurant: false, is_closed: false },
-];
-const FIELDS = ['name', 'lat', 'lon', 'review', 'rating', 'google_rating', 'google_url', 'author', 'image_url', 'visited_at', 'category', 'is_restaurant', 'is_closed'];
-
-function download(filename, content, type) {
-  const blob = new Blob([content], { type });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function toCSV(rows) {
-  const head = FIELDS.join(',');
-  const body = rows.map(r => FIELDS.map(k => {
-    const v = r[k] ?? '';
-    return /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v;
-  }).join(',')).join('\n');
-  return head + '\n' + body;
-}
-
-$('#download-sample').addEventListener('click', () =>
-  download('美食地圖範例.csv', '﻿' + toCSV(SAMPLE), 'text/csv;charset=utf-8'));
-$('#download-sample-json').addEventListener('click', () =>
-  download('美食地圖範例.json', JSON.stringify(SAMPLE, null, 2), 'application/json'));
-
-// 簡易 CSV 解析（支援引號內逗號 / 換行）
-function parseCSV(text) {
-  const rows = [];
-  let row = [], field = '', q = false;
-  text = text.replace(/^﻿/, '');
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (q) {
-      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
-      else field += c;
-    } else if (c === '"') q = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-    else if (c !== '\r') field += c;
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row); }
-  return rows.filter(r => r.some(x => x !== ''));
-}
-
-function normalize(raw) {
-  const out = {
-    name: (raw.name ?? '').toString().trim(),
-    lat: parseFloat(raw.lat),
-    lon: parseFloat(raw.lon),
-    review: (raw.review ?? '').toString().trim().slice(0, 500) || null,
-    rating: raw.rating === '' || raw.rating == null ? null : parseFloat(raw.rating),
-    google_rating: raw.google_rating === '' || raw.google_rating == null ? null : parseFloat(raw.google_rating),
-    google_url: (raw.google_url ?? '').toString().trim() || null,
-    author: (raw.author ?? '').toString().trim() || currentUser(),  // 沒填就用目前使用者
-    image_url: (raw.image_url ?? '').toString().trim() || null,     // 匯入時填圖片網址即可
-    visited_at: parseDate(raw.visited_at),                          // 造訪時間（可留空）
-    category: (raw.category ?? '').toString().trim() || null,
-    is_restaurant: parseBool(raw.is_restaurant),                    // 留空預設為餐廳
-    is_closed: parseBool(raw.is_closed, false),                     // 留空預設未歇業
-  };
-  return out;
-}
-
-// 解析布林：空白用 dflt；false/0/否/no/n 視為 false，其餘視為 true
-function parseBool(v, dflt = true) {
-  const s = String(v ?? '').trim();
-  if (s === '') return dflt;
-  return !/^(false|0|否|no|n)$/i.test(s);
-}
-
-$('#import-file').addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const text = await file.text();
-  let records = [];
-  try {
-    if (file.name.toLowerCase().endsWith('.json') || text.trim().startsWith('[')) {
-      records = JSON.parse(text).map(normalize);
-    } else {
-      const rows = parseCSV(text);
-      const header = rows.shift().map(h => h.trim().toLowerCase());
-      records = rows.map(cols => {
-        const obj = {};
-        header.forEach((h, i) => (obj[h] = cols[i]));
-        return normalize(obj);
-      });
-    }
-  } catch (err) {
-    return toast('檔案解析失敗：' + err.message, true);
-  }
-  const valid = records.filter(r => r.name && !isNaN(r.lat) && !isNaN(r.lon));
-  const skipped = records.length - valid.length;
-  pendingImport = valid;
-  $('#import-preview').innerHTML =
-    `讀到 <b>${records.length}</b> 筆，有效 <b>${valid.length}</b> 筆` +
-    (skipped ? `，略過 ${skipped} 筆（缺名稱或座標）` : '') +
-    (valid.length ? `<br>例：${esc(valid[0].name)}（${valid[0].lat}, ${valid[0].lon}）` : '');
-  $('#import-confirm').hidden = valid.length === 0;
-});
-
-$('#import-confirm').addEventListener('click', async () => {
-  if (!pendingImport || !pendingImport.length) return;
-  $('#import-confirm').disabled = true;
-  const { error } = await sb.from(TABLE).insert(pendingImport);
-  $('#import-confirm').disabled = false;
-  if (error) return toast('匯入失敗：' + error.message, true);
-  toast(`成功匯入 ${pendingImport.length} 筆`);
-  pendingImport = null;
-  $('#import-preview').innerHTML = '';
-  $('#import-confirm').hidden = true;
-  $('#import-file').value = '';
-  await loadPlaces();
-  showView('list');
-});
-
 // ---------- 快速登錄（時間 + 短網址 + 備註 → pending 表）----------
-// 在外面吃完先記一筆，之後把清單複製給 LLM 補齊資料，再走批次匯入寫進 places。
+// 在外面吃完先記一筆，之後把清單複製給 LLM 補齊資料，再由 LLM 寫進 places。
 // 這裡刻意「不」解析短網址（不呼叫 resolveShortUrl），原樣存、原樣複製。
 const PENDING_TABLE = CFG.pendingTable || 'pending_places';
 let pendingRows = [];
@@ -899,17 +782,12 @@ function fmtLocalStamp(iso) {
        + `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-// 匯入卡片分頁切換（批次匯入 / 快速登錄）
-$$('.import-tab').forEach(btn => btn.addEventListener('click', () => {
-  const mode = btn.dataset.mode;
-  $$('.import-tab').forEach(b => b.classList.toggle('active', b === btn));
-  $('#import-bulk').hidden = mode !== 'bulk';
-  $('#import-quick').hidden = mode !== 'quick';
-  if (mode === 'quick') {
-    $('#quick-form').visited_at.value = nowLocalInput();   // 每次切進來都帶到「現在」
-    loadPending();
-  }
-}));
+// 展開「快速登錄」時才帶時間、載清單（收合時不打 API）
+$('#sec-quick').addEventListener('toggle', () => {
+  if (!$('#sec-quick').open) return;
+  $('#quick-form').visited_at.value = nowLocalInput();   // 每次展開都帶到「現在」
+  loadPending();
+});
 
 async function loadPending() {
   const { data, error } = await sb.from(PENDING_TABLE)
