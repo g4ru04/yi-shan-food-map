@@ -156,7 +156,13 @@
 
           <!-- 批次匯入（編輯模式隱藏）-->
           <div class="card" id="import-card">
-            <h3>📦 批次匯入</h3>
+            <div class="import-tabs">
+              <button type="button" class="import-tab active" data-mode="bulk">📦 批次匯入</button>
+              <button type="button" class="import-tab" data-mode="quick">⚡ 快速登錄</button>
+            </div>
+
+            <!-- 模式 A：批次匯入（CSV / JSON，欄位齊全）-->
+            <div id="import-bulk">
             <p class="hint">支援 <b>CSV</b> 或 <b>JSON</b> 檔。第一次用建議先下載範例照著填。</p>
             <button type="button" class="btn" id="download-sample">⬇️ 下載 CSV 範例</button>
             <button type="button" class="btn" id="download-sample-json">⬇️ 下載 JSON 範例</button>
@@ -177,6 +183,34 @@
               <p><code>is_closed</code> 留空＝營業中；已歇業填 <code>true</code> 或 <code>是</code>。</p>
               <p>批次匯入的 <code>image_url</code> 請直接填圖片網址（批次無法上傳檔案，檔案上傳請用左邊表單）。</p>
             </details>
+            </div>
+
+            <!-- 模式 B：快速登錄（只記時間 + 短網址 + 備註，之後交給 LLM 補齊）-->
+            <div id="import-quick" hidden>
+              <p class="hint">在外面吃完就先記一筆：時間預設現在，貼上 Google 分享的短網址即可。之後把下面的清單複製給 LLM 補齊資料，再用批次匯入寫進地圖。</p>
+
+              <form id="quick-form" class="quick-form">
+                <label>時間
+                  <input type="datetime-local" name="visited_at" required />
+                </label>
+                <label>Google 短網址 *
+                  <input type="url" name="google_url" placeholder="https://maps.app.goo.gl/..." required />
+                </label>
+                <label>備註（選填）
+                  <input type="text" name="note" maxlength="200" placeholder="例：吃了牛肉麵，湯頭讚" />
+                </label>
+                <button type="submit" class="btn primary" id="quick-submit">⚡ 送出</button>
+              </form>
+
+              <div class="pending-head">
+                <h4>待處理 <span id="pending-count">—</span> 筆</h4>
+                <div class="pending-actions">
+                  <button type="button" class="btn small" id="pending-copy">📋 複製全部</button>
+                  <button type="button" class="btn small danger" id="pending-clear">🗑️ 清空全部</button>
+                </div>
+              </div>
+              <div id="pending-list" class="pending-list"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -186,6 +220,18 @@
   <!-- 詳細視窗 -->
   <div id="detail-modal" class="modal" hidden>
     <div class="modal-box" id="detail-box"></div>
+  </div>
+
+  <!-- 名字輸入彈窗（取代 prompt；密碼仍走 prompt）-->
+  <div id="name-modal" class="modal" hidden>
+    <div class="modal-box name-box">
+      <h3 id="name-title">歡迎！請輸入你的名字</h3>
+      <input type="text" id="name-input" maxlength="20" placeholder="你的名字" autocomplete="nickname" />
+      <div class="name-actions">
+        <button type="button" class="btn ghost" id="name-cancel" hidden>取消</button>
+        <button type="button" class="btn primary" id="name-confirm">確認</button>
+      </div>
+    </div>
   </div>
 
   <!-- 提示訊息 -->

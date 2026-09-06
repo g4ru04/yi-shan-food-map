@@ -207,6 +207,46 @@ textarea { resize: vertical; }
 .fmt { margin-top: 14px; font-size: 13px; color: var(--muted); }
 .fmt code { background: #f3ece2; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
 
+/* ---------- 匯入分頁（批次匯入 / 快速登錄）---------- */
+.import-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+.import-tab {
+  border: 0; background: none; color: var(--muted); cursor: pointer;
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  padding: 8px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.import-tab:hover { color: var(--text); }
+.import-tab.active { color: var(--primary-dark); border-bottom-color: var(--primary); }
+
+/* ---------- 快速登錄 ---------- */
+.quick-form { display: flex; flex-direction: column; }
+.quick-form .btn { align-self: flex-start; margin: 4px 0 0; }
+
+.pending-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+  margin: 22px 0 10px; padding-top: 16px; border-top: 1px solid var(--border);
+}
+.pending-head h4 { margin: 0; font-size: 15px; }
+.pending-actions { display: flex; gap: 6px; }
+.pending-actions .btn { margin: 0; }
+
+.pending-list { display: flex; flex-direction: column; gap: 8px; }
+.pending-item {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px 10px; background: #fffdfb;
+}
+.pending-item .pi-main { flex: 1; min-width: 0; }
+.pending-item .pi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+.pending-item .pi-time { font-size: 13px; font-weight: 600; color: var(--text); }
+.pending-item .pi-note { font-size: 12px; color: var(--muted); }
+.pending-item .pi-url {
+  display: block; font-size: 12px; color: #1a73e8; text-decoration: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pending-item .pi-url:hover { text-decoration: underline; }
+.pending-item .btn { margin: 0; flex-shrink: 0; }
+
 /* ---------- Modal ---------- */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
 .modal-box { position: relative; background: #fff; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; max-height: 85vh; overflow-y: auto; }
@@ -236,6 +276,13 @@ textarea { resize: vertical; }
   box-shadow: 0 2px 10px rgba(0,0,0,.2); cursor: pointer; user-select: none;
 }
 .greeting:hover { background: var(--primary); }
+
+/* ---------- 名字輸入彈窗 ---------- */
+.name-box { max-width: 380px; text-align: left; }
+.name-box h3 { margin: 0 0 14px; }
+.name-box input { margin-bottom: 16px; }
+.name-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.name-actions .btn { margin: 0; }
 
 /* ---------- Toast ---------- */
 .toast {

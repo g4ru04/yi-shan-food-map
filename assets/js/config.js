@@ -7,5 +7,6 @@ window.SUPABASE_CONFIG = {
   url: 'https://gylxgpqdbhbuoxaxbazb.supabase.co',
   key: 'sb_publishable_3bpRJx_gbvhNNMWM5TlpAg_qss7NmHl',
   table: 'places',
+  pendingTable: 'pending_places',   // 快速登錄暫存表（時間 + 短網址 + 備註）
   bucket: 'place-photos',   // Supabase Storage bucket（放照片）
 };

@@ -63,3 +63,29 @@ drop policy if exists "place-photos delete" on storage.objects;
 create policy "place-photos read"   on storage.objects for select using (bucket_id = 'place-photos');
 create policy "place-photos insert" on storage.objects for insert with check (bucket_id = 'place-photos');
 create policy "place-photos delete" on storage.objects for delete using (bucket_id = 'place-photos');
+
+-- ============================================================
+--  快速登錄暫存表（pending_places）
+--  只存「時間 + Google 短網址 + 備註」，之後複製出來交給 LLM
+--  補齊成完整資料，再走批次匯入寫進 places。
+-- ============================================================
+create table if not exists public.pending_places (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),               -- 登錄當下時間
+  visited_at timestamptz not null default now(),               -- 表單填的「時間」
+  google_url text        not null,                             -- 原始短網址（不解析）
+  note       text,                                             -- 備註（選填）
+  author     text                                              -- 登錄者
+);
+
+create index if not exists pending_places_created_at_idx on public.pending_places (created_at desc);
+
+alter table public.pending_places enable row level security;
+
+drop policy if exists "pending read"   on public.pending_places;
+drop policy if exists "pending insert" on public.pending_places;
+drop policy if exists "pending delete" on public.pending_places;
+
+create policy "pending read"   on public.pending_places for select using (true);
+create policy "pending insert" on public.pending_places for insert with check (true);
+create policy "pending delete" on public.pending_places for delete using (true);

@@ -304,17 +304,54 @@ function renderGreeting(name) {
 function currentUser() {
   return getCookie('username') || '訪客';
 }
-function initUserName() {
+// 名字輸入彈窗（取代 prompt；密碼仍走瀏覽器 prompt）
+// cancelable=false 時沒有取消鈕、Esc 也關不掉，一定要給名字
+function askName({ title, value = '', cancelable = true }) {
+  return new Promise(resolve => {
+    const modal = $('#name-modal');
+    const input = $('#name-input');
+    const cancelBtn = $('#name-cancel');
+    $('#name-title').textContent = title;
+    input.value = value;
+    cancelBtn.hidden = !cancelable;
+    modal.hidden = false;
+    setTimeout(() => { input.focus(); input.select(); }, 0);
+
+    const close = result => {
+      modal.hidden = true;
+      $('#name-confirm').removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      input.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onOk = () => {
+      const v = input.value.trim();
+      if (!v && !cancelable) { input.focus(); return; }   // 首次進入不能留空
+      close(v || null);
+    };
+    const onCancel = () => close(null);
+    const onKey = e => {
+      if (e.key === 'Enter') { e.preventDefault(); onOk(); }
+      if (e.key === 'Escape' && cancelable) onCancel();
+    };
+
+    $('#name-confirm').addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    input.addEventListener('keydown', onKey);
+  });
+}
+
+async function initUserName() {
   let name = getCookie('username');
   if (!name) {
-    name = (prompt('歡迎！請輸入你的名字：') || '').trim() || '訪客';
+    name = (await askName({ title: '歡迎！請輸入你的名字', cancelable: false })) || '訪客';
     setCookie('username', name, 365);
   }
   renderGreeting(name);
 }
 // 點問候語可改名字
-$('#greeting').addEventListener('click', () => {
-  const name = (prompt('修改名字：', getCookie('username') || '') || '').trim();
+$('#greeting').addEventListener('click', async () => {
+  const name = await askName({ title: '修改名字', value: getCookie('username') || '' });
   if (name) { setCookie('username', name, 365); renderGreeting(name); }
 });
 
@@ -838,6 +875,150 @@ $('#import-confirm').addEventListener('click', async () => {
   $('#import-file').value = '';
   await loadPlaces();
   showView('list');
+});
+
+// ---------- 快速登錄（時間 + 短網址 + 備註 → pending 表）----------
+// 在外面吃完先記一筆，之後把清單複製給 LLM 補齊資料，再走批次匯入寫進 places。
+// 這裡刻意「不」解析短網址（不呼叫 resolveShortUrl），原樣存、原樣複製。
+const PENDING_TABLE = CFG.pendingTable || 'pending_places';
+let pendingRows = [];
+
+// datetime-local 要的是本地時間字串 YYYY-MM-DDTHH:mm（toISOString 是 UTC，不能直接用）
+function nowLocalInput() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// 複製給 LLM 用的時間格式：YYYY-MM-DD HH:mm（本地時區）
+function fmtLocalStamp(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} `
+       + `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// 匯入卡片分頁切換（批次匯入 / 快速登錄）
+$$('.import-tab').forEach(btn => btn.addEventListener('click', () => {
+  const mode = btn.dataset.mode;
+  $$('.import-tab').forEach(b => b.classList.toggle('active', b === btn));
+  $('#import-bulk').hidden = mode !== 'bulk';
+  $('#import-quick').hidden = mode !== 'quick';
+  if (mode === 'quick') {
+    $('#quick-form').visited_at.value = nowLocalInput();   // 每次切進來都帶到「現在」
+    loadPending();
+  }
+}));
+
+async function loadPending() {
+  const { data, error } = await sb.from(PENDING_TABLE)
+    .select('*')
+    .order('visited_at', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (error) {
+    toast('讀取待處理失敗：' + error.message, true);
+    console.error(error);
+    return;
+  }
+  pendingRows = data || [];
+  renderPending();
+}
+
+function renderPending() {
+  $('#pending-count').textContent = pendingRows.length;
+  $('#pending-list').innerHTML = pendingRows.length
+    ? pendingRows.map(r => `
+    <div class="pending-item">
+      <div class="pi-main">
+        <div class="pi-head">
+          <span class="pi-time">${esc(fmtDate(r.visited_at))}</span>
+          ${r.note ? `<span class="pi-note">${esc(r.note)}</span>` : ''}
+        </div>
+        <a class="pi-url" href="${esc(r.google_url)}" target="_blank" rel="noopener">${esc(r.google_url)}</a>
+      </div>
+      <button type="button" class="btn small danger" onclick="deletePending(${r.id})" title="刪除這筆">🗑️</button>
+    </div>`).join('')
+    : '<p class="hint">目前沒有待處理資料。</p>';
+}
+
+$('#quick-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  const url = f.google_url.value.trim();
+  if (!url) return toast('請貼上 Google 短網址', true);
+  const rec = {
+    visited_at: f.visited_at.value ? new Date(f.visited_at.value).toISOString() : new Date().toISOString(),
+    google_url: url,
+    note: f.note.value.trim() || null,
+    author: currentUser(),
+  };
+  const btn = $('#quick-submit');
+  btn.disabled = true;
+  const { error } = await sb.from(PENDING_TABLE).insert(rec);
+  btn.disabled = false;
+  if (error) return toast('登錄失敗：' + error.message, true);
+  toast('已登錄，等待處理');
+  f.google_url.value = '';
+  f.note.value = '';
+  f.visited_at.value = nowLocalInput();   // 下一筆一樣預設現在
+  await loadPending();
+});
+
+window.deletePending = async function (id) {
+  if (!confirm('確定要刪除這筆待處理資料？')) return;
+  const { error } = await sb.from(PENDING_TABLE).delete().eq('id', id);
+  if (error) return toast('刪除失敗：' + error.message, true);
+  toast('已刪除');
+  loadPending();
+};
+
+// 複製格式：每行一筆「時間 | 短網址 | 備註」（沒備註就只有兩段）
+function pendingCopyText() {
+  return pendingRows.map(r => {
+    const parts = [fmtLocalStamp(r.visited_at), r.google_url];
+    if (r.note) parts.push(r.note);
+    return parts.join(' | ');
+  }).join('\n');
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // 非 https 或舊瀏覽器：退回隱藏 textarea + execCommand
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+
+$('#pending-copy').addEventListener('click', async () => {
+  if (!pendingRows.length) return toast('目前沒有待處理資料', true);
+  const ok = await copyText(pendingCopyText());
+  toast(ok ? `已複製 ${pendingRows.length} 筆` : '複製失敗，請手動選取', !ok);
+});
+
+// 清空全部：兩段確認，只刪目前清單上看到的這些 id（避免誤刪剛剛才新增的）
+$('#pending-clear').addEventListener('click', async () => {
+  if (!pendingRows.length) return toast('目前沒有待處理資料', true);
+  const n = pendingRows.length;
+  if (!confirm(`要清空全部 ${n} 筆待處理資料嗎？`)) return;
+  if (!confirm(`最後確認：這 ${n} 筆會直接從資料庫刪除，無法復原。確定要清空？`)) return;
+  const btn = $('#pending-clear');
+  btn.disabled = true;
+  const { error } = await sb.from(PENDING_TABLE).delete().in('id', pendingRows.map(r => r.id));
+  btn.disabled = false;
+  if (error) return toast('清空失敗：' + error.message, true);
+  toast(`已清空 ${n} 筆`);
+  await loadPending();
 });
 
 // ---------- 首次進入彈窗（尋人啟事風格）----------
