@@ -523,15 +523,22 @@ $('#detail-modal').addEventListener('click', e => {
 });
 
 // ---------- 2) 列表 ----------
-// 依「年份 + 四季」分組：春 3-5 月、夏 6-8 月、秋 9-11 月、冬 12-2 月
-// （冬季照該筆自己的年份算，所以 2026/12 是「2026 冬」、2027/1 是「2027 冬」）
-const SEASONS = ['冬', '春', '夏', '秋'];
+// 依「年份 + 四季」分組：春 2-4 月、夏 5-7 月、秋 8-10 月、冬 11-12 月+隔年 1 月
+// （冬季橫跨年末年初，統一算「11、12 月那一年」的冬天，所以 2025/11、2025/12、
+// 2026/1 都是「2025 冬」，接著才是 2026 春）
+const SEASONS = ['春', '夏', '秋', '冬'];
 function seasonKey(p) {
   const iso = p.visited_at || p.created_at;
   if (!iso) return { key: 'unknown', label: '未填時間', sort: -1 };
   const d = new Date(iso);
-  const y = d.getFullYear();
-  const s = Math.floor(((d.getMonth() + 1) % 12) / 3);   // 0=冬(12,1,2) 1=春 2=夏 3=秋
+  let y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  let s;
+  if (m === 1) { s = 3; y -= 1; }   // 1 月算前一年的冬天
+  else if (m <= 4) s = 0;           // 2-4 月 春
+  else if (m <= 7) s = 1;           // 5-7 月 夏
+  else if (m <= 10) s = 2;          // 8-10 月 秋
+  else s = 3;                       // 11-12 月 冬
   return { key: `${y}-${s}`, label: `${y} ${SEASONS[s]}`, sort: y * 10 + s };
 }
 
