@@ -1,0 +1,38 @@
+# Supabase 免費方案閒置 7 天會自動暫停專案（2026-09 曾因此整站讀取失敗）
+# → 每 3 天打一次 places API，讓專案保持活躍
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '17 3 */3 * *'   # UTC 03:17 = 台灣 11:17，每 3 天
+  workflow_dispatch:
+
+permissions:
+  actions: write   # 下面「重新啟用排程」要用
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 連線設定直接讀 config.js（publishable key 本來就公開），不在這裡重複一份
+      - name: Ping Supabase
+        run: |
+          url=$(grep -oE "url: *'[^']+'" assets/js/config.js | cut -d"'" -f2)
+          key=$(grep -oE "key: *'[^']+'" assets/js/config.js | cut -d"'" -f2)
+          table=$(grep -oE "table: *'[^']+'" assets/js/config.js | cut -d"'" -f2)
+          code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 10 \
+            "$url/rest/v1/$table?select=id&limit=1" \
+            -H "apikey: $key" -H "authorization: Bearer $key")
+          echo "HTTP $code"
+          # 失敗就讓 job 紅掉 → GitHub 會寄信通知（多半代表專案又被暫停了）
+          test "$code" = 200
+
+      # GitHub 會停用「repo 60 天沒活動」的排程 workflow；
+      # 每次跑完呼叫一次 enable API 重置計時，repo 很久沒 commit 也不會停
+      - name: Keep this schedule enabled
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/supabase-keepalive.yml/enable"
