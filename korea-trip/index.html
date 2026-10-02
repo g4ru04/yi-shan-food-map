@@ -137,7 +137,7 @@
 
 <div id="sidebar">
   <h1>首爾 5 天 4 夜旅遊地圖</h1>
-  <div class="subtitle">10/6 (一) 19:05 抵達 → 10/10 (五) 12:35 離開 ｜ 3人 2間房</div>
+  <div class="subtitle">10/6 (二) 19:05 抵達 → 10/10 (六) 12:35 離開 ｜ 3人 2間房</div>
 
   <!-- Legend (點擊類別可篩選地圖上的點，再點一次取消) -->
   <div class="legend">
@@ -182,7 +182,7 @@
   <div class="day-card" onclick="flyToDay(1)">
     <div class="day-header">
       <span class="day-num">DAY 1</span>
-      <span class="day-date">10/6 (一)</span>
+      <span class="day-date">10/6 (二)</span>
     </div>
     <div class="day-theme">抵達首爾 + 明洞夜逛</div>
     <div class="day-items">
@@ -198,7 +198,7 @@
   <div class="day-card" onclick="flyToDay(2)">
     <div class="day-header">
       <span class="day-num">DAY 2</span>
-      <span class="day-date">10/7 (二)</span>
+      <span class="day-date">10/7 (三)</span>
     </div>
     <div class="day-theme">購物日：明洞 + 弘大 + 聖水</div>
     <div class="day-items">
@@ -216,7 +216,7 @@
   <div class="day-card" onclick="flyToDay(3)">
     <div class="day-header">
       <span class="day-num">DAY 3</span>
-      <span class="day-date">10/8 (三)</span>
+      <span class="day-date">10/8 (四)</span>
     </div>
     <div class="day-theme">汗蒸幕 + The Weeknd 演唱會</div>
     <div class="day-items">
@@ -237,7 +237,7 @@
   <div class="day-card" onclick="flyToDay(4)">
     <div class="day-header">
       <span class="day-num">DAY 4</span>
-      <span class="day-date">10/9 (四)</span>
+      <span class="day-date">10/9 (五)</span>
     </div>
     <div class="day-theme">最後衝刺 + 打包</div>
     <div class="day-items">
@@ -256,7 +256,7 @@
   <div class="day-card" onclick="flyToDay(5)">
     <div class="day-header">
       <span class="day-num">DAY 5</span>
-      <span class="day-date">10/10 (五)</span>
+      <span class="day-date">10/10 (六)</span>
     </div>
     <div class="day-theme">回程</div>
     <div class="day-items">
@@ -314,8 +314,8 @@
 
   <div class="tip-box">
     <strong>💰 換錢</strong>（1 TWD ≈ 42.5 KRW）<br>
-    每人帶台幣 <strong>NT$9,000</strong>，分三段換：機場 NT$1,500 應急 → Day 2 明洞換錢所 NT$5,000（主力）→ Day 4 明洞補換<br>
-    ⚠️ 明洞換錢所（大使館/一品香）<strong>21:30 打烊</strong>，Day 1 到明洞已關門，機場一定要先換<br>
+    每人帶台幣 <strong>NT$9,000</strong>，分三段換：出發前台灣（台銀）先換 ₩100,000 應急 → Day 2 明洞換錢所 NT$5,000（主力）→ Day 4 明洞補換<br>
+    ⚠️ 明洞換錢所（大使館/一品香）<strong>21:30 打烊</strong>，Day 1 約 21:30 才到明洞（剛好打烊），出發前要先在台灣換一小筆<br>
     購物一律刷卡；WOWPASS 只當交通卡＋小額用（開卡費 ₩5,000、領現 ₩1,000、T-money 餘額分開）
   </div>
 
@@ -410,7 +410,7 @@ addMarker('aquafield', [37.6530, 126.8920], '#27ae60', 16,
 
 // Concert
 const concertMarker = L.marker([37.6745, 126.7418], { icon: createStarIcon('#9b59b6') })
-  .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (三) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40<br><br><a href="https://maps.google.com/?cid=14855984331673672246" target="_blank">google-url</a> 4.5⭐️(1,195)')
+  .bindPopup('<b>高陽體育館</b><br>The Weeknd 演唱會<br>10/8 (四) 19:45<br><br>地鐵3號線可達<br>⚠️ 末班車約 23:20~23:40<br><br><a href="https://maps.google.com/?cid=14855984331673672246" target="_blank">google-url</a> 4.5⭐️(1,195)')
   .addTo(map);
 allMarkers['concert'] = { marker: concertMarker, pos: [37.6745, 126.7418], color: '#9b59b6', size: 20, days: [3], isStar: true };
 
