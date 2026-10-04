@@ -82,7 +82,7 @@
 | — | 聖水站 3 號出口，성수이로 58 | — |
 | 19:30 | 🍽️ 聖水晚餐（꿉당烤肉、大成排骨、有名聖水馬鈴薯排骨湯 24H）→ 回飯店 | 地鐵2號線 聖水 → 乙支路3街 → 步行約 10 分鐘 |
 
-> CHAAKAN 優惠：出示按讚 Reels 享 8 折（至 2026.12.31）
+> CHAAKAN 優惠：出示[按讚 Reels](https://www.instagram.com/p/DZ2cE7jvvC9/)（@yocindy101）享 8 折（至 2026.12.31）
 >
 > 🛍️ **明洞逛街補充**：品牌都集中在商圈內——Olive Young、大創、SPAO、MLB、Emis、Kodak、Åland、Butter、ABC Mart；下午茶可衝 **Hello Kitty Apple Café**（명동6길 15，明洞站 6 號出口步行 3-5 分，10:00-22:00，3 樓有三麗鷗周邊店）[3.9⭐(202)](https://maps.google.com/?cid=8375444824916994493)
 > 🛍️ 想買質感小眾包：**FERIA**（延南洞，Y2K 粉嫩系、約台幣萬元內）離弘大不遠可順路
@@ -220,7 +220,7 @@
 ## CHAAKAN Shoes 首爾分店
 
 > 平價國民女鞋：鞋子不到 NT$1,000、靴子 NT$2,000 有找
-> 出示按讚 Reels 享 8 折（至 2026.12.31）
+> 出示[按讚 Reels](https://www.instagram.com/p/DZ2cE7jvvC9/)（@yocindy101）享 8 折（至 2026.12.31）
 
 | 分店 | 位置 | Google 評分 |
 |:---|:---|:---|
@@ -319,7 +319,7 @@
 | 技巧 | 說明 |
 |------|------|
 | 酷柏返點 | Line 搜尋「酷柏國際返點」→ 免稅店報團號 → 回國拿現金回饋 |
-| CHAAKAN 8折 | 到 CHAAKAN 門市出示按讚 Reels 即享 8 折（至 2026.12.31） |
+| CHAAKAN 8折 | 到 CHAAKAN 門市出示[按讚 Reels](https://www.instagram.com/p/DZ2cE7jvvC9/)即享 8 折（至 2026.12.31） |
 | 明洞連鎖店 | SPAO、Olive Young、大創等連鎖店各分店價格一樣，不用怕明洞比較貴 |
 | SeS 快速通關 | 仁川機場入境前辦理，加速通關 |
 
@@ -335,7 +335,7 @@
 - [ ] 下載所有 APP
 - [ ] Catchtable 註冊（韓國餐廳訂位，需手機驗證，台灣先辦好）
 - [ ] 酷柏返點 LINE 加好友
-- [ ] CHAAKAN Reels 先按讚
+- [ ] CHAAKAN Reels 先按讚：https://www.instagram.com/p/DZ2cE7jvvC9/
 
 ## 行李打包清單（5 天 4 夜）
 

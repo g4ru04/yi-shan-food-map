@@ -36,7 +36,7 @@
 | 17:30 | 聖水散步＋CHAAKAN 聖水店（聖水站 3 號出口） | — |
 | 19:30 | 🍽️ 聖水晚餐（꿉당烤肉、大成排骨、有名聖水馬鈴薯排骨湯 24H）→ 回飯店 | 2號線→乙支路3街＋步行 10 分 |
 
-> CHAAKAN 出示按讚 Reels 享 8 折
+> CHAAKAN 出示[按讚 Reels](https://www.instagram.com/p/DZ2cE7jvvC9/)享 8 折
 
 ## Day 3｜10/8 (四) — 汗蒸幕＋The Weeknd 演唱會
 
@@ -112,7 +112,7 @@
 - [ ] 下載所有 APP
 - [ ] Catchtable 註冊（韓國餐廳訂位，需手機驗證，台灣先辦好）
 - [ ] 酷柏返點 LINE 加好友
-- [ ] CHAAKAN Reels 先按讚
+- [ ] CHAAKAN Reels 先按讚：https://www.instagram.com/p/DZ2cE7jvvC9/
 
 ## 行李打包清單
 
