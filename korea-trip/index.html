@@ -187,7 +187,7 @@
     <div class="day-theme">抵達首爾 + 明洞夜逛</div>
     <div class="day-items">
       <span class="time">15:30</span> 🛫 華航 CI162 桃園 T1 起飛（14:50 登機）<br>
-      <span class="time">19:05</span> 抵達仁川機場 T2（辦 SeS、下載 Smart Pass）<br>
+      <span class="time">19:05</span> 抵達仁川機場 T2（登記 SeS 自動通關）<br>
       <span class="time">20:00</span> 搭 AREX 機場快線 T2 → 首爾站（直達車約 51 分鐘）<br>
       <span class="time">20:55</span> 首爾站 → 地鐵1號線 → 鐘路3街站（約 7 分鐘）<br>
       <span class="time">21:10</span> Check-in M&LUCKY HOTEL、放行李<br>
@@ -263,7 +263,7 @@
       <span class="time">08:30</span> Check-out、寄放行李取回<br>
       <span class="time">09:00</span> 鐘路3街 → 地鐵1號線 → 首爾站（約 7 分鐘）<br>
       <span class="time">09:15</span> 搭 <span class="highlight">AREX 機場快線</span> 直達車終點即 T2（約 51 分鐘）<br>
-      <span class="time">10:10</span> 抵達仁川機場 T2（Smart Pass 刷臉出境）<br>
+      <span class="time">10:10</span> 抵達仁川機場 T2（Smart Pass 刷臉＋SeS 自動閘門出境）<br>
       <span class="time">12:35</span> 🛫 華航 CI161 起飛（11:55 登機）→ 14:10 桃園 T1
     </div>
   </div>
@@ -285,8 +285,9 @@
 
   <div class="tip-box">
     <strong>機場通關</strong><br>
-    SeS：入境前申請快速通關<br>
-    Smart Pass：出境刷臉通關，省排隊時間
+    SeS：10/6 入境時在 SeS 櫃台登記（護照＋指紋＋臉），入境/出境審查都能走自動閘門<br>
+    Smart Pass：出發前在 App 登記護照＋臉，10/10 刷臉過出境大廳與登機門<br>
+    AREX 直達車：要另外買票（官方 ₩13,000／Klook 約 ₩11,500），嗶卡進不去
   </div>
 
   <div class="tip-box">
@@ -377,7 +378,7 @@ function addMarker(id, pos, color, size, popup, days, label) {
 
 // Airport
 addMarker('airport', [37.4602, 126.4407], '#9b59b6', 16,
-  '<b>仁川國際機場 T2</b><br>抵達：10/6 19:05（華航 CI162，15:30 桃園 T1 起飛）<br>離開：10/10 12:35（華航 CI161 → 14:10 桃園 T1）<br><br><b>交通</b>：AREX 直達車 T2 ↔ 首爾站約 51 分鐘<br><br><a href="https://maps.google.com/?cid=10181407952118529748" target="_blank">google-url</a> 4.5⭐️(33,091)', [1,5]);
+  '<b>仁川國際機場 T2</b><br>抵達：10/6 19:05（華航 CI162，15:30 桃園 T1 起飛）<br>離開：10/10 12:35（華航 CI161 → 14:10 桃園 T1）<br><br><b>交通</b>：AREX 直達車 T2 ↔ 首爾站約 51 分鐘<br>🎫 直達車要另外買票：Klook 電子票到 B1 售票機「兌換票券」換對號座票<br><br><a href="https://maps.google.com/?cid=10181407952118529748" target="_blank">google-url</a> 4.5⭐️(33,091)', [1,5]);
 
 // Hotel (confirmed)
 addMarker('hotel', [37.5713, 126.9909], '#ffd369', 18,
@@ -405,7 +406,7 @@ addMarker('lotte', [37.5656, 126.9810], '#4a90d9', 12,
 
 // Attractions
 addMarker('aquafield', [37.6530, 126.8920], '#27ae60', 16,
-  '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>扁柏木/多媒體藝術/雲端熱療室<br>屋頂泳池僅夏季開放（10 月不用帶泳衣）<br><br><a href="https://maps.google.com/?cid=17404309354366294526" target="_blank">google-url</a> 4.3⭐️(3,784)', [3]);
+  '<b>AQUAFIELD 高陽店</b><br>아쿠아필드<br>地鐵3號線 三松站 3 號出口<br><br>鹽磚房（喜馬拉雅岩鹽）必體驗<br>🛒 Starfield B1 大創：買演唱會野餐墊/坐墊/雨衣<br>扁柏木/多媒體藝術/雲端熱療室<br>屋頂泳池僅夏季開放（10 月不用帶泳衣）<br><br><a href="https://maps.google.com/?cid=17404309354366294526" target="_blank">google-url</a> 4.3⭐️(3,784)', [3]);
 
 // Concert
 const concertMarker = L.marker([37.6745, 126.7418], { icon: createStarIcon('#9b59b6') })
@@ -480,6 +481,14 @@ addMarker('objectseogyo', [37.5553, 126.9230], '#4a90d9', 11,
   '<b>Object 西橋店（弘大）</b><br>오브젝트 서교점<br>4 層樓文創選物：獨立作家貼紙/袋物/雜貨 ₩3,000-40,000<br>⏰ 12:00-21:00<br>📍 와우산로35길 13<br><br><a href="https://www.google.com/maps/search/?api=1&query=오브젝트+서교점" target="_blank">google-url</a>', []);
 addMarker('doota', [37.5689, 127.0090], '#4a90d9', 12,
   '<b>DOOTA Mall（東大門）</b><br>두타몰<br>夜間綜合商場：K-fashion/美妝，開到午夜<br>⏰ 約 10:30-24:00<br>💡 東大門夜逛以 DOOTA 為主（apM 已改批發）<br><br><a href="https://www.google.com/maps/search/?api=1&query=두타몰" target="_blank">google-url</a>', []);
+addMarker('loofon', [37.5523, 126.9221], '#4a90d9', 11,
+  '<b>Loofon 弘大</b><br>루프온 홍대<br>2026 流行穿搭一站買齊：帽子/墨鏡/絲巾/衣鞋，全身約 NT$3,000 內<br>⏰ 11:00-23:00<br>📍 와우산로21길 31 B1（弘大入口站 9 號出口）<br><br><a href="https://www.google.com/maps/search/?api=1&query=루프온+홍대" target="_blank">google-url</a>', [2]);
+addMarker('yejak', [37.5725, 126.9912], '#4a90d9', 10,
+  '<b>예작쥬얼리（玉戒指）</b><br>韓國流行玉飾 옥코어，BTS V 同款；店員會中英文<br>⏰ 平日 11:00-19:00／週末 11:00-18:00<br>📍 돈화문로 32（鐘路3街站 9 號出口，飯店旁）<br><br><a href="https://www.google.com/maps/search/?api=1&query=예작쥬얼리+종로" target="_blank">google-url</a>', []);
+addMarker('oksibang', [37.5705, 126.9925], '#4a90d9', 10,
+  '<b>옥시방（玉戒指）</b><br>玉戒指/項鍊，需韓文溝通<br>⏰ 10:30-18:30<br>📍 종로 141-1 금천지상가 1F（鐘路3街站 11 號出口）<br><br><a href="https://www.google.com/maps/search/?api=1&query=옥시방+종로" target="_blank">google-url</a>', []);
+addMarker('newwave711', [37.5613, 126.9873], '#4a90d9', 10,
+  '<b>7-11 NEW WAVE 明洞店</b><br>세븐일레븐 뉴웨이브 명동점<br>發光地鐵站牌鑰匙圈扭蛋、漢江拉麵機、KPOP 周邊/紀念品<br>⏰ 24H<br>📍 퇴계로 139（明洞站 9 號出口）<br><br><a href="https://www.google.com/maps/search/?api=1&query=세븐일레븐+뉴웨이브+명동점" target="_blank">google-url</a>', []);
 addMarker('daelim', [37.5416, 127.0559], '#f39c12', 12,
   '<b>大林倉庫（聖水）</b><br>대림창고<br>倉庫改建咖啡＋藝廊，聖水地標<br>咖啡 ₩7,000-17,000<br>⏰ 11:00-22:00<br><br><a href="https://www.google.com/maps/search/?api=1&query=대림창고" target="_blank">google-url</a> 4.2⭐️(2,000+)', []);
 addMarker('londonbagel', [37.5789, 126.9850], '#f39c12', 12,
