@@ -62,12 +62,69 @@
   tr.gone td:nth-child(2), tr.gone td.last-seen { opacity: 1; }
   td.last-seen.stale, td.last-seen.stale .sub { color: #c62828; font-weight: 600; }
   .yes { color: #2e7d32; } .no { color: #b71c1c; } .unk { color: #999; }
+  /* 桌機:篩選永遠展開;手機專用元件隱藏 */
+  #fbox > summary, .mtabs, .sortl { display: none; }
+  #pager span { white-space: nowrap; }
+
+  /* ---- 手機版:列表 / 地圖切換、篩選收合、列表改卡片 ---- */
+  @media (max-width: 768px) {
+    body { padding: 0; }
+    .shell { height: auto; border: 0; }
+    header { position: sticky; top: 0; z-index: 1000; background: #fff; padding: 8px 12px; }
+    h1 { font-size: 15px; margin: 0; }
+    .meta { display: block; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* 篩選展開時標頭會很高,改成跟著捲動,不要蓋住列表 */
+    header:has(#fbox[open]) { position: static; }
+    .mtabs { display: flex; margin: 8px 0 4px; }
+    .mtabs button { flex: 1; padding: 7px; font-size: 15px; border: 1px solid #1a4fa0; background: #fff; color: #1a4fa0; }
+    .mtabs button:first-child { border-radius: 6px 0 0 6px; } .mtabs button:last-child { border-radius: 0 6px 6px 0; }
+    .mtabs button.on { background: #1a4fa0; color: #fff; }
+    #fbox > summary { display: list-item; cursor: pointer; padding: 6px 0; font-weight: 600; color: #1a4fa0; }
+    .filters { gap: 10px 14px; margin-top: 4px; padding-bottom: 6px; }
+    .filters input, .filters select { font-size: 16px; }
+    .filters input[type=number] { width: 84px; }
+    .filters .q, .filters .sortl { display: flex; flex: 1 1 100%; gap: 6px; align-items: center; }
+    .filters .q input, .filters .sortl select { flex: 1; width: auto; }
+    .count { display: none; }
+    main { display: block; }
+    #map { display: none; height: calc(100vh - 150px); border-left: 0; }
+    body.v-map #map { display: block; }
+    body.v-map #left { display: none; }
+    #list { overflow: visible; }
+    thead { display: none; }
+    table, tbody { display: block; }
+    #rows tr { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; padding: 12px; border-bottom: 1px solid #e5e5e5; }
+    #rows td { border: 0; padding: 0; }
+    #rows td.c-thumb { flex: 0 0 96px; order: 0; }
+    /* 標題吃滿縮圖右側整行,標籤才會換到下一行 */
+    #rows td.title { flex: 1 1 calc(100% - 110px); min-width: 0; order: 1; }
+    #rows td.title a { word-break: break-word; }
+    #rows td.chip { flex: 0 0 auto; background: #f1f3f5; border-radius: 4px; padding: 2px 7px; font-size: 13px; text-align: left; color: #333; }
+    #rows td.chip::before { content: attr(data-l) ' '; color: #888; font-size: 11px; }
+    #rows td.chip br { display: none; }
+    #rows td.chip .sub, #rows td.chip div { display: inline; margin-left: 4px; }
+    #rows td.wide { flex: 1 1 100%; font-size: 12px; }
+    #rows td.c-contact { white-space: normal; font-size: 13px; }
+    #rows td.c-contact br { display: none; }
+    #rows td.c-contact a { display: inline-block; padding: 4px 0 4px 10px; font-size: 14px; }
+    #rows td.c-first, #rows td.c-status.is-active { display: none; }
+    #rows td.c-price { order: 2; font-weight: 600; } #rows td.c-area { order: 3; } #rows td.c-dist { order: 4; color: #1a4fa0; }
+    #rows td.c-floor { order: 5; } #rows td.c-light { order: 6; } #rows td.c-bed { order: 7; } #rows td.c-status { order: 8; }
+    #rows td.c-post { order: 9; } #rows td.c-last { order: 10; } #rows td.c-first { order: 11; }
+    #rows td.c-fac { order: 12; } #rows td.c-contact { order: 13; }
+    tr.gone td { opacity: .55; }
+    #pager { position: sticky; bottom: 0; }
+    #pager button { padding: 6px 16px; font-size: 15px; }
+  }
 </style>
 </head>
 <body>
 <div class="shell">
 <header>
   <h1>591 租屋清單 <span class="meta" id="meta">讀取中…</span></h1>
+  <div class="mtabs"><button data-v="list" class="on">列表</button><button data-v="map">地圖</button></div>
+  <details id="fbox" open>
+  <summary id="fsum">篩選 / 排序</summary>
   <div class="filters">
     <label>租金 <input type="number" id="pmin" step="500"> – <input type="number" id="pmax" step="500"></label>
     <label><input type="checkbox" id="withFee"> 含管理費</label>
@@ -80,9 +137,14 @@
     <label><input type="checkbox" id="washer"> 洗衣機</label>
     <label><input type="checkbox" id="owner"> 屋主直租</label>
     <label>狀態 <select id="status"><option value="">全部</option><option value="active,new">在架</option><option value="new">本次新上架</option><option value="gone">已消失</option></select></label>
-    <label><input type="search" id="q" placeholder="關鍵字(標題/地址/設備/備註)"></label>
+    <label class="sortl">排序 <select id="sortSel">
+      <option value="dist:1">距離 近→遠</option><option value="total:1">租金(+管)低→高</option><option value="total:-1">租金(+管)高→低</option>
+      <option value="area_real:-1">坪數 大→小</option><option value="first_seen:-1">首次爬到 新→舊</option><option value="post_days:1">發佈 新→舊</option>
+    </select></label>
+    <label class="q"><input type="search" id="q" placeholder="關鍵字(標題/地址/設備/備註)"></label>
     <span class="count" id="count"></span>
   </div>
+  </details>
 </header>
 <main>
   <div id="left">
@@ -123,6 +185,7 @@ const DATA_SOURCE = 'supabase';
 // const DATA_SOURCE = 'json';
 
 const PAGE_SIZE = 50;
+const isMobile = () => matchMedia('(max-width: 768px)').matches;
 // 預設排序基準點(距離以直線距離計)
 const ORIGIN = [24.1418, 120.6870];
 
@@ -172,7 +235,10 @@ function areaText(i) {
   return d === 0 ? `${use} -0` : d > 0 ? `${use} - ${d.toFixed(1)}` : `${use} + ${(-d).toFixed(1)}`;
 }
 
-let D, map, markers, byId, sortKey = 'dist', sortDir = 1, page = 0, list = [];
+// 同一支號碼常以不同格式重複出現(0967-013-725 / 0967-013725),依數字去重
+const uniqPhones = (ps) => [...new Map(ps.map((p) => [p.replace(/\D/g, ''), p])).values()];
+
+let D, map, markers, byId, bounds, fitted = false, sortKey = 'dist', sortDir = 1, page = 0, list = [];
 const baseStyle = (i) => ({ radius: 6, weight: 1, color: i.status === 'gone' ? '#999' : '#1a4fa0', fillOpacity: 0.6 });
 
 function init(data) {
@@ -190,32 +256,56 @@ function init(data) {
     i.search = [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), i.vision_note, i.contact].join(' ').toLowerCase();
   }
 
-  map = L.map('map');
+  map = L.map('map').setView(ORIGIN, 14); // 先給預設視野,隱藏狀態下加 marker 才不會報錯
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri', maxZoom: 19 }).addTo(map);
   markers = new Map();
   byId = new Map(D.items.map((i) => [i.id, i]));
   for (const i of D.items) if (i.lat) {
     const m = L.circleMarker([i.lat, i.lng], baseStyle(i))
-      .bindPopup(`<b><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a></b><br>${i.price} 元 · ${i.area_ping} 坪 · ${esc(i.floor)}/${esc(i.floor_total)}<br>${esc(i.address)}`);
+      .bindPopup(`<b><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a></b><br>${i.price} 元 · ${i.area_ping} 坪 · ${esc(i.floor)}/${esc(i.floor_total)}<br>${esc(i.address)}<br><a href="#" data-show="${i.id}">在列表中查看 ›</a>`);
     m.on('click', () => showRow(i.id));
     markers.set(i.id, m);
   }
-  const bounds = D.items.filter((i) => i.lat).map((i) => [i.lat, i.lng]);
-  if (bounds.length) map.fitBounds(bounds, { padding: [20, 20] });
+  bounds = D.items.filter((i) => i.lat).map((i) => [i.lat, i.lng]);
+  fitMap();
   L.marker(ORIGIN, { title: '基準點' }).addTo(map).bindPopup('距離基準點');
 
   $('rows').addEventListener('mouseover', (e) => { const tr = e.target.closest('tr'); if (tr) highlight(Number(tr.dataset.id)); });
+  // 桌機點整列、手機點距離標籤:地圖定位到該房源(手機會切到地圖頁)
   $('rows').addEventListener('click', (e) => {
     const tr = e.target.closest('tr'); if (!tr || e.target.closest('a')) return;
-    const m = markers.get(Number(tr.dataset.id)); if (m) { map.setView(m.getLatLng(), 16); m.openPopup(); }
+    if (isMobile() && !e.target.closest('.c-dist')) return;
+    const m = markers.get(Number(tr.dataset.id)); if (!m) return;
+    if (isMobile()) setView('map');
+    map.setView(m.getLatLng(), 16); m.openPopup();
   });
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-show]'); if (!a) return;
+    e.preventDefault(); setView('list'); showRow(Number(a.dataset.show));
+  });
+  document.querySelectorAll('.mtabs button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
+  $('sortSel').addEventListener('change', () => { [sortKey, sortDir] = $('sortSel').value.split(':'); sortDir = Number(sortDir); refresh(); });
+  if (isMobile()) $('fbox').open = false;
   document.querySelectorAll('th[data-k]').forEach((th) => th.addEventListener('click', () => {
     sortDir = sortKey === th.dataset.k ? -sortDir : 1; sortKey = th.dataset.k; refresh();
   }));
-  document.querySelectorAll('.filters input, .filters select').forEach((el) => el.addEventListener('input', refresh));
+  document.querySelectorAll('.filters input, .filters select:not(#sortSel)').forEach((el) => el.addEventListener('input', refresh));
   $('prev').onclick = () => { page--; renderPage(); };
   $('next').onclick = () => { page++; renderPage(); };
   refresh();
+}
+
+// 手機版地圖一開始是隱藏的(尺寸 0),fitBounds 會算錯;等第一次看得到地圖時再框
+function fitMap() {
+  if (fitted || !bounds.length || !$('map').offsetWidth) return;
+  map.fitBounds(bounds, { padding: [20, 20] });
+  fitted = true;
+}
+
+function setView(v) {
+  document.body.classList.toggle('v-map', v === 'map');
+  document.querySelectorAll('.mtabs button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
+  if (v === 'map') { map.invalidateSize(); fitMap(); }
 }
 
 function highlight(id) {
@@ -264,6 +354,9 @@ function refresh() {
   const ids = new Set(list.map((i) => i.id));
   for (const [id, m] of markers) ids.has(id) ? m.addTo(map) : m.remove();
   $('count').textContent = `${list.length} / ${D.items.length} 筆`;
+  $('fsum').textContent = `篩選 / 排序 · ${list.length} / ${D.items.length} 筆`;
+  const sv = `${sortKey}:${sortDir}`;
+  if ([...$('sortSel').options].some((o) => o.value === sv)) $('sortSel').value = sv;
   document.querySelectorAll('th[data-k]').forEach((th) => {
     th.classList.toggle('sorted', th.dataset.k === sortKey);
     th.dataset.dir = sortDir > 0 ? ' ▲' : ' ▼';
@@ -287,22 +380,22 @@ function renderPage() {
       + (i.preferred ? '<span class="badge">優選</span>' : '')
       + (i.contact_role === '屋主' ? '<span class="badge">屋主</span>' : '');
     return `<tr data-id="${i.id}" class="${i.status === 'gone' ? 'gone' : ''}">
-      <td><a href="${esc(i.url)}" target="_blank"><img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.photo)}"></a></td>
+      <td class="c-thumb"><a href="${esc(i.url)}" target="_blank"><img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.photo)}"></a></td>
       <td class="title"><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a><div>${badges}</div>
         <div class="sub">${esc(i.kind)} · ${esc(i.address)} · #${i.id}</div></td>
-      <td class="num">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
-      <td class="nowrap"><span class="badge ${sc}">${st}</span>${i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
-      <td class="sub nowrap">${fmt(i.first_seen)}</td>
-      <td class="sub nowrap last-seen ${i.status === 'gone' ? 'stale' : ''}" title="${i.status === 'gone' ? '最新一次爬取沒有這間' : ''}">${fmt(i.last_seen)}<br>共 ${i.seen_count} 次</td>
-      <td class="sub nowrap">${esc(i.post_time)}<br>${esc(i.refresh_time || '')}</td>
-      <td class="num">${i.price.toLocaleString()}<div class="sub">${i.manage_fee ? '+' + i.manage_fee : esc(i.manage_fee_note || '')}</div>${i.price_history.length > 1 ? `<div class="sub" title="歷次租金">${i.price_history.join('→')}</div>` : ''}</td>
-      <td class="num" title="可使用 ${i.area_ping} 坪 / 建物(不含公設)${i.area_build ?? '?'} 坪${i.area_build != null && !buildOk(i) ? '(數值不合理,未採用)' : ''} / 權狀 ${i.area_right ?? '?'} 坪">${areaText(i)}</td>
-      <td class="num">${esc(i.floor)}/${esc(i.floor_total)}</td>
-      <td class="${lc}" title="${esc(i.vision_note)}">${lt}</td>
-      <td class="${bc}" title="${esc(i.vision_note)}">${bt}</td>
-      <td class="sub fac">${i.has_elevator ? '<span class="yes">電梯</span>' : '<span class="no">無電梯</span>'} ·
+      <td class="num chip c-dist" data-l="📍">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
+      <td class="nowrap chip c-status ${i.status === 'active' ? 'is-active' : ''}" data-l=""><span class="badge ${sc}">${st}</span>${i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
+      <td class="sub nowrap chip c-first" data-l="首次">${fmt(i.first_seen)}</td>
+      <td class="sub nowrap chip c-last last-seen ${i.status === 'gone' ? 'stale' : ''}" data-l="最後" title="${i.status === 'gone' ? '最新一次爬取沒有這間' : ''}">${fmt(i.last_seen)}<br><span class="sub">共 ${i.seen_count} 次</span></td>
+      <td class="sub nowrap chip c-post" data-l="發佈">${esc(i.post_time)}<br><span class="sub">${esc(i.refresh_time || '')}</span></td>
+      <td class="num chip c-price" data-l="$">${i.price.toLocaleString()}<div class="sub">${i.manage_fee ? '+' + i.manage_fee : esc(i.manage_fee_note || '')}</div>${i.price_history.length > 1 ? `<div class="sub" title="歷次租金">${i.price_history.join('→')}</div>` : ''}</td>
+      <td class="num chip c-area" data-l="坪" title="可使用 ${i.area_ping} 坪 / 建物(不含公設)${i.area_build ?? '?'} 坪${i.area_build != null && !buildOk(i) ? '(數值不合理,未採用)' : ''} / 權狀 ${i.area_right ?? '?'} 坪">${areaText(i)}</td>
+      <td class="num chip c-floor" data-l="樓">${esc(i.floor)}/${esc(i.floor_total)}</td>
+      <td class="${lc} chip c-light" data-l="採光" title="${esc(i.vision_note)}">${lt}</td>
+      <td class="${bc} chip c-bed" data-l="雙人床" title="${esc(i.vision_note)}">${bt}</td>
+      <td class="sub fac wide c-fac">${i.has_elevator ? '<span class="yes">電梯</span>' : '<span class="no">無電梯</span>'} ·
         ${i.has_washer ? '<span class="yes">洗衣機</span>' : '<span class="no">無洗衣機</span>'}<br>${esc(i.facilities.filter((f) => f !== '電梯' && f !== '洗衣機').join('、'))}</td>
-      <td class="sub nowrap">${esc(i.contact)}<br>${i.phones.map((p) => `<a href="tel:${esc(p)}">${esc(p)}</a>`).join('<br>')}</td>
+      <td class="sub nowrap wide c-contact">${esc(i.contact)}<br>${uniqPhones(i.phones).map((p) => `<a href="tel:${esc(p)}">${esc(p)}</a>`).join('<br>')}</td>
     </tr>`;
   }).join('');
 }
