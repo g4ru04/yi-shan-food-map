@@ -58,3 +58,7 @@
 ## 子目錄
 
 - `korea-trip/` 有自己的 CLAUDE.md（行程檔案連動更新規則），改該目錄前先讀
+- `591-rent-house/`:591 租屋清單(獨立頁,整頁 `prompt()` 密碼鎖,共用 `assets/js/config.js` 的 Supabase 設定)
+  - 爬蟲 `scripts/591-rent.mjs`(`scrape` → `images --download` + LLM 判圖 + `scripts/591-merge-vision.py` → `sync`),流程見 `~/.claude/commands/auto-retrieve-rent-data.md`
+  - 網頁預設讀 Supabase `rent_listings` / `rent_snapshots`;`index.html` 的 `DATA_SOURCE` 兩行註解對調即改讀 `data.json`(`dump` 從 Supabase 產生,`json` 從本機快照產生)
+  - `data/` 的快照、`vision.json` 進 git;照片與判圖批次檔只留本機(.gitignore)

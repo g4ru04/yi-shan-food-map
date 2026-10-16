@@ -112,3 +112,42 @@ drop policy if exists "pending delete" on public.pending_places;
 create policy "pending read"   on public.pending_places for select using (true);
 create policy "pending insert" on public.pending_places for insert with check (true);
 create policy "pending delete" on public.pending_places for delete using (true);
+
+-- ============================================================
+--  591 租屋(591-rent-house/):scripts/591-rent.mjs sync 寫入,網頁讀取
+--  rent_listings.data = 網頁要用的整列資料(格式同 591-rent-house/data.json 的 items[])
+-- ============================================================
+create table if not exists public.rent_listings (
+  id          bigint primary key,           -- 591 id(換 id 重刊時以最新 id 為準)
+  status      text not null,                -- active / new / gone
+  first_seen  timestamptz not null,
+  last_seen   timestamptz not null,
+  data        jsonb not null,
+  updated_at  timestamptz not null default now()
+);
+create table if not exists public.rent_snapshots (
+  scraped_at  timestamptz primary key,       -- 每次爬取
+  count int, total int, query_url text
+);
+
+-- 與 places 相同:匿名金鑰可讀寫
+alter table public.rent_listings  enable row level security;
+alter table public.rent_snapshots enable row level security;
+
+drop policy if exists "public read"   on public.rent_listings;
+drop policy if exists "public insert" on public.rent_listings;
+drop policy if exists "public update" on public.rent_listings;
+drop policy if exists "public delete" on public.rent_listings;
+create policy "public read"   on public.rent_listings for select using (true);
+create policy "public insert" on public.rent_listings for insert with check (true);
+create policy "public update" on public.rent_listings for update using (true) with check (true);
+create policy "public delete" on public.rent_listings for delete using (true);
+
+drop policy if exists "public read"   on public.rent_snapshots;
+drop policy if exists "public insert" on public.rent_snapshots;
+drop policy if exists "public update" on public.rent_snapshots;
+drop policy if exists "public delete" on public.rent_snapshots;
+create policy "public read"   on public.rent_snapshots for select using (true);
+create policy "public insert" on public.rent_snapshots for insert with check (true);
+create policy "public update" on public.rent_snapshots for update using (true) with check (true);
+create policy "public delete" on public.rent_snapshots for delete using (true);

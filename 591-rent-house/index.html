@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<title>591 租屋清單</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<script>
+  // 密碼鎖(同美食地圖 ADD_PWD_HASH):只擋一般瀏覽,資料本身仍可經公開 API / data.json 讀到
+  const PWD_HASH = 'c0d7c54022345b39c9be73e19b30ccb040ba03b1fefb2566a9f510a09aba4796';
+  const UNLOCK_KEY = 'rent591_unlocked';
+  window.__unlocked = (async () => {
+    if (sessionStorage.getItem(UNLOCK_KEY) === PWD_HASH) return;
+    const pwd = prompt('請輸入密碼：');
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd ?? ''));
+    const hash = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (hash !== PWD_HASH) { location.replace('../'); throw new Error('locked'); }
+    sessionStorage.setItem(UNLOCK_KEY, hash);
+  })();
+</script>
+<!-- Supabase 連線設定(url / publishable key)與美食地圖共用;必須是同步 script,放在下方 inline script 之前 -->
+<script src="../assets/js/config.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px; font: 14px/1.45 -apple-system, "PingFang TC", sans-serif; color: #222; background: #f6f6f4; }
+  .shell { display: flex; flex-direction: column; height: calc(100vh - 80px); border: 1px solid #ddd; background: #fff; }
+  header { padding: 10px 16px; border-bottom: 1px solid #ddd; }
+  h1 { font-size: 16px; margin: 0 0 6px; }
+  .meta { color: #666; font-size: 12px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; align-items: center; }
+  .filters label { white-space: nowrap; }
+  .filters input[type=number] { width: 72px; }
+  .filters input[type=search] { width: 180px; }
+  .count { font-weight: 600; margin-left: auto; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 380px; }
+  #left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  #list { flex: 1; overflow: auto; }
+  #pager { display: flex; gap: 12px; align-items: center; justify-content: center; padding: 8px; border-top: 1px solid #ddd; background: #fafafa; }
+  #pager button { padding: 3px 12px; }
+  #map { height: 100%; border-left: 1px solid #ddd; }
+  #msg { padding: 24px; color: #b71c1c; }
+  table { border-collapse: collapse; width: 100%; background: #fff; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #eee; vertical-align: top; text-align: left; }
+  th { position: sticky; top: 0; background: #fafafa; cursor: pointer; user-select: none; font-weight: 600; white-space: nowrap; z-index: 1; }
+  th.sorted::after { content: attr(data-dir); color: #888; }
+  td.title { min-width: 240px; }
+  td.fac { min-width: 170px; }
+  td.nowrap, .badge { white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr:hover, tr.active { background: #fff8e1; }
+  img.thumb { width: 96px; height: 72px; object-fit: cover; border-radius: 4px; display: block; background: #eee; }
+  .title a { color: #1a4fa0; text-decoration: none; font-weight: 600; }
+  .sub { color: #777; font-size: 12px; }
+  .badge { display: inline-block; padding: 0 5px; border-radius: 3px; font-size: 11px; margin-right: 3px; border: 1px solid #ccc; color: #555; }
+  .badge.new { border-color: #2e7d32; color: #2e7d32; }
+  .badge.relisted { border-color: #6a1b9a; color: #6a1b9a; }
+  .badge.gone { border-color: #b71c1c; color: #b71c1c; }
+  .badge.active { border-color: #1a4fa0; color: #1a4fa0; }
+  tr.gone td { opacity: .45; }
+  tr.gone td:nth-child(2), tr.gone td.last-seen { opacity: 1; }
+  td.last-seen.stale, td.last-seen.stale .sub { color: #c62828; font-weight: 600; }
+  .yes { color: #2e7d32; } .no { color: #b71c1c; } .unk { color: #999; }
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <h1>591 租屋清單 <span class="meta" id="meta">讀取中…</span></h1>
+  <div class="filters">
+    <label>租金 <input type="number" id="pmin" step="500"> – <input type="number" id="pmax" step="500"></label>
+    <label><input type="checkbox" id="withFee"> 含管理費</label>
+    <label>坪數 <input type="number" id="amin" step="1"> – <input type="number" id="amax" step="1"></label>
+    <label>區 <select id="section"><option value="">全部</option></select></label>
+    <label>類型 <select id="kind"><option value="">全部</option></select></label>
+    <label>採光 <select id="lighting"><option value="">全部</option><option value="good">好</option><option value="good,fair">好+普通</option><option value="poor">差</option></select></label>
+    <label><input type="checkbox" id="bed"> 雙人床</label>
+    <label><input type="checkbox" id="elev"> 電梯</label>
+    <label><input type="checkbox" id="washer"> 洗衣機</label>
+    <label><input type="checkbox" id="owner"> 屋主直租</label>
+    <label>狀態 <select id="status"><option value="">全部</option><option value="active,new">在架</option><option value="new">本次新上架</option><option value="gone">已消失</option></select></label>
+    <label><input type="search" id="q" placeholder="關鍵字(標題/地址/設備/備註)"></label>
+    <span class="count" id="count"></span>
+  </div>
+</header>
+<main>
+  <div id="left">
+    <div id="list">
+      <table>
+        <thead><tr>
+          <th></th>
+          <th data-k="title">房源</th>
+          <th data-k="dist">距離</th>
+          <th data-k="status_n">狀態</th>
+          <th data-k="first_seen">首次爬到</th>
+          <th data-k="last_seen">最後爬到</th>
+          <th data-k="post_days">發佈</th>
+          <th data-k="total">租金(+管)</th>
+          <th data-k="area_real" title="依實際面積(建物面積,不含公設)排序;無資料或數值不合理時以可使用面積代替">坪</th>
+          <th data-k="floor_n">樓層</th>
+          <th data-k="lighting_n">採光</th>
+          <th data-k="bed_n">雙人床</th>
+          <th>設備</th>
+          <th>聯絡</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="msg" hidden></div>
+    </div>
+    <div id="pager">
+      <button id="prev">上一頁</button><span id="pageInfo"></span><button id="next">下一頁</button>
+    </div>
+  </div>
+  <div id="map"></div>
+</main>
+</div>
+<script>
+// 資料來源:預設讀 Supabase(rent_listings / rent_snapshots,由 scripts/591-rent.mjs sync 寫入)。
+// 要改讀靜態檔,把下面兩行的註解對調即可(data.json 由 `node scripts/591-rent.mjs dump` 或 `json` 產生;
+// json 模式需用 http server 開,file:// 讀不到)。
+const DATA_SOURCE = 'supabase';
+// const DATA_SOURCE = 'json';
+
+const PAGE_SIZE = 50;
+// 預設排序基準點(距離以直線距離計)
+const ORIGIN = [24.1418, 120.6870];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LIGHT = { good: ['好', 3, 'yes'], fair: ['普通', 2, ''], poor: ['差', 1, 'no'], unknown: ['?', 0, 'unk'] };
+const BED = { yes: ['是', 2, 'yes'], no: ['否', 0, 'no'], unknown: ['?', 1, 'unk'] };
+const STATUS = { new: ['本次新上架', 0, 'new'], active: ['在架', 1, 'active'], gone: ['已消失', 2, 'gone'] };
+const fmt = (t) => t ? new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+const distKm = (lat, lng) => {
+  const r = Math.PI / 180, [a, b] = ORIGIN;
+  const h = Math.sin((lat - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(lat * r) * Math.sin((lng - b) * r / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+};
+
+// PostgREST 單次最多回 1000 列,分頁讀完
+async function supaAll(table, order) {
+  const C = window.SUPABASE_CONFIG, rows = [];
+  for (let off = 0; ; off += 1000) {
+    const r = await fetch(`${C.url}/rest/v1/${table}?select=*&order=${order}&limit=1000&offset=${off}`,
+      { headers: { apikey: C.key, authorization: `Bearer ${C.key}` } });
+    if (!r.ok) throw new Error(`${table} HTTP ${r.status}`);
+    const page = await r.json();
+    rows.push(...page);
+    if (page.length < 1000) return rows;
+  }
+}
+
+async function loadData() {
+  if (DATA_SOURCE === 'json') {
+    const r = await fetch('data.json', { cache: 'no-cache' });
+    if (!r.ok) throw new Error(`data.json HTTP ${r.status}`);
+    return r.json();
+  }
+  const [rows, snaps] = await Promise.all([supaAll('rent_listings', 'id'), supaAll('rent_snapshots', 'scraped_at.asc')]);
+  return { snapshots: snaps.map((s) => ({ at: s.scraped_at, count: s.count, total: s.total })), items: rows.map((r) => r.data) };
+}
+
+// 建物面積(不含公設)常被填成整棟/整層面積或亂填,只採信落在可使用面積 50%~100% 的值
+const buildOk = (i) => i.area_build != null && i.area_build >= i.area_ping * 0.5 && i.area_build <= i.area_ping;
+
+// 可使用面積 - (可使用 − 建物面積不含公設);沒有(或不合理的)建物面積寫 ?,相等寫 -0
+function areaText(i) {
+  const use = Number(i.area_ping).toFixed(1);
+  if (!buildOk(i)) return `${use} - ?`;
+  const d = Math.round((i.area_ping - i.area_build) * 10) / 10;
+  return d === 0 ? `${use} -0` : d > 0 ? `${use} - ${d.toFixed(1)}` : `${use} + ${(-d).toFixed(1)}`;
+}
+
+let D, map, markers, byId, sortKey = 'dist', sortDir = 1, page = 0, list = [];
+const baseStyle = (i) => ({ radius: 6, weight: 1, color: i.status === 'gone' ? '#999' : '#1a4fa0', fillOpacity: 0.6 });
+
+function init(data) {
+  D = data;
+  $('meta').textContent = `${D.snapshots.length} 次爬取(${D.snapshots.map((s) => `${fmt(s.at)} ${s.count} 筆`).join(' → ')})· 累計 ${D.items.length} 間 · 資料來源 ${DATA_SOURCE}`;
+  for (const k of ['section', 'kind'])
+    for (const v of [...new Set(D.items.map((i) => i[k]))].sort()) $(k).insertAdjacentHTML('beforeend', `<option>${esc(v)}</option>`);
+  for (const i of D.items) {
+    i.total = i.price + (i.manage_fee || 0);
+    i.lighting_n = LIGHT[i.lighting]?.[1] ?? 0;
+    i.bed_n = BED[i.double_bed]?.[1] ?? 1;
+    i.status_n = STATUS[i.status][1];
+    i.area_real = buildOk(i) ? i.area_build : i.area_ping;
+    i.dist = i.lat ? distKm(i.lat, i.lng) : null;
+    i.search = [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), i.vision_note, i.contact].join(' ').toLowerCase();
+  }
+
+  map = L.map('map');
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri', maxZoom: 19 }).addTo(map);
+  markers = new Map();
+  byId = new Map(D.items.map((i) => [i.id, i]));
+  for (const i of D.items) if (i.lat) {
+    const m = L.circleMarker([i.lat, i.lng], baseStyle(i))
+      .bindPopup(`<b><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a></b><br>${i.price} 元 · ${i.area_ping} 坪 · ${esc(i.floor)}/${esc(i.floor_total)}<br>${esc(i.address)}`);
+    m.on('click', () => showRow(i.id));
+    markers.set(i.id, m);
+  }
+  const bounds = D.items.filter((i) => i.lat).map((i) => [i.lat, i.lng]);
+  if (bounds.length) map.fitBounds(bounds, { padding: [20, 20] });
+  L.marker(ORIGIN, { title: '基準點' }).addTo(map).bindPopup('距離基準點');
+
+  $('rows').addEventListener('mouseover', (e) => { const tr = e.target.closest('tr'); if (tr) highlight(Number(tr.dataset.id)); });
+  $('rows').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr'); if (!tr || e.target.closest('a')) return;
+    const m = markers.get(Number(tr.dataset.id)); if (m) { map.setView(m.getLatLng(), 16); m.openPopup(); }
+  });
+  document.querySelectorAll('th[data-k]').forEach((th) => th.addEventListener('click', () => {
+    sortDir = sortKey === th.dataset.k ? -sortDir : 1; sortKey = th.dataset.k; refresh();
+  }));
+  document.querySelectorAll('.filters input, .filters select').forEach((el) => el.addEventListener('input', refresh));
+  $('prev').onclick = () => { page--; renderPage(); };
+  $('next').onclick = () => { page++; renderPage(); };
+  refresh();
+}
+
+function highlight(id) {
+  document.querySelectorAll('tr.active').forEach((t) => t.classList.remove('active'));
+  document.querySelector(`tr[data-id="${id}"]`)?.classList.add('active');
+  for (const [k, m] of markers) m.setStyle(k === id ? { color: '#e65100', radius: 10, fillOpacity: 0.9 } : baseStyle(byId.get(k)));
+}
+
+// 點地圖上的房源:跳到它所在的那一頁再捲過去
+function showRow(id) {
+  const idx = list.findIndex((i) => i.id === id);
+  if (idx < 0) return;
+  if (Math.floor(idx / PAGE_SIZE) !== page) { page = Math.floor(idx / PAGE_SIZE); renderPage(); }
+  document.querySelector(`tr[data-id="${id}"]`)?.scrollIntoView({ block: 'center' });
+  highlight(id);
+}
+
+function filtered() {
+  const n = (id) => ($(id).value === '' ? null : Number($(id).value));
+  const [pmin, pmax, amin, amax] = ['pmin', 'pmax', 'amin', 'amax'].map(n);
+  const lights = $('lighting').value ? $('lighting').value.split(',') : null;
+  const q = $('q').value.trim().toLowerCase();
+  const sts = $('status').value ? $('status').value.split(',') : null;
+  return D.items.filter((i) => {
+    const p = $('withFee').checked ? i.total : i.price;
+    return (pmin == null || p >= pmin) && (pmax == null || p <= pmax)
+      && (amin == null || i.area_ping >= amin) && (amax == null || i.area_ping <= amax)
+      && (!$('section').value || i.section === $('section').value)
+      && (!$('kind').value || i.kind === $('kind').value)
+      && (!lights || lights.includes(i.lighting))
+      && (!$('bed').checked || i.double_bed === 'yes')
+      && (!$('elev').checked || i.has_elevator)
+      && (!$('washer').checked || i.has_washer)
+      && (!$('owner').checked || i.contact_role === '屋主')
+      && (!sts || sts.includes(i.status))
+      && (!q || q.split(/\s+/).every((w) => i.search.includes(w)));
+  }).sort((a, b) => {
+    const x = a[sortKey], y = b[sortKey];
+    return (x == null) - (y == null) || (x < y ? -1 : x > y ? 1 : 0) * sortDir;
+  });
+}
+
+// 篩選 / 排序變動:重算清單、地圖點,回到第 1 頁
+function refresh() {
+  list = filtered();
+  const ids = new Set(list.map((i) => i.id));
+  for (const [id, m] of markers) ids.has(id) ? m.addTo(map) : m.remove();
+  $('count').textContent = `${list.length} / ${D.items.length} 筆`;
+  document.querySelectorAll('th[data-k]').forEach((th) => {
+    th.classList.toggle('sorted', th.dataset.k === sortKey);
+    th.dataset.dir = sortDir > 0 ? ' ▲' : ' ▼';
+  });
+  page = 0;
+  renderPage();
+}
+
+function renderPage() {
+  const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  page = Math.min(Math.max(page, 0), pages - 1);
+  $('pageInfo').textContent = `第 ${page + 1} / ${pages} 頁`;
+  $('prev').disabled = page === 0;
+  $('next').disabled = page >= pages - 1;
+  $('list').scrollTop = 0;
+  $('rows').innerHTML = list.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((i) => {
+    const [lt, , lc] = LIGHT[i.lighting] || LIGHT.unknown;
+    const [bt, , bc] = BED[i.double_bed] || BED.unknown;
+    const [st, , sc] = STATUS[i.status];
+    const badges = (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
+      + (i.preferred ? '<span class="badge">優選</span>' : '')
+      + (i.contact_role === '屋主' ? '<span class="badge">屋主</span>' : '');
+    return `<tr data-id="${i.id}" class="${i.status === 'gone' ? 'gone' : ''}">
+      <td><a href="${esc(i.url)}" target="_blank"><img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.photo)}"></a></td>
+      <td class="title"><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a><div>${badges}</div>
+        <div class="sub">${esc(i.kind)} · ${esc(i.address)} · #${i.id}</div></td>
+      <td class="num">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
+      <td class="nowrap"><span class="badge ${sc}">${st}</span>${i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
+      <td class="sub nowrap">${fmt(i.first_seen)}</td>
+      <td class="sub nowrap last-seen ${i.status === 'gone' ? 'stale' : ''}" title="${i.status === 'gone' ? '最新一次爬取沒有這間' : ''}">${fmt(i.last_seen)}<br>共 ${i.seen_count} 次</td>
+      <td class="sub nowrap">${esc(i.post_time)}<br>${esc(i.refresh_time || '')}</td>
+      <td class="num">${i.price.toLocaleString()}<div class="sub">${i.manage_fee ? '+' + i.manage_fee : esc(i.manage_fee_note || '')}</div>${i.price_history.length > 1 ? `<div class="sub" title="歷次租金">${i.price_history.join('→')}</div>` : ''}</td>
+      <td class="num" title="可使用 ${i.area_ping} 坪 / 建物(不含公設)${i.area_build ?? '?'} 坪${i.area_build != null && !buildOk(i) ? '(數值不合理,未採用)' : ''} / 權狀 ${i.area_right ?? '?'} 坪">${areaText(i)}</td>
+      <td class="num">${esc(i.floor)}/${esc(i.floor_total)}</td>
+      <td class="${lc}" title="${esc(i.vision_note)}">${lt}</td>
+      <td class="${bc}" title="${esc(i.vision_note)}">${bt}</td>
+      <td class="sub fac">${i.has_elevator ? '<span class="yes">電梯</span>' : '<span class="no">無電梯</span>'} ·
+        ${i.has_washer ? '<span class="yes">洗衣機</span>' : '<span class="no">無洗衣機</span>'}<br>${esc(i.facilities.filter((f) => f !== '電梯' && f !== '洗衣機').join('、'))}</td>
+      <td class="sub nowrap">${esc(i.contact)}<br>${i.phones.map((p) => `<a href="tel:${esc(p)}">${esc(p)}</a>`).join('<br>')}</td>
+    </tr>`;
+  }).join('');
+}
+
+window.__unlocked
+  .then(loadData)
+  .then((data) => {
+    if (!data.items?.length) throw new Error('沒有資料');
+    init(data);
+  })
+  .catch((e) => {
+    if (e.message === 'locked') return;
+    $('meta').textContent = '';
+    $('msg').hidden = false;
+    $('msg').textContent = `讀取失敗(${DATA_SOURCE}):${e.message}` +
+      (DATA_SOURCE === 'json' && location.protocol === 'file:' ? '。json 模式要用 http server 開(repo 根目錄 make start)' : '');
+  });
+</script>
+</body>
+</html>
