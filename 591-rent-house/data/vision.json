@@ -6,6 +6,13 @@
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
   },
+  "15394415": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "單扇小窗外為冷氣機與鐵窗，房內偏靠燈；雙人床墊",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
   "16658985": {
     "lighting": "fair",
     "double_bed": "yes",
@@ -123,6 +130,13 @@
     "note": "落地門窗通陽台,明亮,床寬約雙人",
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
+  },
+  "22015953": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "大面橫窗採光明亮；附床頭板雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
   },
   "22015975": {
     "lighting": "fair",
@@ -558,6 +572,13 @@
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
   },
+  "22104547": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "兩扇大窗加陽台門，室內明亮；雙人床",
+    "photos_seen": 2,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
   "22105326": {
     "lighting": "good",
     "double_bed": "yes",
@@ -894,6 +915,20 @@
     "photos_seen": 4,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
   },
+  "22137860": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "整面大窗日光充足；寬版雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22137868": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "照片與22137860相同，大窗明亮；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
   "22138006": {
     "lighting": "fair",
     "double_bed": "yes",
@@ -1152,6 +1187,13 @@
     "note": "僅單一小窗,室內尚可,床寬約雙人",
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
+  },
+  "22159699": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "落地門通陽台但緊鄰牆面，光線普通；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
   },
   "22159744": {
     "lighting": "good",
@@ -1545,6 +1587,13 @@
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00"
   },
+  "22180167": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "客廳有窗簾未見窗景，臥室無窗靠燈；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
   "22181020": {
     "lighting": "fair",
     "double_bed": "yes",
@@ -1569,6 +1618,34 @@
     "judged_at": "2026-10-14T16:00:34.229968+00:00",
     "carried_from": 22179633
   },
+  "22184089": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地窗通陽台，自然光充足；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22184266": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "陽台落地門加側窗，室內明亮；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22185094": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "落地門外為鐵窗小陽台面鄰棟，光線普通；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22185151": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "臥室兩面多扇窗加陽台門，採光佳；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
   "22185437": {
     "lighting": "good",
     "double_bed": "yes",
@@ -1576,6 +1653,27 @@
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00",
     "carried_from": 22102309
+  },
+  "22185627": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "有橫窗但深色玻璃且夜拍，靠燈照明；雙人床墊",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22185683": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "僅一扇小窗掛窗簾，主要靠吸頂燈；雙人床",
+    "photos_seen": 2,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22185713": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "有窗與小陽台但掛百葉，室內靠燈；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
   },
   "22185793": {
     "lighting": "good",
@@ -1592,6 +1690,13 @@
     "photos_seen": 6,
     "judged_at": "2026-10-14T16:00:34.229968+00:00",
     "carried_from": 22139246
+  },
+  "22185846": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "多扇窗但為霧面玻璃，陽台有遮棚；雙人床",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T09:28:30.452880+00:00"
   },
   "22185895": {
     "lighting": "poor",
@@ -1649,143 +1754,6 @@
     "judged_at": "2026-10-14T16:00:34.229968+00:00",
     "carried_from": 22177466
   },
-  "22186664": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "落地玻璃拉門明亮;床約雙人(首張為夜景)",
-    "photos_seen": 6,
-    "judged_at": "2026-10-14T16:00:34.229968+00:00",
-    "carried_from": 22178646
-  },
-  "22186669": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "落地玻璃拉門明亮;床約雙人",
-    "photos_seen": 6,
-    "judged_at": "2026-10-14T16:00:34.229968+00:00",
-    "carried_from": 22178662
-  },
-  "22189818": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "落地玻璃拉門明亮;床約雙人(首張為外觀)",
-    "photos_seen": 6,
-    "judged_at": "2026-10-14T16:00:34.229968+00:00",
-    "carried_from": 22178675
-  },
-  "22189825": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "落地玻璃拉門明亮;床約雙人",
-    "photos_seen": 6,
-    "judged_at": "2026-10-14T16:00:34.229968+00:00",
-    "carried_from": 22178658
-  },
-  "15394415": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "單扇小窗外為冷氣機與鐵窗，房內偏靠燈；雙人床墊",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22015953": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "大面橫窗採光明亮；附床頭板雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22104547": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "兩扇大窗加陽台門，室內明亮；雙人床",
-    "photos_seen": 2,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22137860": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "整面大窗日光充足；寬版雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22137868": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "照片與22137860相同，大窗明亮；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22159699": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "落地門通陽台但緊鄰牆面，光線普通；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22180167": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "客廳有窗簾未見窗景，臥室無窗靠燈；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22184089": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "落地窗通陽台，自然光充足；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22184266": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "陽台落地門加側窗，室內明亮；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185094": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "落地門外為鐵窗小陽台面鄰棟，光線普通；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185151": {
-    "lighting": "good",
-    "double_bed": "yes",
-    "note": "臥室兩面多扇窗加陽台門，採光佳；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185627": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "有橫窗但深色玻璃且夜拍，靠燈照明；雙人床墊",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185683": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "僅一扇小窗掛窗簾，主要靠吸頂燈；雙人床",
-    "photos_seen": 2,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185713": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "有窗與小陽台但掛百葉，室內靠燈；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
-  "22185846": {
-    "lighting": "fair",
-    "double_bed": "yes",
-    "note": "多扇窗但為霧面玻璃，陽台有遮棚；雙人床",
-    "photos_seen": 6,
-    "judged_at": "2026-10-16T09:28:30.452880+00:00"
-  },
   "22186261": {
     "lighting": "good",
     "double_bed": "yes",
@@ -1835,6 +1803,22 @@
     "photos_seen": 6,
     "judged_at": "2026-10-16T09:28:30.452880+00:00"
   },
+  "22186664": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人(首張為夜景)",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22178646
+  },
+  "22186669": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22178662
+  },
   "22187722": {
     "lighting": "fair",
     "double_bed": "yes",
@@ -1848,5 +1832,96 @@
     "note": "多面大橫窗採光充足，雙人尺寸床墊置於地板",
     "photos_seen": 6,
     "judged_at": "2026-10-16T09:28:30.452880+00:00"
+  },
+  "22189818": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人(首張為外觀)",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22178675
+  },
+  "22189825": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22178658
+  },
+  "22190619": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地窗通陽台;床寬約雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22186093
+  },
+  "22191029": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22186669
+  },
+  "22191034": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃拉門明亮;床約雙人(首張為夜景)",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22186664
+  },
+  "22191682": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "僅窄玻璃門,靠燈光;床約雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22180012
+  },
+  "22191689": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "落地玻璃折門通陽台;床看似雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-14T16:00:34.229968+00:00",
+    "carried_from": 22178437
+  },
+  "22185694": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "有窗但偏小且部分朝室內，主靠燈光；雙人床含床頭板",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T14:17:11.841090+00:00"
+  },
+  "22189864": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "轉角多扇大窗採光明亮；床墊寬度明顯為雙人",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T14:17:11.841090+00:00"
+  },
+  "22189878": {
+    "lighting": "good",
+    "double_bed": "unknown",
+    "note": "落地窗通陽台採光佳；床墊寬度介於單雙人難判",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T14:17:11.841090+00:00"
+  },
+  "22191485": {
+    "lighting": "fair",
+    "double_bed": "yes",
+    "note": "僅一扇落地門通陽台且外側緊鄰牆；雙人床架",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T14:17:11.841090+00:00"
+  },
+  "22191611": {
+    "lighting": "good",
+    "double_bed": "yes",
+    "note": "多扇大窗加陽台門採光充足；雙人床架",
+    "photos_seen": 6,
+    "judged_at": "2026-10-16T14:17:11.841090+00:00"
   }
 }
