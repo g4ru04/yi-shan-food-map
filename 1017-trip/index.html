@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新竹兩天一夜｜10/17(六)–10/18(日)</title>
+<style>
+  :root{
+    --bg:#f6f1ea; --card:#fff; --ink:#2a2622; --muted:#7c7368; --line:#ebe3d8;
+    --night:#1d2340; --fire:#f0803c; --gold:#f6c454; --sea:#2f8fa3; --leaf:#5a8f4e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    line-height:1.55;-webkit-text-size-adjust:100%}
+  a{color:inherit;text-decoration-color:rgba(0,0,0,.25);text-underline-offset:2px}
+  .wrap{max-width:1040px;margin:0 auto;padding:18px 14px 48px}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;border-radius:20px;color:#fff;padding:26px 24px 22px;
+    background:radial-gradient(circle at 82% 18%,rgba(246,196,84,.35),transparent 38%),
+               radial-gradient(circle at 12% 110%,rgba(240,128,60,.45),transparent 45%),
+               linear-gradient(160deg,#1d2340,#33305a);
+    box-shadow:0 10px 28px rgba(29,35,64,.25)}
+  .hero .tag{display:inline-block;font-size:.75rem;letter-spacing:1px;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:2px 10px}
+  .hero h1{margin:10px 0 2px;font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:1px}
+  .hero .date{opacity:.85;font-size:1rem}
+  .hero .fw{position:absolute;right:18px;top:12px;font-size:clamp(2.6rem,9vw,4.2rem);opacity:.9}
+  .pins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:18px}
+  .pin{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:10px 12px;font-size:.86rem}
+  .pin b{display:block;font-size:1rem;color:var(--gold)}
+  .pin.hot{background:rgba(240,128,60,.25);border-color:rgba(246,196,84,.6)}
+  .pin small{opacity:.8}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+  @media(min-width:820px){.grid.two{grid-template-columns:1fr 1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;
+    box-shadow:0 3px 12px rgba(0,0,0,.04)}
+  .card h2{margin:0 0 10px;font-size:1.12rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h2 .chip{font-size:.72rem;font-weight:600;border-radius:999px;padding:2px 9px;color:#fff;background:var(--fire)}
+  .card h2 .chip.sea{background:var(--sea)} .card h2 .chip.leaf{background:var(--leaf)}
+
+  /* timeline */
+  .tl{list-style:none;margin:0;padding:0;position:relative}
+  .tl::before{content:"";position:absolute;left:62px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl li{display:flex;gap:16px;padding:7px 0;position:relative}
+  .tl .t{flex:0 0 50px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;
+    color:var(--fire);font-size:.88rem;padding-top:1px;white-space:nowrap}
+  .tl li::after{content:"";position:absolute;left:58px;top:13px;width:10px;height:10px;border-radius:50%;
+    background:#fff;border:2px solid var(--fire)}
+  .tl .d{flex:1;min-width:0;padding-left:12px}
+  .tl .d .s{color:var(--muted);font-size:.83rem}
+  .tl li.star .d>b:first-child{color:var(--fire)}
+  .tl li.star::after{background:var(--gold);border-color:var(--fire);width:12px;height:12px;left:57px;top:12px}
+  .day2 .tl .t{color:var(--leaf)} .day2 .tl li::after{border-color:var(--leaf)}
+
+  .note{margin-top:10px;background:#faf6ef;border-left:4px solid var(--gold);border-radius:8px;
+    padding:8px 12px;font-size:.84rem;color:#5d554b}
+
+  ul.plain{margin:0;padding-left:1.1em;font-size:.9rem}
+  ul.plain li{margin:4px 0}
+  .alt .route{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.88rem}
+  .alt .route span{background:#eef6f8;border:1px solid #d3e8ed;border-radius:8px;padding:4px 8px}
+  .alt .route i{font-style:normal;color:var(--sea)}
+
+  .warn{color:#b3411e;font-weight:600}
+  footer{margin-top:18px;text-align:center;font-size:.78rem;color:var(--muted)}
+
+  @media(max-width:480px){
+    .wrap{padding:10px 10px 36px}
+    .hero{padding:20px 16px 16px;border-radius:16px}
+    .card{padding:14px 14px}
+    .tl::before{left:52px} .tl li::after{left:48px} .tl li.star::after{left:47px}
+    .tl .t{flex-basis:42px;font-size:.82rem} .tl li{gap:14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="fw">🎆</div>
+    <span class="tag">新版 · 兩天一夜</span>
+    <h1>新竹秋焰之旅</h1>
+    <div class="date">10/17(六) – 10/18(日)　台中出發 · 青草湖煙火 · 竹北住一晚</div>
+    <div class="pins">
+      <div class="pin"><b>10/17 14:00 取車</b>中租 台中中港站<br><small><a href="https://maps.google.com/?q=台中市西屯區臺灣大道三段828號">西屯區臺灣大道三段828號</a> · <a href="tel:0427085255">04-2708-5255</a></small></div>
+      <div class="pin hot"><b>10/17 19:20 煙火 🔥</b>青草湖秋焰祭<br><small>只有 300 秒！17:00 起每半小時一場燈光秀</small></div>
+      <div class="pin"><b>10/17 住宿</b>雲端商務旅館-新竹館（竹北）<br><small><a href="https://maps.google.com/?q=竹北市新泰路102號">竹北市新泰路102號</a> · <a href="tel:035510129">03-5510129</a><br>入住 17:00 起・退房 11:00<br>B1 車位先到先停，滿了停對面（17:00–11:00 折抵）</small></div>
+      <div class="pin"><b>10/18 14:00 還車</b>中港站<br><small>還車前先加油</small></div>
+    </div>
+  </header>
+
+  <div class="grid two">
+    <section class="card">
+      <h2>🎆 10/17(六) <span class="chip">主方案：市區文青 + 煙火</span></h2>
+      <ul class="tl">
+        <li><span class="t">13:00</span><div class="d"><b>台灣大道三段附近吃午餐</b><div class="s">晚一點吃、吃飽一點，晚餐可以簡單</div></div></li>
+        <li><span class="t">14:00</span><div class="d"><b>取車</b>，國道1北上</div></li>
+        <li><span class="t">15:40</span><div class="d"><b>停新竹後站</b><div class="s">晶品城 / 後站停車場</div></div></li>
+        <li><span class="t">15:50</span><div class="d"><b>新竹公園</b><div class="s">春室 Glass Studio、玻工館、麗池（–16:50）</div></div></li>
+        <li><span class="t">16:50</span><div class="d"><b>東門城「新竹之心」→ 護城河 → 城隍廟</b><div class="s">小吃當晚餐，或留肚子吃青草湖市集（–17:45）</div></div></li>
+        <li><span class="t">17:50</span><div class="d"><b>後站搭接駁</b><div class="s"><span class="warn">18:00 前上車</span>，末班 19:00</div></div></li>
+        <li><span class="t">18:15</span><div class="d"><b>青草湖</b><div class="s">蠟筆小新氣偶、燈光秀、卡湖畔位</div></div></li>
+        <li class="star"><span class="t">19:20</span><div class="d"><b>🎇 煙火 300 秒</b><div class="s">19:20–19:25</div></div></li>
+        <li><span class="t">19:30</span><div class="d"><b>逛市集</b><div class="s">等人潮散了再排回程接駁（末班 21:30）</div></div></li>
+        <li><span class="t">21:00</span><div class="d"><b>後站取車 → 竹北 check-in</b><div class="s">約 20 分</div></div></li>
+      </ul>
+      <div class="note">時間比較緊，hidden Off / 貳參咖啡先拿掉，週日有空可以補。</div>
+    </section>
+
+    <section class="card day2">
+      <h2>☀️ 10/18(日) <span class="chip leaf">還車 14:00，早上從容</span></h2>
+      <ul class="tl">
+        <li><span class="t">09:00</span><div class="d"><b>睡飽、吃早餐</b></div></li>
+        <li><span class="t">10:30</span><div class="d"><b>退房</b><div class="s">B1 / 對面停車 <span class="warn">11:00 前要開走</span></div></div></li>
+        <li><span class="t">10:40</span><div class="d"><b>新瓦屋客家文化保存區</b><div class="s">竹北 5 分鐘，免費（–11:30）</div></div></li>
+        <li><span class="t">11:30</span><div class="d"><b>竹北午餐或咖啡</b><div class="s">藍氣球、KURUMI、kukukohi 哭哭咖啡（–12:20）</div></div></li>
+        <li><span class="t">12:20</span><div class="d"><b>國道1南下</b></div></li>
+        <li><span class="t">13:40</span><div class="d"><b>到中港站先加油</b></div></li>
+        <li class="star"><span class="t">14:00</span><div class="d"><b>還車 ✅</b></div></li>
+      </ul>
+      <div class="note">週六沒走海線的話：10:00 退房 → 10:20–11:30 南寮漁港 → 新竹市區午餐（例如補回 hidden Off）→ 12:30 南下，一樣來得及。</div>
+    </section>
+  </div>
+
+  <div class="grid two">
+    <section class="card alt">
+      <h2>🌅 替代方案 <span class="chip sea">海線夕陽</span></h2>
+      <div class="route">
+        <span>15:40 南寮漁港魚鱗天梯</span><i>→</i>
+        <span>16:30 十七公里海岸線</span><i>→</i>
+        <span>17:00 香山濕地賞蟹步道<br>夕陽約 17:20</span><i>→</i>
+        <span>17:50 停中華大學南門搭接駁<br><small>香山區五福路二段707號</small></span><i>→</i>
+        <span>🎆 煙火</span><i>→</i>
+        <span>開 35 分到竹北</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>🚗 為什麼停車轉接駁</h2>
+      <ul class="plain">
+        <li><b>交管 10/17–18 13:30–23:00</b>：明湖路775巷汽車禁行（機車可）、明湖路1075巷只給接駁車、青峰路全線、高峰路386巷管制</li>
+        <li>會場<b>沒有汽車停車場</b>，開車只能到外圍，散場會卡在管制區</li>
+        <li><b>停車點</b>：新竹火車站後站停車場群（後站 / 晶品城 / 稅務大樓 / 明志書院 / 府後地下 / 錦華第一）、中華大學南門、五福路二段路邊</li>
+        <li><b>免費接駁</b>：去程 13:30–19:00、回程 15:00–21:30，約 15–20 分一班</li>
+        <li>👍 推薦停<b>後站</b>：新竹公園、東門城、城隍廟都走得到，車只要停一次</li>
+        <li>官方更新：<a href="https://www.facebook.com/seeinghsinchu" target="_blank" rel="noopener">跟風玩新竹 FB</a></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>✅ 待確認</h2>
+    <ul class="plain">
+      <li>咖啡廳週末營業時間（部分預約制，或週一二休）</li>
+    </ul>
+  </section>
+
+  <footer>阿珊的美食地圖 · 新竹兩天一夜 2026/10/17–18</footer>
+</div>
+</body>
+</html>
