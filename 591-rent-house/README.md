@@ -1,6 +1,6 @@
 # 591 租屋清單
 
-每小時爬一次 591 租屋,記下每間房何時出現、何時消失,用網頁瀏覽,有明顯變動時發 Slack 通知。
+每 5 小時爬一次 591 租屋,記下每間房何時出現、何時消失,用網頁瀏覽,有明顯變動時發 Slack 通知。
 
 - **網頁**:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖「新增地點」頁)
 - **搜尋條件**:台中市東區 + 北區、租金 5,000–10,000、坪數 11–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`
@@ -9,7 +9,7 @@
 ## 架構
 
 ```
-             每小時(launchd / cron)
+          每 5 小時(launchd / cron)
                      │
           scripts/591-watch.sh ── 載入 ~/.config/591-rent/env(Slack token、claude 登入 token)
                      │
@@ -47,7 +47,7 @@
 - **新上架**:`first_seen` 在 24 小時內。網頁上標「24h 內新上架」。
 - **消失**:上一輪還在、這一輪不在列表上時,會先打開該房源的詳情頁確認。
   - 詳情頁已下架 → 立刻標成消失。
-  - 詳情頁還在 → 多半是改價或改條件,不在搜尋範圍內了;連續 3 輪都沒出現才算消失。
+  - 詳情頁還在 → 多半是改價或改條件,不在搜尋範圍內了;連續 3 輪(約 15 小時)都沒出現才算消失。
 - **回來**:已經消失的房源,同一個 id 又出現。
 - **換 id 重刊**:新 id 會跟 14 天內不見的房源比對,樓層和地址都相同,而且電話、標題、聯絡人+坪數其中一項相同,就視為同一間。網頁上標「換 id 重刊」。
 - **防呆**:列表抓到的筆數少於頁面 total 的 95%,這輪就不寫回並發失敗通知,避免把一批房源誤判成消失。
@@ -75,7 +75,7 @@ const DATA_SOURCE = 'supabase';
 
 json 模式在本機預覽要用 http server(repo 根目錄 `make start` → http://localhost:8080/591-rent-house/)。
 
-## 在新電腦安裝每小時排程
+## 在新電腦安裝排程(每 5 小時)
 
 **1. 準備**
 
@@ -113,7 +113,7 @@ tail -20 591-rent-house/data/watch.log
 
 **4. 掛上排程**(二選一)
 
-macOS LaunchAgent(建議,電腦睡眠時錯過的那一輪醒來會補跑):
+macOS LaunchAgent(建議,每天 0:07、5:07、10:07、15:07、20:07 執行;電腦睡眠時錯過的那一輪醒來會補跑):
 
 ```bash
 sed "s#__REPO__#$PWD#g" 591-rent-house/launchd.plist.example > ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist
@@ -124,12 +124,12 @@ launchctl list | grep 591-rent          # 確認有掛上
 - 停用:`launchctl unload ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist`
 - 如果 repo 放在「桌面 / 文件 / 下載」底下,要到「系統設定 → 隱私權與安全性 → 完全取用磁碟」加入 `/bin/bash`,否則排程讀不到檔案。
 
-Linux / cron(每小時第 7 分):
+Linux / cron(每天 0:07、5:07、10:07、15:07、20:07):
 
 ```bash
 crontab -e
 # 加入這一行(路徑換成 repo 的絕對路徑)
-7 * * * * /bin/bash /path/to/yi-shan-food-map/scripts/591-watch.sh
+7 */5 * * * /bin/bash /path/to/yi-shan-food-map/scripts/591-watch.sh
 ```
 
 **5. 只能有一台電腦掛排程。** 兩台同時寫入時,後跑的那台會偵測到並放棄那一輪,不會寫壞資料,但會浪費一次爬取。
@@ -210,4 +210,5 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 | `判圖失敗 … ENOENT` | `CLAUDE_BIN` 路徑錯誤 |
 | `執行期間已有其他程序寫入` | 兩台電腦都在跑排程,停掉其中一台 |
 | 想改搜尋條件 | 改 `scripts/591-rent.mjs` 的 `QUERY`;舊資料和新條件比對會產生大量「消失」,建議先清空兩張表 |
+| 想改執行頻率 | 改 `launchd.plist.example` 的 `StartCalendarInterval`(或 crontab 那一行)後重新安裝;24 不能被 5 整除,所以 20:07 到隔天 0:07 只隔 4 小時 |
 | 想改距離基準點 | 改 `591-rent-house/index.html` 和 `scripts/591-rent.mjs` 兩處的 `ORIGIN` |

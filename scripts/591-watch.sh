@@ -1,5 +1,5 @@
 #!/bin/bash
-# 591 租屋每小時排程入口(launchd / cron 呼叫這支)。用法見 591-rent-house/README.md
+# 591 租屋排程入口(每 5 小時,由 launchd / cron 呼叫)。用法見 591-rent-house/README.md
 # 載入 ~/.config/591-rent/env(Slack token、PATH 等,不進 git)→ 跑 watch;同一台電腦同時只跑一份。
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"

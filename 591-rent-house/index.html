@@ -180,7 +180,7 @@
 </main>
 </div>
 <script>
-// 資料來源:預設讀 Supabase(rent_listings / rent_snapshots,由 scripts/591-rent.mjs watch 每小時寫入)。
+// 資料來源:預設讀 Supabase(rent_listings / rent_snapshots,由 scripts/591-rent.mjs watch 每 5 小時寫入)。
 // 要改讀靜態檔,把下面兩行的註解對調即可(data.json 由 `node scripts/591-rent.mjs dump` 從 Supabase 產生;
 // json 模式需用 http server 開,file:// 讀不到)。
 const DATA_SOURCE = 'supabase';
@@ -222,7 +222,7 @@ async function loadData() {
     if (!r.ok) throw new Error(`data.json HTTP ${r.status}`);
     return r.json();
   }
-  // 每小時一筆爬取紀錄,只拿最近幾筆顯示
+  // 每次爬取一筆紀錄,只拿最近幾筆顯示
   const C = window.SUPABASE_CONFIG;
   const snapRes = fetch(`${C.url}/rest/v1/rent_snapshots?select=*&order=scraped_at.desc&limit=5`, { headers: { apikey: C.key, authorization: `Bearer ${C.key}` } })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`rent_snapshots HTTP ${r.status}`))));

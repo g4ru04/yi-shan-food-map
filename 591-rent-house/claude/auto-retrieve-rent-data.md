@@ -4,7 +4,7 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 
 # Auto Retrieve Rent Data (591)
 
-手動跑一次和每小時排程相同的流程(`scripts/591-rent.mjs watch`),並把結果整理給使用者。
+手動跑一次和排程(每 5 小時)相同的流程(`scripts/591-rent.mjs watch`),並把結果整理給使用者。
 正本在 repo `591-rent-house/claude/auto-retrieve-rent-data.md`;`~/.claude/commands/` 底下是它的 symlink / 複本。
 
 - Repo:`yi-shan-food-map`(下列指令都在 repo 根目錄執行;這台電腦是 `/Users/mac-ben/claude-assistant/yi-shan-food-map`)
