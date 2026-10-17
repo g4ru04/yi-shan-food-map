@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  591 租屋每小時排程(macOS LaunchAgent)。把 __REPO__ 換成 repo 絕對路徑後:
+    sed "s#__REPO__#$PWD#g" 591-rent-house/launchd.plist.example > ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist
+    launchctl load ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist
+  每小時第 7 分執行;電腦睡眠錯過的那一輪,醒來後會補跑一次。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>tw.g4ru04.591-rent-watch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__REPO__/scripts/591-watch.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict><key>Minute</key><integer>7</integer></dict>
+  <key>StandardOutPath</key><string>/tmp/591-rent-watch.launchd.log</string>
+  <key>StandardErrorPath</key><string>/tmp/591-rent-watch.launchd.log</string>
+</dict>
+</plist>

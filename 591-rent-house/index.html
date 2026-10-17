@@ -25,7 +25,8 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; padding: 40px; font: 14px/1.45 -apple-system, "PingFang TC", sans-serif; color: #222; background: #f6f6f4; }
-  .shell { display: flex; flex-direction: column; height: calc(100vh - 80px); border: 1px solid #ddd; background: #fff; }
+  /* 不固定高度:篩選列換行變高時整頁可捲,列表至少保留 60vh,不會被擠到 0 */
+  .shell { display: flex; flex-direction: column; min-height: calc(100vh - 80px); border: 1px solid #ddd; background: #fff; }
   header { padding: 10px 16px; border-bottom: 1px solid #ddd; }
   h1 { font-size: 16px; margin: 0 0 6px; }
   .meta { color: #666; font-size: 12px; }
@@ -34,7 +35,7 @@
   .filters input[type=number] { width: 72px; }
   .filters input[type=search] { width: 180px; }
   .count { font-weight: 600; margin-left: auto; }
-  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 380px; }
+  main { flex: 1 0 60vh; min-height: 60vh; display: grid; grid-template-columns: 1fr 380px; }
   #left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   #list { flex: 1; overflow: auto; }
   #pager { display: flex; gap: 12px; align-items: center; justify-content: center; padding: 8px; border-top: 1px solid #ddd; background: #fafafa; }
@@ -67,9 +68,10 @@
   #pager span { white-space: nowrap; }
 
   /* ---- 手機版:列表 / 地圖切換、篩選收合、列表改卡片 ---- */
-  @media (max-width: 768px) {
+  /* 手機:窄螢幕或觸控裝置(含橫向、要求桌面版網站)都用這套 */
+  @media (max-width: 768px), (pointer: coarse) {
     body { padding: 0; }
-    .shell { height: auto; border: 0; }
+    .shell { min-height: 0; border: 0; }
     header { position: sticky; top: 0; z-index: 1000; background: #fff; padding: 8px 12px; }
     h1 { font-size: 15px; margin: 0; }
     .meta { display: block; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -86,7 +88,7 @@
     .filters .q, .filters .sortl { display: flex; flex: 1 1 100%; gap: 6px; align-items: center; }
     .filters .q input, .filters .sortl select { flex: 1; width: auto; }
     .count { display: none; }
-    main { display: block; }
+    main { display: block; min-height: 0; }
     #map { display: none; height: calc(100vh - 150px); border-left: 0; }
     body.v-map #map { display: block; }
     body.v-map #left { display: none; }
@@ -136,7 +138,7 @@
     <label><input type="checkbox" id="elev"> 電梯</label>
     <label><input type="checkbox" id="washer"> 洗衣機</label>
     <label><input type="checkbox" id="owner"> 屋主直租</label>
-    <label>狀態 <select id="status"><option value="">全部</option><option value="active,new">在架</option><option value="new">本次新上架</option><option value="gone">已消失</option></select></label>
+    <label>狀態 <select id="status"><option value="">全部</option><option value="active,new">在架</option><option value="new">24h 內新上架</option><option value="gone">已消失</option></select></label>
     <label class="sortl">排序 <select id="sortSel">
       <option value="dist:1">距離 近→遠</option><option value="total:1">租金(+管)低→高</option><option value="total:-1">租金(+管)高→低</option>
       <option value="area_real:-1">坪數 大→小</option><option value="first_seen:-1">首次爬到 新→舊</option><option value="post_days:1">發佈 新→舊</option>
@@ -178,14 +180,14 @@
 </main>
 </div>
 <script>
-// 資料來源:預設讀 Supabase(rent_listings / rent_snapshots,由 scripts/591-rent.mjs sync 寫入)。
-// 要改讀靜態檔,把下面兩行的註解對調即可(data.json 由 `node scripts/591-rent.mjs dump` 或 `json` 產生;
+// 資料來源:預設讀 Supabase(rent_listings / rent_snapshots,由 scripts/591-rent.mjs watch 每小時寫入)。
+// 要改讀靜態檔,把下面兩行的註解對調即可(data.json 由 `node scripts/591-rent.mjs dump` 從 Supabase 產生;
 // json 模式需用 http server 開,file:// 讀不到)。
 const DATA_SOURCE = 'supabase';
 // const DATA_SOURCE = 'json';
 
 const PAGE_SIZE = 50;
-const isMobile = () => matchMedia('(max-width: 768px)').matches;
+const isMobile = () => matchMedia('(max-width: 768px), (pointer: coarse)').matches;
 // 預設排序基準點(距離以直線距離計)
 const ORIGIN = [24.1418, 120.6870];
 
@@ -193,7 +195,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const LIGHT = { good: ['好', 3, 'yes'], fair: ['普通', 2, ''], poor: ['差', 1, 'no'], unknown: ['?', 0, 'unk'] };
 const BED = { yes: ['是', 2, 'yes'], no: ['否', 0, 'no'], unknown: ['?', 1, 'unk'] };
-const STATUS = { new: ['本次新上架', 0, 'new'], active: ['在架', 1, 'active'], gone: ['已消失', 2, 'gone'] };
+const STATUS = { new: ['24h 內新上架', 0, 'new'], active: ['在架', 1, 'active'], gone: ['已消失', 2, 'gone'] };
 const fmt = (t) => t ? new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 const distKm = (lat, lng) => {
   const r = Math.PI / 180, [a, b] = ORIGIN;
@@ -220,8 +222,12 @@ async function loadData() {
     if (!r.ok) throw new Error(`data.json HTTP ${r.status}`);
     return r.json();
   }
-  const [rows, snaps] = await Promise.all([supaAll('rent_listings', 'id'), supaAll('rent_snapshots', 'scraped_at.asc')]);
-  return { snapshots: snaps.map((s) => ({ at: s.scraped_at, count: s.count, total: s.total })), items: rows.map((r) => r.data) };
+  // 每小時一筆爬取紀錄,只拿最近幾筆顯示
+  const C = window.SUPABASE_CONFIG;
+  const snapRes = fetch(`${C.url}/rest/v1/rent_snapshots?select=*&order=scraped_at.desc&limit=5`, { headers: { apikey: C.key, authorization: `Bearer ${C.key}` } })
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`rent_snapshots HTTP ${r.status}`))));
+  const [rows, snaps] = await Promise.all([supaAll('rent_listings', 'id'), snapRes]);
+  return { snapshots: snaps.reverse().map((s) => ({ at: s.scraped_at, count: s.count, total: s.total })), items: rows.map((r) => r.data) };
 }
 
 // 建物面積(不含公設)常被填成整棟/整層面積或亂填,只採信落在可使用面積 50%~100% 的值
@@ -243,7 +249,8 @@ const baseStyle = (i) => ({ radius: 6, weight: 1, color: i.status === 'gone' ? '
 
 function init(data) {
   D = data;
-  $('meta').textContent = `${D.snapshots.length} 次爬取(${D.snapshots.map((s) => `${fmt(s.at)} ${s.count} 筆`).join(' → ')})· 累計 ${D.items.length} 間 · 資料來源 ${DATA_SOURCE}`;
+  const last = D.snapshots.at(-1);
+  $('meta').textContent = `最近爬取 ${last ? `${fmt(last.at)} · ${last.count} 筆` : '—'} · 累計 ${D.items.length} 間 · 資料來源 ${DATA_SOURCE}`;
   for (const k of ['section', 'kind'])
     for (const v of [...new Set(D.items.map((i) => i[k]))].sort()) $(k).insertAdjacentHTML('beforeend', `<option>${esc(v)}</option>`);
   for (const i of D.items) {
@@ -384,7 +391,7 @@ function renderPage() {
       <td class="title"><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a><div>${badges}</div>
         <div class="sub">${esc(i.kind)} · ${esc(i.address)} · #${i.id}</div></td>
       <td class="num chip c-dist" data-l="📍">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
-      <td class="nowrap chip c-status ${i.status === 'active' ? 'is-active' : ''}" data-l=""><span class="badge ${sc}">${st}</span>${i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
+      <td class="nowrap chip c-status ${i.status === 'active' ? 'is-active' : ''}" data-l=""><span class="badge ${sc}">${st}</span>${i.status === 'gone' && i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
       <td class="sub nowrap chip c-first" data-l="首次">${fmt(i.first_seen)}</td>
       <td class="sub nowrap chip c-last last-seen ${i.status === 'gone' ? 'stale' : ''}" data-l="最後" title="${i.status === 'gone' ? '最新一次爬取沒有這間' : ''}">${fmt(i.last_seen)}<br><span class="sub">共 ${i.seen_count} 次</span></td>
       <td class="sub nowrap chip c-post" data-l="發佈">${esc(i.post_time)}<br><span class="sub">${esc(i.refresh_time || '')}</span></td>

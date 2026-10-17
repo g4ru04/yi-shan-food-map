@@ -4,9 +4,5 @@ node_modules/
 .vscode/
 .idea/
 
-# 591 租屋:照片與 LLM 判圖中間檔只留本機(快照、vision.json 有進 git)
-591-rent-house/data/photos/
-591-rent-house/data/photos-manifest.json
-591-rent-house/data/vision-batches/
-591-rent-house/data/export/
-591-rent-house/data/viewer.html
+# 591 租屋:資料以 Supabase 為準,本機 data/(判圖照片暫存、log、舊快照)不進 git
+591-rent-house/data/
