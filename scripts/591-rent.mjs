@@ -415,7 +415,7 @@ async function slackPost(text, threadTs) {
     return r;
   };
   const channel = (await call('conversations.open', { users: process.env.SLACK_USER_ID || 'URQHCM761' })).channel.id;
-  return (await call('chat.postMessage', { channel, text, ...(threadTs ? { thread_ts: threadTs } : {}), unfurl_links: false })).ts;
+  return (await call('chat.postMessage', { channel, text, ...(threadTs ? { thread_ts: threadTs } : {}), unfurl_links: false, unfurl_media: false })).ts;
 }
 
 // thread 訊息太長時切成多則(Slack 單則上限約 4k 字)
