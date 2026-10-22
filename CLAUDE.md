@@ -60,5 +60,6 @@
 - `korea-trip/` 有自己的 CLAUDE.md（行程檔案連動更新規則），改該目錄前先讀
 - `591-rent-house/`:591 租屋清單(獨立頁,整頁 `prompt()` 密碼鎖,共用 `assets/js/config.js` 的 Supabase 設定)。**先讀 `591-rent-house/README.md`**
   - 資料只存在 Supabase(`rent_listings` / `rent_snapshots`),`591-rent-house/data/` 整個 gitignore,不要 commit 資料檔
+  - 照片只存本機 `591-rent-house/data/photos/<id>/`(每輪 watch 存新房源的,下架後照留);看已消失房源照片:`node scripts/591-rent.mjs photos` → `open 591-rent-house/data/gallery.html`
   - 爬蟲 `scripts/591-rent.mjs watch`(排程入口 `scripts/591-watch.sh`,每 5 小時由這台(ben)的 launchd 跑);`dump` 才會更新 `data.json` 靜態備份
   - Claude 指令正本 `591-rent-house/claude/auto-retrieve-rent-data.md`(`~/.claude/commands/` 底下是 symlink)

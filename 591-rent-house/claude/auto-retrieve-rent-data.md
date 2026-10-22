@@ -17,10 +17,13 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 - 無參數:完整執行(寫入 Supabase;有任何變動就發 Slack)
 - `dry`:只爬取與合併,不寫入、不發 Slack,印出會發的訊息
 - `view`:不爬,只打開網頁
+- `photos`(或使用者問「已下架 / 消失的房子照片」):不爬,補抓照片並打開本機相簿
 
 ## 流程
 
-1. **執行**(`view` 時跳過)。用 Bash `run_in_background` 跑,等完成通知,不要輪詢:
+0. **`photos`**:跑 `node scripts/591-rent.mjs photos`(全部房源加 `all`),完成後 `open 591-rent-house/data/gallery.html`,回報幾間、照片在 `591-rent-house/data/photos/<id>/`,結束。想看特定幾間時直接用 Read 看該資料夾的 jpg。
+
+1. **執行**(`view`、`photos` 時跳過)。用 Bash `run_in_background` 跑,等完成通知,不要輪詢:
 
    ```bash
    bash scripts/591-watch.sh --notify-min 0        # 無參數
@@ -31,7 +34,7 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
    - 約 1 分鐘;有新房源時會用 `claude -p` 判圖,每 5 間多約 1–2 分鐘。
 
 2. **看結果**:`tail -20 591-rent-house/data/watch.log`。
-   - 成功時有一行摘要:`列表 N/M、詳情 K 次 → 新上架 …、消失 …、回來 …、換 id …、改價 …、判圖 …、在架 …`。
+   - 成功時有一行摘要:`列表 N/M、詳情 K 次 → 新上架 …、消失 …、回來 …、換 id …、改價 …、存圖 …、判圖 …、在架 …`。
    - 出現「失敗:」就照實回報原因,不要假裝成功:
      - DNS 失敗或連不上 Supabase → 專案被暫停,請使用者到 Supabase dashboard 按 Resume。
      - `列表只抓到 x/y 筆` → 591 列表不穩或擋爬,等下一輪。
@@ -50,6 +53,6 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 
 ## 注意
 
-- 不要 commit 任何資料檔;`591-rent-house/data/` 整個被 gitignore。
+- 不要 commit 任何資料檔;`591-rent-house/data/` 整個被 gitignore(照片 `data/photos/<id>/` 也在裡面,下架後照留)。
 - 想更新網頁的靜態 JSON 備份版時才跑 `dump` 並 commit `591-rent-house/data.json`;push 前先詢問使用者(repo 規則)。
 - 排程在另一台電腦上跑時,手動執行可能和排程撞期:腳本偵測到就會放棄這輪,不會重複寫入。

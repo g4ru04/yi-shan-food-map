@@ -13,6 +13,7 @@
  *       --vision-max N 這輪最多判幾間(預設 VISION_MAX;一次補判全部時調大)
  *       --notify-min N 新上架 + 消失 + 回來 ≥ N 間才發 Slack(預設 3;0 = 每次都發)
  *   node scripts/591-rent.mjs dump      從 Supabase 讀回,寫成 591-rent-house/data.json(網頁的靜態 JSON 版)
+ *   node scripts/591-rent.mjs photos [all]  補抓 Supabase 上所有房源還沒存的照片,並產生 591-rent-house/data/gallery.html(預設只列已消失的;all = 全部)
  *
  * 環境變數(排程用 scripts/591-watch.sh 從 ~/.config/591-rent/env 載入):
  *   SLACK_BOT_TOKEN / SLACK_USER_ID   Slack DM 通知(沒設就只印出)
@@ -30,8 +31,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PAGE = path.join(ROOT, '591-rent-house');
-const DATA_DIR = path.join(PAGE, 'data'); // 本機暫存(照片、log、失敗旗標),整個 gitignore
-const PHOTOS = path.join(DATA_DIR, 'photos');
+const DATA_DIR = path.join(PAGE, 'data'); // 本機資料(照片、log、失敗旗標),整個 gitignore
+const PHOTOS = path.join(DATA_DIR, 'photos'); // 每間房一個資料夾 <id>/1.jpg…、info.json;下架後仍保留
+const GALLERY = path.join(DATA_DIR, 'gallery.html');
 const FAIL_FLAG = path.join(DATA_DIR, '.last-run-failed');
 const DATA_JSON = path.join(PAGE, 'data.json');
 const SITE_URL = 'https://g4ru04.github.io/yi-shan-food-map/591-rent-house/';
@@ -241,7 +243,7 @@ function toItem(list, det, prev, now) {
     // 換 id 重刊比對用(列表上的原始地址/聯絡人)
     match: { address: list.address || null, floor: fl || null, title: list.title, contact_listing: list.linkman || null, area_ping: num(list.area ?? list.area_name), phones: d.phones || [] },
     // 原始詳情子集:之後沿用舊列時,用它 + 新列表重新推導所有欄位
-    detail: det ? { ...det, post_date: det.post_date ?? postDate(det.post_time, now), photos: (det.photos || []).slice(0, 6) } : (prev?.detail ?? null),
+    detail: det ? { ...det, post_date: det.post_date ?? postDate(det.post_time, now), photos: det.photos || [] } : (prev?.detail ?? null),
   };
 }
 
@@ -329,7 +331,27 @@ function mergeRun(prev, scraped, details, now, { full = false } = {}) {
   return { rows: [...out.values()], deleteIds, events: ev };
 }
 
-// ---------------------------------------------------------------- 判圖(claude -p,只開放 Read)
+// ---------------------------------------------------------------- 照片存本機
+// 每間房存到 data/photos/<id>/(1.jpg…、info.json);資料夾已存在就不重抓,下架後也留著(看已消失的用 photos 指令產生 gallery.html)
+async function savePhotos(rows) {
+  let n = 0;
+  for (const d of rows) {
+    const dir = path.join(PHOTOS, String(d.id));
+    const urls = (d.detail?.photos || []).filter((x) => !x.includes('/video/'));
+    if (!urls.length || fs.existsSync(dir)) continue;
+    fs.mkdirSync(dir, { recursive: true });
+    for (const [i, u] of urls.entries()) {
+      // 591 圖床要帶尺寸後綴(不帶會 403);!1600x.jpg 約 1600x1200、無浮水印、每張 ~400KB
+      try { fs.writeFileSync(path.join(dir, `${i + 1}.jpg`), await getBin(u.replace(/!.*$/, '') + '!1600x.jpg')); n++; } catch { /* 單張失敗略過 */ }
+      await sleep(200);
+    }
+    const { id, url, title, price, manage_fee, area_ping, floor, floor_total, address, section, contact, first_seen } = d;
+    fs.writeFileSync(path.join(dir, 'info.json'), JSON.stringify({ id, url, title, price, manage_fee, area_ping, floor, floor_total, address, section, contact, first_seen }));
+  }
+  return n;
+}
+
+// ---------------------------------------------------------------- 判圖(claude -p,只開放 Read;看的是 savePhotos 存下的 1.jpg~6.jpg)
 const VISION_PROMPT = (ids) => `你是租屋照片判讀員。目前目錄下每個資料夾是一間房源(資料夾名 = 房源 id),裡面是 1.jpg~6.jpg。
 請用 Read 工具逐張看以下房源的照片:${ids.join(', ')}
 每間判斷:
@@ -349,27 +371,16 @@ function runClaude(prompt, cwd) {
   });
 }
 
-// 還沒判過,或加 iron_window 之前判的舊資料(重判補上)
+// 還沒判過,或加 iron_window 之前判的舊資料(重判補上);照片由 savePhotos 先存好,一張都沒有就別判(模型會全回 unknown 並被當成已判),下一輪再試
 const needsVision = (d) => !d.has_vision || d.iron_window == null;
 
 async function judgePhotos(rows, max = VISION_MAX) {
-  const todo = rows.filter((d) => d.status !== 'gone' && needsVision(d) && d.detail?.photos?.length)
+  const todo = rows.filter((d) => d.status !== 'gone' && needsVision(d) && fs.existsSync(path.join(PHOTOS, String(d.id), '1.jpg')))
     .sort((a, b) => b.first_seen.localeCompare(a.first_seen)).slice(0, max);
   if (!todo.length) return 0;
   let done = 0;
   for (let k = 0; k < todo.length; k += VISION_BATCH) {
-    const batch = [];
-    for (const d of todo.slice(k, k + VISION_BATCH)) {
-      const dir = path.join(PHOTOS, String(d.id));
-      fs.mkdirSync(dir, { recursive: true });
-      for (const [n, u] of d.detail.photos.filter((x) => !x.includes('/video/')).slice(0, 6).entries()) {
-        const f = path.join(dir, `${n + 1}.jpg`);
-        if (!fs.existsSync(f)) try { fs.writeFileSync(f, await getBin(u.replace(/!.*$/, '') + '!800x.water2.jpg')); } catch { /* 單張失敗略過 */ }
-      }
-      // 一張都沒載到就別判(模型會全回 unknown 並被當成已判),下一輪再試
-      if (fs.readdirSync(dir).length) batch.push(d);
-    }
-    if (!batch.length) continue;
+    const batch = todo.slice(k, k + VISION_BATCH);
     try {
       const outText = await runClaude(VISION_PROMPT(batch.map((d) => d.id)), PHOTOS);
       const res = JSON.parse(outText.slice(outText.indexOf('{'), outText.lastIndexOf('}') + 1));
@@ -379,7 +390,6 @@ async function judgePhotos(rows, max = VISION_MAX) {
         if (!r || !['good', 'fair', 'poor', 'unknown'].includes(r.lighting) || !yn.includes(r.double_bed) || !yn.includes(r.iron_window)) continue;
         Object.assign(d, { lighting: r.lighting, double_bed: r.double_bed, iron_window: r.iron_window,
           vision_note: String(r.note || '').slice(0, 80), has_vision: true });
-        fs.rmSync(path.join(PHOTOS, String(d.id)), { recursive: true, force: true });
         done++;
       }
     } catch (e) {
@@ -491,10 +501,11 @@ async function cmdWatch(args) {
     for (const id of [...needDetail, ...verify]) { details.set(id, await fetchDetail(id)); await sleep(900); }
 
     const { rows, deleteIds, events } = mergeRun(prev, items, details, now, { full });
+    const photos = dry ? 0 : await savePhotos(rows);
     const vision = has(args, '--no-vision') || dry ? 0 : await judgePhotos(rows, Number(argVal(args, '--vision-max', VISION_MAX)));
     const active = rows.filter((d) => d.status !== 'gone').length;
     const summary = `列表 ${items.length}/${total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
-      `換 id ${events.relisted.length}、改價 ${events.price.length}、判圖 ${vision}、在架 ${active}`;
+      `換 id ${events.relisted.length}、改價 ${events.price.length}、存圖 ${photos}、判圖 ${vision}、在架 ${active}`;
     const changes = events.added.length + events.gone.length + events.back.length;
 
     if (dry) {
@@ -537,8 +548,37 @@ async function cmdDump() {
   console.log(`已從 Supabase 寫出 ${path.relative(ROOT, DATA_JSON)}:${items.length} 間(在架 ${items.filter((i) => i.status !== 'gone').length})`);
 }
 
+// 補抓照片 + 產生本機相簿頁 data/gallery.html(預設只列已消失的房源;photos all = 全部)
+async function cmdPhotos(args) {
+  const rows = (await readAll(supa(), 'rent_listings', 'id')).map((r) => r.data);
+  log(`補抓照片 ${await savePhotos(rows)} 張`);
+  const byId = new Map();
+  for (const d of rows) for (const id of [d.id, ...(d.old_ids || [])]) byId.set(String(id), d);
+  const all = has(args, 'all');
+  const cards = [];
+  for (const id of fs.existsSync(PHOTOS) ? fs.readdirSync(PHOTOS).filter((n) => /^\d+$/.test(n)) : []) {
+    const dir = path.join(PHOTOS, id);
+    // 換 id 重刊時舊列會從 Supabase 刪掉:照片資料夾還在,改用 info.json 顯示
+    const d = byId.get(id) || (fs.existsSync(path.join(dir, 'info.json')) ? { ...JSON.parse(fs.readFileSync(path.join(dir, 'info.json'), 'utf8')), status: 'deleted' } : { id, status: 'deleted' });
+    if (!all && d.status !== 'gone' && d.status !== 'deleted') continue;
+    const imgs = fs.readdirSync(dir).filter((f) => f.endsWith('.jpg')).sort((a, b) => parseInt(a) - parseInt(b));
+    cards.push({ ...d, dir: id, imgs });
+  }
+  cards.sort((a, b) => String(b.gone_at || b.last_seen || '').localeCompare(String(a.gone_at || a.last_seen || '')));
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const st = { gone: (d) => `已消失 ${fmtTW(d.gone_at)} 起`, deleted: () => '已換 id 重刊(舊 id)', new: () => '24h 內新上架', active: () => '在架' };
+  const html = `<!doctype html><meta charset="utf-8"><title>591 照片${all ? '' : '(已消失)'}</title>
+<style>body{font:14px system-ui;margin:16px}section{margin:0 0 28px}h3{margin:0 0 2px;font-size:16px}.sub{color:#666;margin-bottom:6px}.g{display:flex;flex-wrap:wrap;gap:6px}img{height:170px;border-radius:4px;background:#eee}</style>
+<h1>591 照片${all ? '' : '(已消失)'} · ${cards.length} 間 · ${fmtTW(Date.now())}</h1>
+` + cards.map((d) => `<section><h3><a href="${esc(d.url || `https://rent.591.com.tw/${d.id}`)}" target="_blank">${esc(d.title || d.id)}</a></h3>
+<div class="sub">$${d.price ?? '?'}${d.manage_fee ? `+${d.manage_fee}` : ''}|${d.area_ping ?? '?'}坪|${esc(d.floor)}/${esc(d.floor_total)}|${esc(d.address)}|${(st[d.status] || st.active)(d)}|${d.imgs.length} 張</div>
+<div class="g">${d.imgs.map((f) => `<a href="photos/${d.dir}/${f}" target="_blank"><img loading="lazy" src="photos/${d.dir}/${f}"></a>`).join('')}</div></section>`).join('\n');
+  fs.writeFileSync(GALLERY, html);
+  console.log(`已寫出 ${GALLERY}:${cards.length} 間(open "${GALLERY}" 可直接開)`);
+}
+
 const [cmd, ...rest] = process.argv.slice(2);
-const cmds = { watch: cmdWatch, dump: cmdDump };
+const cmds = { watch: cmdWatch, dump: cmdDump, photos: cmdPhotos };
 if (!cmds[cmd]) {
   console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('*/')[0].replace(/^#!.*\n\/\*\*?/, ''));
   process.exit(cmd ? 1 : 0);

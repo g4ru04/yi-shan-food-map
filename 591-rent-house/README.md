@@ -5,6 +5,7 @@
 - **網頁**:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖「新增地點」頁)
 - **搜尋條件**:台中市東區 + 北區、租金 5,000–10,000、坪數 11–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`
 - **資料**:只存在 Supabase,不進 git
+- **照片**:每間房的照片存在跑排程那台電腦的 `591-rent-house/data/photos/<id>/`(不進 git),下架後也留著;想看已消失房源的照片跑 `node scripts/591-rent.mjs photos`
 
 ## 架構
 
@@ -17,9 +18,10 @@
         1. 讀 Supabase 現況(rent_listings)
         2. 爬 591 列表(翻到最後一頁);只抓新房源的詳情頁
         3. 合併:仍在 / 新上架 / 消失 / 回來 / 換 id 重刊 / 改價
-        4. 新房源照片丟給 `claude -p` 判斷採光、雙人床
-        5. 寫回 Supabase(rent_listings、rent_snapshots)
-        6. 新上架 + 消失 + 回來 ≥ 3 → Slack DM(摘要 + thread 列出每間)
+        4. 把還沒存過的房源照片存到本機 data/photos/<id>/(1600px、每張 ~400KB、每間最多 12 張)
+        5. 新房源照片丟給 `claude -p` 判斷採光、雙人床
+        6. 寫回 Supabase(rent_listings、rent_snapshots)
+        7. 新上架 + 消失 + 回來 ≥ 3 → Slack DM(摘要 + thread 列出每間)
                      │
                  Supabase ──────────► 591-rent-house/index.html(網頁直接讀,重新整理就是最新)
                      │
@@ -66,6 +68,15 @@
 | `… watch --no-vision` | 跳過判圖 |
 | `… watch --vision-max N` | 這輪最多判 N 間(預設 20;要一次補判很多間時調大,例如 `CLAUDE_BIN=$(which bridge-cli) … --vision-max 40`) |
 | `node scripts/591-rent.mjs dump` | 從 Supabase 匯出成 `591-rent-house/data.json`(要 commit 才會更新網頁的靜態版) |
+| `node scripts/591-rent.mjs photos` | 補抓 Supabase 上所有房源還沒存的照片,並產生 `591-rent-house/data/gallery.html`(只列已消失的;`photos all` 列全部),`open` 該檔即可瀏覽 |
+
+### 照片存本機
+
+- 位置:`591-rent-house/data/photos/<房源 id>/1.jpg …`(依 591 詳情頁順序,最多 12 張)+ `info.json`(標題、租金、地址等,方便離線辨識)。
+- 每輪 `watch` 只抓**資料夾還不存在**的房源;下架(消失)後資料夾照留,所以已消失房源的照片都還在。
+- 換 id 重刊時舊 id 的列會從 Supabase 刪掉,舊資料夾仍保留,`gallery.html` 會標成「已換 id 重刊(舊 id)」。
+- 空間:每間約 2MB,2026-10-22 回補 305 間共 666MB;之後每天新增幾間,一年約多 3–4GB。要清理就刪整個 `data/photos/`,下一輪會把在架的重抓回來(已消失的不會)。
+- 判圖(`claude -p`)也是看這裡的 1.jpg~6.jpg,不再另外下載。
 
 網頁資料來源在 `index.html`,把下面兩行的註解對調就能切換:
 
@@ -173,6 +184,7 @@ ln -sf "$PWD/591-rent-house/claude/auto-retrieve-rent-data.md" ~/.claude/command
 | `/auto-retrieve-rent-data` | 跑一輪(寫入 Supabase,有變動就發 Slack),然後整理新上架、消失清單 |
 | `/auto-retrieve-rent-data dry` | 只看會有什麼變動,不寫入 |
 | `/auto-retrieve-rent-data view` | 只打開網頁 |
+| `/auto-retrieve-rent-data photos` | 補抓照片並打開已消失房源的本機相簿 `data/gallery.html` |
 
 <details>
 <summary>指令檔內容(md 長這樣)</summary>
