@@ -16,4 +16,6 @@ if ! mkdir "$LOCK" 2>/dev/null; then echo "$(date '+%F %T') 上一輪尚未結�
 trap 'rmdir "$LOCK"' EXIT
 
 cd "$REPO" || exit 1
+# 先拉最新程式碼再爬;拉不到(離線、分叉)只記 log,照舊用本機版本跑
+git pull -q --ff-only origin main >> "$LOG" 2>&1 || echo "$(date '+%F %T') git pull 失敗,用本機版本繼續" >> "$LOG"
 node scripts/591-rent.mjs watch "$@" >> "$LOG" 2>&1

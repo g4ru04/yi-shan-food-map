@@ -12,7 +12,7 @@
 ```
           每 5 小時(launchd / cron)
                      │
-          scripts/591-watch.sh ── 載入 ~/.config/591-rent/env(Slack token、claude 登入 token)
+          scripts/591-watch.sh ── 載入 ~/.config/591-rent/env(Slack token、claude 登入 token)、git pull 最新程式碼
                      │
       node scripts/591-rent.mjs watch
         1. 讀 Supabase 現況(rent_listings)
@@ -60,7 +60,7 @@
 
 | 指令 | 做什麼 |
 |---|---|
-| `bash scripts/591-watch.sh` | 排程用的入口:載入 env 檔、防止同時跑兩份、log 寫到 `591-rent-house/data/watch.log` |
+| `bash scripts/591-watch.sh` | 排程用的入口:載入 env 檔、`git pull --ff-only` 拉最新程式碼(拉不到就用本機版本)、防止同時跑兩份、log 寫到 `591-rent-house/data/watch.log` |
 | `node scripts/591-rent.mjs watch` | 跑一輪完整流程(上面架構的 1–6) |
 | `… watch --dry-run` | 只爬取與合併,不寫入、不發 Slack,印出結果和會發的訊息 |
 | `… watch --notify-min 0` | 不管變動多少都發 Slack(預設門檻 3) |
