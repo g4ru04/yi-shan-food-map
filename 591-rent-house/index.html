@@ -131,7 +131,8 @@
     <label>租金 <input type="number" id="pmin" step="500"> – <input type="number" id="pmax" step="500"></label>
     <label><input type="checkbox" id="withFee"> 含管理費</label>
     <label>坪數 <input type="number" id="amin" step="1"> – <input type="number" id="amax" step="1"></label>
-    <label title="與基準點的直線距離;沒有座標的房源會被排除">距離 ≤ <input type="number" id="dmax" step="0.1" min="0.1"> km</label>
+    <label title="與基準點的直線距離;沒有座標的房源會被排除(清空 = 不限)">距離 ≤ <input type="number" id="dmax" step="0.1" min="0.1" value="1.5"> km</label>
+    <label title="591 刊登天數;清空 = 不限">刊登 ≤ <input type="number" id="pdmax" step="1" min="0" value="7"> 天</label>
     <label>區 <select id="section"><option value="">全部</option></select></label>
     <label>類型 <select id="kind"><option value="">全部</option></select></label>
     <label>採光 <select id="lighting"><option value="">全部</option><option value="good">好</option><option value="good,fair">好+普通</option><option value="poor">差</option></select></label>
@@ -338,7 +339,7 @@ function showRow(id) {
 
 function filtered() {
   const n = (id) => ($(id).value === '' ? null : Number($(id).value));
-  const [pmin, pmax, amin, amax, dmax] = ['pmin', 'pmax', 'amin', 'amax', 'dmax'].map(n);
+  const [pmin, pmax, amin, amax, dmax, pdmax] = ['pmin', 'pmax', 'amin', 'amax', 'dmax', 'pdmax'].map(n);
   const lights = $('lighting').value ? $('lighting').value.split(',') : null;
   const q = $('q').value.trim().toLowerCase();
   const sts = $('status').value ? $('status').value.split(',') : null;
@@ -347,6 +348,7 @@ function filtered() {
     return (pmin == null || p >= pmin) && (pmax == null || p <= pmax)
       && (amin == null || i.area_ping >= amin) && (amax == null || i.area_ping <= amax)
       && (dmax == null || (i.dist != null && Math.round(i.dist * 10) / 10 <= dmax))
+      && (pdmax == null || (i.post_days != null && i.post_days <= pdmax))
       && (!$('section').value || i.section === $('section').value)
       && (!$('kind').value || i.kind === $('kind').value)
       && (!lights || lights.includes(i.lighting))

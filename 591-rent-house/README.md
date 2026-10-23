@@ -3,7 +3,8 @@
 每 5 小時爬一次 591 租屋,記下每間房何時出現、何時消失,用網頁瀏覽,有明顯變動時發 Slack 通知。
 
 - **網頁**:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖「新增地點」頁)
-- **搜尋條件**:台中市東區 + 北區、租金 5,000–10,000、坪數 11–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`
+- **搜尋條件**:台中市東區 + 北區 + 中區 + 西區、租金 5,000–10,000、坪數 11–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`(591 section id:東區 99、北區 102、中區 98、西區 101)
+- **關注範圍**:距基準點 ≤ 1.5 km 且 591 刊登 ≤ 7 天(`scripts/591-rent.mjs` 的 `MAX_KM` / `MAX_POST_DAYS`)。範圍外的房源照樣爬、照樣存 Supabase,但**不發 Slack、不判圖**;網頁的「距離 ≤」「刊登 ≤」篩選預設就是這兩個值,清空即可看全部
 - **資料**:只存在 Supabase,不進 git
 - **照片**:每間房的照片存在跑排程那台電腦的 `591-rent-house/data/photos/<id>/`(不進 git),下架後也留著;想看已消失房源的照片跑 `node scripts/591-rent.mjs photos`
 
@@ -193,7 +194,7 @@ ln -sf "$PWD/591-rent-house/claude/auto-retrieve-rent-data.md" ~/.claude/command
 
 ```markdown
 ---
-description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),與 Supabase 合併、判圖、發 Slack,並回報變動
+description: 爬 591 租屋(台中東區+北區+中區+西區、5000-10000 元、11-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
 ---
 
 # Auto Retrieve Rent Data (591)
@@ -222,6 +223,7 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 | `判圖失敗 … Failed to authenticate` | env 檔沒設或設錯 `CLAUDE_CODE_OAUTH_TOKEN`,重跑 `claude setup-token` |
 | `判圖失敗 … ENOENT` | `CLAUDE_BIN` 路徑錯誤 |
 | `執行期間已有其他程序寫入` | 兩台電腦都在跑排程,停掉其中一台 |
-| 想改搜尋條件 | 改 `scripts/591-rent.mjs` 的 `QUERY`;舊資料和新條件比對會產生大量「消失」,建議先清空兩張表 |
+| 想改搜尋條件 | 改 `scripts/591-rent.mjs` 的 `QUERY`;縮小條件時舊資料會產生大量「消失」,建議先清空兩張表(放寬條件不會) |
+| 想改關注範圍(距離 / 刊登天數) | 改 `scripts/591-rent.mjs` 的 `MAX_KM` / `MAX_POST_DAYS`,以及 `591-rent-house/index.html` 篩選欄 `#dmax` / `#pdmax` 的 `value` |
 | 想改執行頻率 | 改 `launchd.plist.example` 的 `StartCalendarInterval`(或 crontab 那一行)後重新安裝;24 不能被 5 整除,所以 20:07 到隔天 0:07 只隔 4 小時 |
 | 想改距離基準點 | 改 `591-rent-house/index.html` 和 `scripts/591-rent.mjs` 兩處的 `ORIGIN` |

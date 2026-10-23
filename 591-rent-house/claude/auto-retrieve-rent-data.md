@@ -1,5 +1,5 @@
 ---
-description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),與 Supabase 合併、判圖、發 Slack,並回報變動
+description: 爬 591 租屋(台中東區+北區+中區+西區、5000-10000 元、11-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
 ---
 
 # Auto Retrieve Rent Data (591)
@@ -10,6 +10,7 @@ description: 爬 591 租屋(台中東區+北區、5000-10000 元、11-20 坪),�
 - Repo:`yi-shan-food-map`(下列指令都在 repo 根目錄執行;這台電腦是 `/Users/ben/claude-assistant/yi-shan-food-map`)
 - 網頁:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖新增頁)
 - 資料:只存在 Supabase(`rent_listings` 每間房一列、`rent_snapshots` 每次成功爬取一列),不進 git
+- 關注範圍:距基準點 ≤ 1.5km 且刊登 ≤ 7 天才發 Slack / 判圖;範圍外的照樣存,網頁清空「距離 ≤」「刊登 ≤」篩選即可看到
 - 詳細說明:`591-rent-house/README.md`
 
 ## 參數($ARGUMENTS)

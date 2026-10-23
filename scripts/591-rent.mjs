@@ -2,7 +2,8 @@
 /**
  * 591 租屋:爬取 → 與 Supabase 現況合併 → 判圖 → 寫回 Supabase → Slack 通知
  *
- * 條件:台中市(8) 東區(99)+北區(102)、租金 5000-10000、坪數 11-20(不限房型、不限優選)。
+ * 條件:台中市(8) 東區(99)+北區(102)+中區(98)+西區(101)、租金 5000-10000、坪數 11-20(不限房型、不限優選)。
+ * 關注範圍(SCOPE):距基準點 ≤ 1.5km 且 591 刊登 ≤ 7 天;範圍外的照樣存進 Supabase(網頁可調篩選看到),但不發 Slack、不判圖。
  * 資料以 Supabase 為唯一來源(rent_listings 每間房一列、rent_snapshots 每次成功爬取一列),不進 git。
  *
  * Usage:
@@ -38,7 +39,7 @@ const FAIL_FLAG = path.join(DATA_DIR, '.last-run-failed');
 const DATA_JSON = path.join(PAGE, 'data.json');
 const SITE_URL = 'https://g4ru04.github.io/yi-shan-food-map/591-rent-house/';
 
-const QUERY = { region: '8', section: '102,99', price: '5000_10000', acreage: '11$_20$', sort: 'area_desc' };
+const QUERY = { region: '8', section: '102,99,98,101', price: '5000_10000', acreage: '11$_20$', sort: 'area_desc' };
 const LIST_URL = (firstRow, sort = QUERY.sort) =>
   'https://rent.591.com.tw/list?' +
   Object.entries({ ...QUERY, sort, firstRow }).map(([k, v]) => `${k}=${v}`).join('&');
@@ -46,6 +47,9 @@ const LIST_URL = (firstRow, sort = QUERY.sort) =>
 const SORTS = ['area_desc', 'posttime_desc', 'area_asc'];
 // 距離基準點(同 591-rent-house/index.html 的 ORIGIN)
 const ORIGIN = [24.1418, 120.6870];
+// 關注範圍(同 index.html 篩選預設值):超出的不發 Slack、不判圖;post_days 未知(詳情抓失敗)時不排除
+const MAX_KM = 1.5, MAX_POST_DAYS = 7;
+const inScope = (d) => (distKm(d) ?? Infinity) <= MAX_KM && (d.post_days ?? 0) <= MAX_POST_DAYS;
 const NEW_WINDOW_MS = 24 * 3600e3;   // first_seen 24h 內算「新上架」
 const RELIST_WINDOW_MS = 14 * 864e5; // 換 id 重刊只跟 14 天內不見的房源比對
 const MISS_LIMIT = 3;                // 詳情頁還在但連續 N 輪不在搜尋結果 → 視為消失(多半是改價/改條件)
@@ -375,7 +379,7 @@ function runClaude(prompt, cwd) {
 const needsVision = (d) => !d.has_vision || d.iron_window == null;
 
 async function judgePhotos(rows, max = VISION_MAX) {
-  const todo = rows.filter((d) => d.status !== 'gone' && needsVision(d) && fs.existsSync(path.join(PHOTOS, String(d.id), '1.jpg')))
+  const todo = rows.filter((d) => d.status !== 'gone' && inScope(d) && needsVision(d) && fs.existsSync(path.join(PHOTOS, String(d.id), '1.jpg')))
     .sort((a, b) => b.first_seen.localeCompare(a.first_seen)).slice(0, max);
   if (!todo.length) return 0;
   let done = 0;
@@ -470,6 +474,7 @@ const byDist = (a, b) => (distKm(a) ?? 99) - (distKm(b) ?? 99);
 const ago = (from, to) => { const h = Math.round((Date.parse(to) - Date.parse(from)) / 3600e3); return h < 48 ? `${h} 小時` : `${Math.round(h / 24)} 天`; };
 
 async function notify(ev, active, now) {
+  ev = { ...ev, added: ev.added.filter(inScope), gone: ev.gone.filter(inScope), back: ev.back.filter(inScope) };
   const head = `🏠 591 租屋變動 ${fmtTW(now)}:新上架 ${ev.added.length}、消失 ${ev.gone.length}` +
     (ev.back.length ? `、回來 ${ev.back.length}` : '') + (ev.relisted.length ? `、換 id 重刊 ${ev.relisted.length}` : '') +
     `(在架 ${active} 間)\n<${SITE_URL}|打開租屋清單>`;
@@ -506,7 +511,7 @@ async function cmdWatch(args) {
     const active = rows.filter((d) => d.status !== 'gone').length;
     const summary = `列表 ${items.length}/${total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
       `換 id ${events.relisted.length}、改價 ${events.price.length}、存圖 ${photos}、判圖 ${vision}、在架 ${active}`;
-    const changes = events.added.length + events.gone.length + events.back.length;
+    const changes = [...events.added, ...events.gone, ...events.back].filter(inScope).length; // 門檻只數關注範圍內的
 
     if (dry) {
       log(`[dry-run] ${summary}`);
