@@ -64,6 +64,7 @@
 | `… watch --notify-min 0` | 不管變動多少都發 Slack(預設門檻 3) |
 | `… watch --full` | 已知房源的詳情也全部重抓(約 4 分鐘;預設只抓新房源) |
 | `… watch --no-vision` | 跳過判圖 |
+| `… watch --vision-max N` | 這輪最多判 N 間(預設 20;要一次補判很多間時調大,例如 `CLAUDE_BIN=$(which bridge-cli) … --vision-max 40`) |
 | `node scripts/591-rent.mjs dump` | 從 Supabase 匯出成 `591-rent-house/data.json`(要 commit 才會更新網頁的靜態版) |
 
 網頁資料來源在 `index.html`,把下面兩行的註解對調就能切換:

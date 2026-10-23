@@ -6,10 +6,11 @@
  * 資料以 Supabase 為唯一來源(rent_listings 每間房一列、rent_snapshots 每次成功爬取一列),不進 git。
  *
  * Usage:
- *   node scripts/591-rent.mjs watch [--dry-run] [--full] [--no-vision] [--notify-min N]
+ *   node scripts/591-rent.mjs watch [--dry-run] [--full] [--no-vision] [--vision-max N] [--notify-min N]
  *       --dry-run      爬取 + 合併,但不寫 Supabase、不發 Slack(只印出結果與訊息內容)
  *       --full         已知房源的詳情也全部重抓(預設只抓新 id 的詳情)
  *       --no-vision    跳過 claude -p 判圖
+ *       --vision-max N 這輪最多判幾間(預設 VISION_MAX;一次補判全部時調大)
  *       --notify-min N 新上架 + 消失 + 回來 ≥ N 間才發 Slack(預設 3;0 = 每次都發)
  *   node scripts/591-rent.mjs dump      從 Supabase 讀回,寫成 591-rent-house/data.json(網頁的靜態 JSON 版)
  *
@@ -351,21 +352,24 @@ function runClaude(prompt, cwd) {
 // 還沒判過,或加 iron_window 之前判的舊資料(重判補上)
 const needsVision = (d) => !d.has_vision || d.iron_window == null;
 
-async function judgePhotos(rows) {
+async function judgePhotos(rows, max = VISION_MAX) {
   const todo = rows.filter((d) => d.status !== 'gone' && needsVision(d) && d.detail?.photos?.length)
-    .sort((a, b) => b.first_seen.localeCompare(a.first_seen)).slice(0, VISION_MAX);
+    .sort((a, b) => b.first_seen.localeCompare(a.first_seen)).slice(0, max);
   if (!todo.length) return 0;
   let done = 0;
   for (let k = 0; k < todo.length; k += VISION_BATCH) {
-    const batch = todo.slice(k, k + VISION_BATCH);
-    for (const d of batch) {
+    const batch = [];
+    for (const d of todo.slice(k, k + VISION_BATCH)) {
       const dir = path.join(PHOTOS, String(d.id));
       fs.mkdirSync(dir, { recursive: true });
       for (const [n, u] of d.detail.photos.filter((x) => !x.includes('/video/')).slice(0, 6).entries()) {
         const f = path.join(dir, `${n + 1}.jpg`);
         if (!fs.existsSync(f)) try { fs.writeFileSync(f, await getBin(u.replace(/!.*$/, '') + '!800x.water2.jpg')); } catch { /* 單張失敗略過 */ }
       }
+      // 一張都沒載到就別判(模型會全回 unknown 並被當成已判),下一輪再試
+      if (fs.readdirSync(dir).length) batch.push(d);
     }
+    if (!batch.length) continue;
     try {
       const outText = await runClaude(VISION_PROMPT(batch.map((d) => d.id)), PHOTOS);
       const res = JSON.parse(outText.slice(outText.indexOf('{'), outText.lastIndexOf('}') + 1));
@@ -487,7 +491,7 @@ async function cmdWatch(args) {
     for (const id of [...needDetail, ...verify]) { details.set(id, await fetchDetail(id)); await sleep(900); }
 
     const { rows, deleteIds, events } = mergeRun(prev, items, details, now, { full });
-    const vision = has(args, '--no-vision') || dry ? 0 : await judgePhotos(rows);
+    const vision = has(args, '--no-vision') || dry ? 0 : await judgePhotos(rows, Number(argVal(args, '--vision-max', VISION_MAX)));
     const active = rows.filter((d) => d.status !== 'gone').length;
     const summary = `列表 ${items.length}/${total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
       `換 id ${events.relisted.length}、改價 ${events.price.length}、判圖 ${vision}、在架 ${active}`;
