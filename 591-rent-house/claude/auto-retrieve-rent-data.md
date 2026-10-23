@@ -1,5 +1,5 @@
 ---
-description: 爬 591 租屋(台中東區+北區+中區+西區、5000-10000 元、11-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
+description: 爬 591 + 樂屋網租屋(台中東區+北區+中區+西區、5000-10000 元、11-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
 ---
 
 # Auto Retrieve Rent Data (591)
@@ -11,6 +11,7 @@ description: 爬 591 租屋(台中東區+北區+中區+西區、5000-10000 元�
 - 網頁:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖新增頁)
 - 資料:只存在 Supabase(`rent_listings` 每間房一列、`rent_snapshots` 每次成功爬取一列),不進 git
 - 關注範圍:距基準點 ≤ 1.5km 且刊登 ≤ 7 天才發 Slack / 判圖;範圍外的照樣存,網頁清空「距離 ≤」「刊登 ≤」篩選即可看到
+- 來源:591 + 樂屋網(樂屋用 playwright 開本機 Chrome 抓,第一次或 cookie 失效時會閃一下 Chrome 視窗;樂屋房源 id ≥ 1,000,000,000,`source: rakuya`)
 - 詳細說明:`591-rent-house/README.md`
 
 ## 參數($ARGUMENTS)
@@ -35,11 +36,12 @@ description: 爬 591 租屋(台中東區+北區+中區+西區、5000-10000 元�
    - 約 1 分鐘;有新房源時會用 `claude -p` 判圖,每 5 間多約 1–2 分鐘。
 
 2. **看結果**:`tail -20 591-rent-house/data/watch.log`。
-   - 成功時有一行摘要:`列表 N/M、詳情 K 次 → 新上架 …、消失 …、回來 …、換 id …、改價 …、存圖 …、判圖 …、在架 …`。
+   - 成功時有一行摘要:`列表 591 N/M + 樂屋 N/M、詳情 K 次 → 新上架 …、消失 …、回來 …、換 id …、改價 …、存圖 …、判圖 …、在架 …`。
    - 出現「失敗:」就照實回報原因,不要假裝成功:
      - DNS 失敗或連不上 Supabase → 專案被暫停,請使用者到 Supabase dashboard 按 Resume。
      - `列表只抓到 x/y 筆` → 591 列表不穩或擋爬,等下一輪。
      - `已有其他程序寫入` → 另一台電腦的排程剛跑完,這輪放棄是正常的。
+     - `樂屋網 Cloudflare 擋住` / `Cannot find package 'playwright'` → 見 README 常見問題。
    - 出現「判圖失敗」→ 檢查 env 檔的 `CLAUDE_BIN` 與 `CLAUDE_CODE_OAUTH_TOKEN`;沒判到的房源下一輪會自動補判。
 
 3. **打開網頁**:`open "https://g4ru04.github.io/yi-shan-food-map/591-rent-house/"`。

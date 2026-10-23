@@ -134,6 +134,7 @@
     <label title="與基準點的直線距離;沒有座標的房源會被排除(清空 = 不限)">距離 ≤ <input type="number" id="dmax" step="0.1" min="0.1" value="1.5"> km</label>
     <label title="591 刊登天數;清空 = 不限">刊登 ≤ <input type="number" id="pdmax" step="1" min="0" value="7"> 天</label>
     <label>區 <select id="section"><option value="">全部</option></select></label>
+    <label>來源 <select id="src"><option value="">全部</option><option value="591">591</option><option value="rakuya">樂屋</option></select></label>
     <label>類型 <select id="kind"><option value="">全部</option></select></label>
     <label>採光 <select id="lighting"><option value="">全部</option><option value="good">好</option><option value="good,fair">好+普通</option><option value="poor">差</option></select></label>
     <label><input type="checkbox" id="bed"> 雙人床</label>
@@ -350,6 +351,7 @@ function filtered() {
       && (dmax == null || (i.dist != null && Math.round(i.dist * 10) / 10 <= dmax))
       && (pdmax == null || (i.post_days != null && i.post_days <= pdmax))
       && (!$('section').value || i.section === $('section').value)
+      && (!$('src').value || (i.source || '591') === $('src').value)
       && (!$('kind').value || i.kind === $('kind').value)
       && (!lights || lights.includes(i.lighting))
       && (!$('bed').checked || i.double_bed === 'yes')
@@ -397,6 +399,7 @@ function renderPage() {
     const [st, , sc] = STATUS[i.status];
     const badges = (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
       + (i.preferred ? '<span class="badge">優選</span>' : '')
+      + (i.source === 'rakuya' ? '<span class="badge">樂屋</span>' : '')
       + (i.contact_role === '屋主' ? '<span class="badge">屋主</span>' : '');
     return `<tr data-id="${i.id}" class="${i.status === 'gone' ? 'gone' : ''}">
       <td class="c-thumb"><a href="${esc(i.url)}" target="_blank"><img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.photo)}"></a></td>

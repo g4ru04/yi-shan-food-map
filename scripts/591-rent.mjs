@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * 591 租屋:爬取 → 與 Supabase 現況合併 → 判圖 → 寫回 Supabase → Slack 通知
+ * 591 + 樂屋網 租屋:爬取 → 與 Supabase 現況合併 → 判圖 → 寫回 Supabase → Slack 通知
  *
- * 條件:台中市(8) 東區(99)+北區(102)+中區(98)+西區(101)、租金 5000-10000、坪數 11-20(不限房型、不限優選)。
+ * 591 條件:台中市(8) 東區(99)+北區(102)+中區(98)+西區(101)、租金 5000-10000、坪數 11-20(不限房型、不限優選)。
+ * 樂屋網條件:北區(404)+中區(400)+東區(401)+西區(403)、獨立套房(usecode=8)、租金 5000-10000、坪數 10-20;Cloudflare 擋純 HTTP,用 playwright + 本機 Chrome 抓。
  * 關注範圍(SCOPE):距基準點 ≤ 1.5km 且 591 刊登 ≤ 7 天;範圍外的照樣存進 Supabase(網頁可調篩選看到),但不發 Slack、不判圖。
  * 資料以 Supabase 為唯一來源(rent_listings 每間房一列、rent_snapshots 每次成功爬取一列),不進 git。
  *
@@ -45,6 +46,10 @@ const LIST_URL = (firstRow, sort = QUERY.sort) =>
   Object.entries({ ...QUERY, sort, firstRow }).map(([k, v]) => `${k}=${v}`).join('&');
 // 坪數相同的房源在 area_desc 下順序不穩,翻頁會重複/漏掉;改以多種排序取聯集直到湊滿 total
 const SORTS = ['area_desc', 'posttime_desc', 'area_asc'];
+// 樂屋網(使用者給的搜尋網址;翻頁加 &page=N,每頁 19 筆)
+const RAKUYA_LIST = 'https://rent.rakuya.com.tw/result?zipcode=404,400,401,403&usecode=8&price=5000~10000&size=10~20';
+const RAKUYA_ID_BASE = 1e9; // 樂屋 id = 1e9 + ehid 中段 8 位數字;591 id 是 8 位數,不會撞
+const CHROME_PROFILE = path.join(DATA_DIR, 'chrome-profile'); // 樂屋用的 Chrome profile(cf_clearance cookie 存這,不進 git)
 // 距離基準點(同 591-rent-house/index.html 的 ORIGIN)
 const ORIGIN = [24.1418, 120.6870];
 // 關注範圍(同 index.html 篩選預設值):超出的不發 Slack、不判圖;post_days 未知(詳情抓失敗)時不排除
@@ -207,7 +212,7 @@ function postDate(s, at) {
 
 // 591 圖床要帶尺寸後綴(不帶會 404);有些網址已帶 !fit… 後綴要先去掉,影片封面(.png)不能縮,跳過
 const firstPhoto = (urls) => (urls || []).find((x) => !x.includes('/video/'));
-const thumbUrl = (u) => (u ? u.replace(/!.*$/, '') + '!510x400.jpg' : '');
+const thumbUrl = (u) => (!u ? '' : u.includes('591.com.tw') ? u.replace(/!.*$/, '') + '!510x400.jpg' : u);
 
 // ---------------------------------------------------------------- 每間房的資料形狀(= rent_listings.data = data.json items[])
 // list:591 列表項;det:parseDetail 結果(沿用舊列時傳 prev.detail);prev:Supabase 上的舊 data(新房源為 null)
@@ -229,7 +234,7 @@ function toItem(list, det, prev, now) {
     iron_window: prev?.iron_window ?? null, // null = 還沒判過(加這欄之前判的舊資料也是)
     vision_note: prev?.vision_note ?? '', has_vision: prev?.has_vision ?? false,
     // 房源欄位
-    id: list.id, url: list.url || `https://rent.591.com.tw/${list.id}`, title: list.title, kind: list.kind_name,
+    id: list.id, source: list.source || '591', url: list.url || `https://rent.591.com.tw/${list.id}`, title: list.title, kind: list.kind_name,
     preferred: !!list.preferred, price,
     manage_fee: manageFree ? 0 : (d.manage_fee_amount || num(mt) || null), // 0=免/含租金內;null=未載明
     manage_fee_note: mt || null,
@@ -261,6 +266,118 @@ function samePlace(a, b) {
   if (a.contact_listing && a.contact_listing === b.contact_listing && a.area_ping === b.area_ping) return 'address+contact+area+floor';
   return null;
 }
+
+
+// ---------------------------------------------------------------- 樂屋網爬取(playwright + 本機 Google Chrome)
+// 樂屋網整站(列表、詳情、API)都在 Cloudflare 後面:純 HTTP 與 headless 首次挑戰都被擋(403「請稍候」),
+// 但有視窗的 Chrome 秒過、拿到的 cf_clearance cookie 效期一年。做法:平常 headless(UA 改成和有視窗時一樣)跑;
+// 被擋就改開有視窗的 Chrome(視窗移到螢幕外)把這輪跑完,cookie 存在 CHROME_PROFILE,下輪 headless 就過了。
+let rk = null; // { ctx, page }
+async function rakuyaOpen(headless) {
+  const { chromium } = await import('playwright'); // 跑排程的機器要裝 playwright(node 找得到即可)+ Google Chrome
+  const uaFile = path.join(CHROME_PROFILE, 'ua.txt'); // 有視窗那次記下真實 UA,headless 沿用(cf_clearance 綁 UA)
+  const ua = headless && fs.existsSync(uaFile) ? fs.readFileSync(uaFile, 'utf8').trim() : undefined;
+  const ctx = await chromium.launchPersistentContext(CHROME_PROFILE, {
+    channel: 'chrome', headless, locale: 'zh-TW', ...(ua ? { userAgent: ua } : {}), args: headless ? [] : ['--window-position=4000,4000'],
+  });
+  const page = ctx.pages()[0] || await ctx.newPage();
+  if (!headless) fs.writeFileSync(uaFile, await page.evaluate(() => navigator.userAgent));
+  rk = { ctx, page };
+}
+const rakuyaClose = async () => { if (rk) { const c = rk.ctx; rk = null; await c.close(); } };
+async function rakuyaGoto(url) {
+  if (!rk) await rakuyaOpen(true);
+  const challenged = () => /請稍候|Just a moment/.test(document.title);
+  let res = await rk.page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  if (await rk.page.evaluate(challenged)) {
+    await rakuyaClose();
+    await rakuyaOpen(false);
+    res = await rk.page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await rk.page.waitForFunction(() => !/請稍候|Just a moment/.test(document.title), null, { timeout: 20000 })
+      .catch(() => { throw new Error('樂屋網 Cloudflare 擋住(有視窗的 Chrome 也過不了):' + url); });
+  }
+  return res;
+}
+
+// 樂屋 ehid(15 位 hex,網址用)中段 8 位是純數字的物件 id(照片路徑也用它);本系統 id = RAKUYA_ID_BASE + 該數字
+function rakuyaId(ehid) {
+  const n = ehid.slice(6, 14);
+  if (!/^\d{8}$/.test(n)) throw new Error('看不懂的樂屋 ehid:' + ehid);
+  return RAKUYA_ID_BASE + Number(n);
+}
+
+// 列表:整理成和 591 列表項相同的欄位,之後 toItem / mergeRun 不分來源
+async function rakuyaList() {
+  const cards = new Map();
+  let total = null;
+  for (let pg = 1; ; pg++) {
+    await rakuyaGoto(`${RAKUYA_LIST}&page=${pg}`);
+    const d = await rk.page.evaluate(() => ({
+      pagination: window.rentSearch?.pagination || null,
+      cards: [...document.querySelectorAll('section.search-obj[data-ehid]')].map((c) => {
+        const t = (sel) => c.querySelector(sel)?.textContent.trim() || '';
+        return {
+          ehid: c.dataset.ehid, title: t('.card__head h2'), area: t('.info__geo--area'), road: t('.info__geo--road'),
+          kinds: [...c.querySelectorAll('.info__detail-info li:not(.info__floor)')].map((x) => x.textContent.trim()),
+          floor: t('.info__floor'), size: t('.info__space--main'), price: t('.info__price--total'),
+          tags: [...c.querySelectorAll('.group__tags .tag')].map((x) => x.textContent.trim()),
+          refresh: [...c.querySelectorAll('li')].map((x) => x.textContent.trim()).find((x) => /更新$/.test(x)) || null,
+          photo: c.querySelector('.card__photo img')?.getAttribute('src') || null,
+        };
+      }),
+    }));
+    if (!d.pagination) throw new Error(`樂屋第 ${pg} 頁找不到列表資料`);
+    total = d.pagination.total;
+    for (const c of d.cards) cards.set(c.ehid, c);
+    if (!d.cards.length || pg >= d.pagination.pageCount) break;
+    await sleep(600);
+  }
+  const items = [...cards.values()].map((c) => ({
+    id: rakuyaId(c.ehid), source: 'rakuya', url: `https://rent.rakuya.com.tw/item/${c.ehid}`, title: c.title,
+    kind_name: c.kinds[0] || null, price: num(c.price), tags: c.tags, floor_name: c.floor.replace(/樓$/, ''),
+    area: num(c.size), address: `${c.area}-${c.road}`, photoList: c.photo ? [c.photo] : [], refresh_time: c.refresh,
+  }));
+  return { items, total };
+}
+
+// 詳情:頁面 inline 的 window.itemInfo / itemContact / tmpDataLayer + 「物件詳情」表;座標另外打 item-environment API
+async function rakuyaDetail(url) {
+  try {
+    const res = await rakuyaGoto(url);
+    if (res.status() === 404) return { gone: true };
+    const d = await rk.page.evaluate(() => {
+      if (!window.itemInfo) return null;
+      const rows = {};
+      for (const li of document.querySelectorAll('.list__info-sub li')) {
+        const label = li.querySelector('.list__label')?.textContent.trim() || li.closest('.list__info-sub')?.querySelector('h4')?.textContent.trim();
+        const v = li.querySelector('.list__content');
+        if (label && v) rows[label] = v.querySelectorAll('b').length ? [...v.querySelectorAll('b')].map((b) => b.textContent.trim()) : v.textContent.trim();
+      }
+      return { info: window.itemInfo, seller: window.itemContact?.sellerInfo || {}, gtm: window.tmpDataLayer?.itemData || {}, rows };
+    });
+    if (!d) return { gone: true };
+    const ehid = url.match(/item\/([0-9a-f]+)/)[1];
+    const env = await rk.page.evaluate((u) => fetch(u).then((r) => r.json()).catch(() => null),
+      `https://www.rakuya.com.tw/sell_item/api/item-environment/list?ehid=${ehid}`);
+    const r = d.rows, fee = r['管理費'];
+    const facilities = [...(Array.isArray(r['設備']) ? r['設備'] : []), ...(Array.isArray(r['傢俱']) ? r['傢俱'] : [])];
+    return { ok: {
+      address_detail: d.info.title?.address || null,
+      lat: Number(env?.data?.itemLat) || null, lng: Number(env?.data?.itemLng) || null,
+      deposit: r['押金'] || null, manage_fee_text: fee ? String(fee) : null, manage_fee_amount: num(fee),
+      area_use_ping: num(r['坪數']), house_age: null,
+      facilities, has_washer: facilities.includes('洗衣機'), has_elevator_detail: facilities.includes('電梯'),
+      post_date: d.gtm.object_upload_time ? new Date(d.gtm.object_upload_time).toISOString() : null, post_time: d.info.title?.updateAt || null,
+      status: 'open', contact_name: d.seller.nick || null, contact_role: d.seller.identTitle || null,
+      phones: [d.seller.cellPhoneText, d.seller.phoneText].filter(Boolean).map((p) => p.replace(/\s/g, '')),
+      photos: (d.info.images?.photo || []).map((p) => p.url).slice(0, 12),
+    } };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+// 兩個來源的詳情:樂屋 id ≥ RAKUYA_ID_BASE,要用網址(ehid 無法從 id 反推)
+const fetchAny = (id, url) => (id >= RAKUYA_ID_BASE ? rakuyaDetail(url) : fetchDetail(id));
 
 // ---------------------------------------------------------------- 合併(純函式:不做 IO)
 // prev:Map(id → 舊 data);scraped:這次列表項;details:Map(id → { ok } / { gone } / { error });now:ISO
@@ -346,7 +463,7 @@ async function savePhotos(rows) {
     fs.mkdirSync(dir, { recursive: true });
     for (const [i, u] of urls.entries()) {
       // 591 圖床要帶尺寸後綴(不帶會 403);!1600x.jpg 約 1600x1200、無浮水印、每張 ~400KB
-      try { fs.writeFileSync(path.join(dir, `${i + 1}.jpg`), await getBin(u.replace(/!.*$/, '') + '!1600x.jpg')); n++; } catch { /* 單張失敗略過 */ }
+      try { fs.writeFileSync(path.join(dir, `${i + 1}.jpg`), await getBin(u.includes('591.com.tw') ? u.replace(/!.*$/, '') + '!1600x.jpg' : u)); n++; } catch { /* 單張失敗略過 */ }
       await sleep(200);
     }
     const { id, url, title, price, manage_fee, area_ping, floor, floor_total, address, section, contact, first_seen } = d;
@@ -494,22 +611,26 @@ async function cmdWatch(args) {
   try {
     const base = await lastSnapshot(api);
     const prev = new Map((await readAll(api, 'rent_listings', 'id')).map((r) => [r.id, r.data]));
-    const { items, total } = await scrapeList();
+    const s591 = await scrapeList();
+    const rky = await rakuyaList();
+    const items = [...s591.items, ...rky.items], total = s591.total + rky.total;
     // 列表沒抓齊就不寫回,避免把一批房源誤標成消失
     if (!items.length || items.length < total * 0.95) throw new Error(`列表只抓到 ${items.length}/${total} 筆`);
+    const urls = new Map([...[...prev.values()].map((p) => [p.id, p.url]), ...items.map((i) => [i.id, i.url])]);
 
     // 需要詳情的:新 id、上次詳情抓失敗或沒座標的、--full 時全部;以及這次沒出現在列表上的在架房源(確認是否真的下架)
     const seen = new Set(items.map((i) => i.id));
     const needDetail = items.filter((i) => full || !prev.has(i.id) || needsDetail(prev.get(i.id))).map((i) => i.id);
     const verify = [...prev.values()].filter((p) => p.status !== 'gone' && !seen.has(p.id)).map((p) => p.id);
     const details = new Map();
-    for (const id of [...needDetail, ...verify]) { details.set(id, await fetchDetail(id)); await sleep(900); }
+    for (const id of [...needDetail, ...verify]) { details.set(id, await fetchAny(id, urls.get(id))); await sleep(900); }
+    await rakuyaClose();
 
     const { rows, deleteIds, events } = mergeRun(prev, items, details, now, { full });
     const photos = dry ? 0 : await savePhotos(rows);
     const vision = has(args, '--no-vision') || dry ? 0 : await judgePhotos(rows, Number(argVal(args, '--vision-max', VISION_MAX)));
     const active = rows.filter((d) => d.status !== 'gone').length;
-    const summary = `列表 ${items.length}/${total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
+    const summary = `列表 591 ${s591.items.length}/${s591.total} + 樂屋 ${rky.items.length}/${rky.total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
       `換 id ${events.relisted.length}、改價 ${events.price.length}、存圖 ${photos}、判圖 ${vision}、在架 ${active}`;
     const changes = [...events.added, ...events.gone, ...events.back].filter(inScope).length; // 門檻只數關注範圍內的
 
@@ -541,6 +662,8 @@ async function cmdWatch(args) {
       await slackPost(`⚠️ 591 租屋爬取失敗(${fmtTW(now)}):${e.message}\n恢復前不再重複通知。Supabase 被暫停時到 dashboard 按 Resume;591 擋爬則等下一輪。`).catch(() => {});
     }
     process.exitCode = 1;
+  } finally {
+    await rakuyaClose().catch(() => {});
   }
 }
 
