@@ -36,7 +36,7 @@
 `data` 裡比較重要的欄位:
 
 - **房源資訊**:`price`、`manage_fee`、`area_ping`(可使用坪數)、`area_build`(建物面積,不含公設)、`floor`、`has_elevator`、`has_washer`、`lat`/`lng`、`phones`、`post_date`
-- **判圖結果**:`lighting`(good / fair / poor / unknown)、`double_bed`(yes / no / unknown)、`vision_note`
+- **判圖結果**:`lighting`(good / fair / poor / unknown)、`double_bed`(yes / no / unknown)、`iron_window`(陽台鐵窗:yes / no / unknown;null = 還沒判,加欄位前判過的舊資料會在之後幾輪自動重判補上)、`vision_note`
 - **歷史紀錄**:`price_history`、`old_ids`(換 id 前的舊 id)、`seen_count`、`gone_at`
 - **內部用**:`detail`(詳情頁原始欄位)、`match`(換 id 比對用)
 

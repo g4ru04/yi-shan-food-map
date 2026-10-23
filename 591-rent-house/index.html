@@ -111,7 +111,7 @@
     #rows td.c-contact a { display: inline-block; padding: 4px 0 4px 10px; font-size: 14px; }
     #rows td.c-first, #rows td.c-status.is-active { display: none; }
     #rows td.c-price { order: 2; font-weight: 600; } #rows td.c-area { order: 3; } #rows td.c-dist { order: 4; color: #1a4fa0; }
-    #rows td.c-floor { order: 5; } #rows td.c-light { order: 6; } #rows td.c-bed { order: 7; } #rows td.c-status { order: 8; }
+    #rows td.c-floor { order: 5; } #rows td.c-light { order: 6; } #rows td.c-bed { order: 7; } #rows td.c-iron { order: 7; } #rows td.c-status { order: 8; }
     #rows td.c-post { order: 9; } #rows td.c-last { order: 10; } #rows td.c-first { order: 11; }
     #rows td.c-fac { order: 12; } #rows td.c-contact { order: 13; }
     tr.gone td { opacity: .55; }
@@ -131,14 +131,17 @@
     <label>租金 <input type="number" id="pmin" step="500"> – <input type="number" id="pmax" step="500"></label>
     <label><input type="checkbox" id="withFee"> 含管理費</label>
     <label>坪數 <input type="number" id="amin" step="1"> – <input type="number" id="amax" step="1"></label>
+    <label title="與基準點的直線距離;沒有座標的房源會被排除">距離 ≤ <input type="number" id="dmax" step="0.1" min="0.1"> km</label>
     <label>區 <select id="section"><option value="">全部</option></select></label>
     <label>類型 <select id="kind"><option value="">全部</option></select></label>
     <label>採光 <select id="lighting"><option value="">全部</option><option value="good">好</option><option value="good,fair">好+普通</option><option value="poor">差</option></select></label>
     <label><input type="checkbox" id="bed"> 雙人床</label>
+    <label title="LLM 看照片判斷陽台有沒有鐵窗">鐵窗 <select id="iron"><option value="">全部</option><option value="yes">有</option><option value="no">無</option></select></label>
     <label><input type="checkbox" id="elev"> 電梯</label>
     <label><input type="checkbox" id="washer"> 洗衣機</label>
     <label><input type="checkbox" id="owner"> 屋主直租</label>
-    <label>狀態 <select id="status"><option value="">全部</option><option value="active,new">在架</option><option value="new">24h 內新上架</option><option value="gone">已消失</option></select></label>
+    <label>狀態 <select id="status"><option value="">全部</option><option value="active,new" selected>在架</option><option value="new">24h 內新上架</option><option value="gone">已消失</option></select></label>
+    <label><input type="checkbox" id="noGone"> 排除已消失</label>
     <label class="sortl">排序 <select id="sortSel">
       <option value="dist:1">距離 近→遠</option><option value="total:1">租金(+管)低→高</option><option value="total:-1">租金(+管)高→低</option>
       <option value="area_real:-1">坪數 大→小</option><option value="first_seen:-1">首次爬到 新→舊</option><option value="post_days:1">發佈 新→舊</option>
@@ -165,6 +168,7 @@
           <th data-k="floor_n">樓層</th>
           <th data-k="lighting_n">採光</th>
           <th data-k="bed_n">雙人床</th>
+          <th data-k="iron_n" title="LLM 看照片判斷陽台有沒有鐵窗;? = 沒陽台 / 照片沒拍到 / 還沒判">鐵窗</th>
           <th>設備</th>
           <th>聯絡</th>
         </tr></thead>
@@ -195,6 +199,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const LIGHT = { good: ['好', 3, 'yes'], fair: ['普通', 2, ''], poor: ['差', 1, 'no'], unknown: ['?', 0, 'unk'] };
 const BED = { yes: ['是', 2, 'yes'], no: ['否', 0, 'no'], unknown: ['?', 1, 'unk'] };
+const IRON = { yes: ['有', 2, ''], no: ['無', 0, ''], unknown: ['?', 1, 'unk'] };
 const STATUS = { new: ['24h 內新上架', 0, 'new'], active: ['在架', 1, 'active'], gone: ['已消失', 2, 'gone'] };
 const fmt = (t) => t ? new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 const distKm = (lat, lng) => {
@@ -257,6 +262,7 @@ function init(data) {
     i.total = i.price + (i.manage_fee || 0);
     i.lighting_n = LIGHT[i.lighting]?.[1] ?? 0;
     i.bed_n = BED[i.double_bed]?.[1] ?? 1;
+    i.iron_n = IRON[i.iron_window]?.[1] ?? 1;
     i.status_n = STATUS[i.status][1];
     i.area_real = buildOk(i) ? i.area_build : i.area_ping;
     i.dist = i.lat ? distKm(i.lat, i.lng) : null;
@@ -332,7 +338,7 @@ function showRow(id) {
 
 function filtered() {
   const n = (id) => ($(id).value === '' ? null : Number($(id).value));
-  const [pmin, pmax, amin, amax] = ['pmin', 'pmax', 'amin', 'amax'].map(n);
+  const [pmin, pmax, amin, amax, dmax] = ['pmin', 'pmax', 'amin', 'amax', 'dmax'].map(n);
   const lights = $('lighting').value ? $('lighting').value.split(',') : null;
   const q = $('q').value.trim().toLowerCase();
   const sts = $('status').value ? $('status').value.split(',') : null;
@@ -340,14 +346,17 @@ function filtered() {
     const p = $('withFee').checked ? i.total : i.price;
     return (pmin == null || p >= pmin) && (pmax == null || p <= pmax)
       && (amin == null || i.area_ping >= amin) && (amax == null || i.area_ping <= amax)
+      && (dmax == null || (i.dist != null && Math.round(i.dist * 10) / 10 <= dmax))
       && (!$('section').value || i.section === $('section').value)
       && (!$('kind').value || i.kind === $('kind').value)
       && (!lights || lights.includes(i.lighting))
       && (!$('bed').checked || i.double_bed === 'yes')
+      && (!$('iron').value || i.iron_window === $('iron').value)
       && (!$('elev').checked || i.has_elevator)
       && (!$('washer').checked || i.has_washer)
       && (!$('owner').checked || i.contact_role === '屋主')
       && (!sts || sts.includes(i.status))
+      && (!$('noGone').checked || i.status !== 'gone')
       && (!q || q.split(/\s+/).every((w) => i.search.includes(w)));
   }).sort((a, b) => {
     const x = a[sortKey], y = b[sortKey];
@@ -382,6 +391,7 @@ function renderPage() {
   $('rows').innerHTML = list.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((i) => {
     const [lt, , lc] = LIGHT[i.lighting] || LIGHT.unknown;
     const [bt, , bc] = BED[i.double_bed] || BED.unknown;
+    const [it, , ic] = IRON[i.iron_window] || IRON.unknown;
     const [st, , sc] = STATUS[i.status];
     const badges = (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
       + (i.preferred ? '<span class="badge">優選</span>' : '')
@@ -400,6 +410,7 @@ function renderPage() {
       <td class="num chip c-floor" data-l="樓">${esc(i.floor)}/${esc(i.floor_total)}</td>
       <td class="${lc} chip c-light" data-l="採光" title="${esc(i.vision_note)}">${lt}</td>
       <td class="${bc} chip c-bed" data-l="雙人床" title="${esc(i.vision_note)}">${bt}</td>
+      <td class="${ic} chip c-iron" data-l="鐵窗" title="${i.iron_window ? esc(i.vision_note) : '還沒判(下一輪判圖會補)'}">${it}</td>
       <td class="sub fac wide c-fac">${i.has_elevator ? '<span class="yes">電梯</span>' : '<span class="no">無電梯</span>'} ·
         ${i.has_washer ? '<span class="yes">洗衣機</span>' : '<span class="no">無洗衣機</span>'}<br>${esc(i.facilities.filter((f) => f !== '電梯' && f !== '洗衣機').join('、'))}</td>
       <td class="sub nowrap wide c-contact">${esc(i.contact)}<br>${uniqPhones(i.phones).map((p) => `<a href="tel:${esc(p)}">${esc(p)}</a>`).join('<br>')}</td>

@@ -147,7 +147,8 @@ function parseDetail(data) {
   for (const p of remarkText.match(PHONE_RE) || []) phones.add(p.replace(/[\s]/g, ''));
   const facilities = (gtm.facility_name || '').split(',').filter(Boolean);
   return {
-    address_detail: d.positionRound?.address || null,
+    // 剛上架時 591 偶爾回 "undefinedundefinedundefined巷undefined弄undefined號" 且沒有座標,當作缺資料
+    address_detail: /undefined/.test(d.positionRound?.address || '') ? null : d.positionRound?.address || null,
     lat: d.positionRound?.lat ? Number(d.positionRound.lat) : null,
     lng: d.positionRound?.lng ? Number(d.positionRound.lng) : null,
     deposit: cost.deposit || d.deposit || null,
@@ -218,6 +219,7 @@ function toItem(list, det, prev, now) {
     old_ids: prev?.old_ids ?? [], price_history: prev ? [...prev.price_history] : [], gone_at: null, miss_count: 0,
     status: 'active', detail_missing: !det, // toItem 只用在「這次有出現」的房源;new/active 由 mergeRun 依 first_seen 重算
     lighting: prev?.lighting ?? 'unknown', double_bed: prev?.double_bed ?? 'unknown',
+    iron_window: prev?.iron_window ?? null, // null = 還沒判過(加這欄之前判的舊資料也是)
     vision_note: prev?.vision_note ?? '', has_vision: prev?.has_vision ?? false,
     // 房源欄位
     id: list.id, url: list.url || `https://rent.591.com.tw/${list.id}`, title: list.title, kind: list.kind_name,
@@ -256,6 +258,9 @@ function samePlace(a, b) {
 // ---------------------------------------------------------------- 合併(純函式:不做 IO)
 // prev:Map(id → 舊 data);scraped:這次列表項;details:Map(id → { ok } / { gone } / { error });now:ISO
 // 回傳 { rows: 要寫回的 data[], deleteIds, events: { added, gone, back, relisted, price } }
+// 上次詳情抓失敗,或 591 當時沒給座標/地址(剛上架偶爾會這樣):下一輪重抓
+const needsDetail = (p) => p.detail_missing || !p.lat;
+
 function mergeRun(prev, scraped, details, now, { full = false } = {}) {
   const t = Date.parse(now);
   const out = new Map(), deleteIds = [];
@@ -268,7 +273,7 @@ function mergeRun(prev, scraped, details, now, { full = false } = {}) {
   for (const list of scraped) {
     const p = prev.get(list.id);
     if (!p) { fresh.push(list); continue; }
-    const useDet = (full || p.detail_missing) && det(list.id) ? det(list.id) : p.detail;
+    const useDet = (full || needsDetail(p)) && det(list.id) ? det(list.id) : p.detail;
     const d = toItem(list, useDet, p, now);
     if (p.price !== d.price) { d.price_history.push(d.price); ev.price.push([p, d]); }
     if (p.status === 'gone') ev.back.push(d);
@@ -329,8 +334,9 @@ const VISION_PROMPT = (ids) => `你是租屋照片判讀員。目前目錄下每
 每間判斷:
 - lighting:good(大窗/落地窗、自然光充足)、fair(有窗但小或偏暗、主要靠燈)、poor(無對外窗/暗房/窗對牆)、unknown(看不出)
 - double_bed:yes(床寬明顯 ≥ 雙人,約 150cm+)、no(單人床)、unknown(空房無床或看不出)
+- iron_window:陽台有沒有鐵窗(防盜窗/鐵欄杆整面包住):yes(有)、no(陽台開放無鐵窗)、unknown(沒有陽台、照片沒拍到陽台或看不出)
 - note:繁體中文一句說明依據(≤ 40 字)
-看完後只輸出一個 JSON 物件,不要其他文字:{"<id>": {"lighting": "...", "double_bed": "...", "note": "..."}}`;
+看完後只輸出一個 JSON 物件,不要其他文字:{"<id>": {"lighting": "...", "double_bed": "...", "iron_window": "...", "note": "..."}}`;
 
 function runClaude(prompt, cwd) {
   const bin = process.env.CLAUDE_BIN || 'claude';
@@ -342,8 +348,11 @@ function runClaude(prompt, cwd) {
   });
 }
 
+// 還沒判過,或加 iron_window 之前判的舊資料(重判補上)
+const needsVision = (d) => !d.has_vision || d.iron_window == null;
+
 async function judgePhotos(rows) {
-  const todo = rows.filter((d) => d.status !== 'gone' && !d.has_vision && d.detail?.photos?.length)
+  const todo = rows.filter((d) => d.status !== 'gone' && needsVision(d) && d.detail?.photos?.length)
     .sort((a, b) => b.first_seen.localeCompare(a.first_seen)).slice(0, VISION_MAX);
   if (!todo.length) return 0;
   let done = 0;
@@ -362,8 +371,10 @@ async function judgePhotos(rows) {
       const res = JSON.parse(outText.slice(outText.indexOf('{'), outText.lastIndexOf('}') + 1));
       for (const d of batch) {
         const r = res[d.id];
-        if (!r || !['good', 'fair', 'poor', 'unknown'].includes(r.lighting) || !['yes', 'no', 'unknown'].includes(r.double_bed)) continue;
-        Object.assign(d, { lighting: r.lighting, double_bed: r.double_bed, vision_note: String(r.note || '').slice(0, 80), has_vision: true });
+        const yn = ['yes', 'no', 'unknown'];
+        if (!r || !['good', 'fair', 'poor', 'unknown'].includes(r.lighting) || !yn.includes(r.double_bed) || !yn.includes(r.iron_window)) continue;
+        Object.assign(d, { lighting: r.lighting, double_bed: r.double_bed, iron_window: r.iron_window,
+          vision_note: String(r.note || '').slice(0, 80), has_vision: true });
         fs.rmSync(path.join(PHOTOS, String(d.id)), { recursive: true, force: true });
         done++;
       }
@@ -468,9 +479,9 @@ async function cmdWatch(args) {
     // 列表沒抓齊就不寫回,避免把一批房源誤標成消失
     if (!items.length || items.length < total * 0.95) throw new Error(`列表只抓到 ${items.length}/${total} 筆`);
 
-    // 需要詳情的:新 id、上次詳情抓失敗的、--full 時全部;以及這次沒出現在列表上的在架房源(確認是否真的下架)
+    // 需要詳情的:新 id、上次詳情抓失敗或沒座標的、--full 時全部;以及這次沒出現在列表上的在架房源(確認是否真的下架)
     const seen = new Set(items.map((i) => i.id));
-    const needDetail = items.filter((i) => full || !prev.has(i.id) || prev.get(i.id).detail_missing).map((i) => i.id);
+    const needDetail = items.filter((i) => full || !prev.has(i.id) || needsDetail(prev.get(i.id))).map((i) => i.id);
     const verify = [...prev.values()].filter((p) => p.status !== 'gone' && !seen.has(p.id)).map((p) => p.id);
     const details = new Map();
     for (const id of [...needDetail, ...verify]) { details.set(id, await fetchDetail(id)); await sleep(900); }
