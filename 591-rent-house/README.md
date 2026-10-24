@@ -4,8 +4,8 @@
 
 - **網頁**:https://g4ru04.github.io/yi-shan-food-map/591-rent-house/(密碼同美食地圖「新增地點」頁)
 - **搜尋條件**
-  - 591:台中市東區 + 北區 + 中區 + 西區、租金 5,000–10,000、坪數 11–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`(591 section id:東區 99、北區 102、中區 98、西區 101)
-  - 樂屋網:同四區(zipcode 404 北、400 中、401 東、403 西)、獨立套房、租金 5,000–10,000、坪數 10–20,寫死在 `RAKUYA_LIST`(就是 https://rent.rakuya.com.tw/result?zipcode=404,400,401,403&usecode=8&price=5000~10000&size=10~20 )。樂屋整站在 Cloudflare 後面,用 playwright 開本機 Google Chrome 抓(見下方安裝)
+  - 591:台中市東區 + 北區 + 中區 + 西區、租金 5,000–10,000、坪數 8–20(不限房型),寫死在 `scripts/591-rent.mjs` 的 `QUERY`(591 section id:東區 99、北區 102、中區 98、西區 101)
+  - 樂屋網:同四區(zipcode 404 北、400 中、401 東、403 西)、獨立套房、租金 5,000–10,000、坪數 8–20,寫死在 `RAKUYA_LIST`(就是 https://rent.rakuya.com.tw/result?zipcode=404,400,401,403&usecode=8&price=5000~10000&size=8~20 )。樂屋整站在 Cloudflare 後面,用 playwright 開本機 Google Chrome 抓(見下方安裝)
   - 兩邊抓回來後走同一條合併 / 判圖 / 通知流程;樂屋房源的 id = 1,000,000,000 + 樂屋物件編號(591 的 id 是 8 位數,不會撞),`data.source` 標 `rakuya`,網頁有「來源」篩選與「樂屋」標籤
 - **關注範圍**:距基準點 ≤ 1.5 km 且 591 刊登 ≤ 7 天(`scripts/591-rent.mjs` 的 `MAX_KM` / `MAX_POST_DAYS`)。範圍外的房源照樣爬、照樣存 Supabase,但**不發 Slack、不判圖**;網頁的「距離 ≤」「刊登 ≤」篩選預設就是這兩個值,清空即可看全部
 - **資料**:只存在 Supabase,不進 git
@@ -201,7 +201,7 @@ ln -sf "$PWD/591-rent-house/claude/auto-retrieve-rent-data.md" ~/.claude/command
 
 ```markdown
 ---
-description: 爬 591 + 樂屋網租屋(台中東區+北區+中區+西區、5000-10000 元、11-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
+description: 爬 591 + 樂屋網租屋(台中東區+北區+中區+西區、5000-10000 元、8-20 坪;只通知 1.5km 內、刊登 7 天內),與 Supabase 合併、判圖、發 Slack,並回報變動
 ---
 
 # Auto Retrieve Rent Data (591)

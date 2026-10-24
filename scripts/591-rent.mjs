@@ -2,8 +2,8 @@
 /**
  * 591 + 樂屋網 租屋:爬取 → 與 Supabase 現況合併 → 判圖 → 寫回 Supabase → Slack 通知
  *
- * 591 條件:台中市(8) 東區(99)+北區(102)+中區(98)+西區(101)、租金 5000-10000、坪數 11-20(不限房型、不限優選)。
- * 樂屋網條件:北區(404)+中區(400)+東區(401)+西區(403)、獨立套房(usecode=8)、租金 5000-10000、坪數 10-20;Cloudflare 擋純 HTTP,用 playwright + 本機 Chrome 抓。
+ * 591 條件:台中市(8) 東區(99)+北區(102)+中區(98)+西區(101)、租金 5000-10000、坪數 8-20(不限房型、不限優選)。
+ * 樂屋網條件:北區(404)+中區(400)+東區(401)+西區(403)、獨立套房(usecode=8)、租金 5000-10000、坪數 8-20;Cloudflare 擋純 HTTP,用 playwright + 本機 Chrome 抓。
  * 關注範圍(SCOPE):距基準點 ≤ 1.5km 且 591 刊登 ≤ 7 天;範圍外的照樣存進 Supabase(網頁可調篩選看到),但不發 Slack、不判圖。
  * 資料以 Supabase 為唯一來源(rent_listings 每間房一列、rent_snapshots 每次成功爬取一列),不進 git。
  *
@@ -40,14 +40,14 @@ const FAIL_FLAG = path.join(DATA_DIR, '.last-run-failed');
 const DATA_JSON = path.join(PAGE, 'data.json');
 const SITE_URL = 'https://g4ru04.github.io/yi-shan-food-map/591-rent-house/';
 
-const QUERY = { region: '8', section: '102,99,98,101', price: '5000_10000', acreage: '11$_20$', sort: 'area_desc' };
+const QUERY = { region: '8', section: '102,99,98,101', price: '5000_10000', acreage: '8$_20$', sort: 'area_desc' };
 const LIST_URL = (firstRow, sort = QUERY.sort) =>
   'https://rent.591.com.tw/list?' +
   Object.entries({ ...QUERY, sort, firstRow }).map(([k, v]) => `${k}=${v}`).join('&');
 // 坪數相同的房源在 area_desc 下順序不穩,翻頁會重複/漏掉;改以多種排序取聯集直到湊滿 total
 const SORTS = ['area_desc', 'posttime_desc', 'area_asc'];
 // 樂屋網(使用者給的搜尋網址;翻頁加 &page=N,每頁 19 筆)
-const RAKUYA_LIST = 'https://rent.rakuya.com.tw/result?zipcode=404,400,401,403&usecode=8&price=5000~10000&size=10~20';
+const RAKUYA_LIST = 'https://rent.rakuya.com.tw/result?zipcode=404,400,401,403&usecode=8&price=5000~10000&size=8~20';
 const RAKUYA_ID_BASE = 1e9; // 樂屋 id = 1e9 + ehid 中段 8 位數字;591 id 是 8 位數,不會撞
 const CHROME_PROFILE = path.join(DATA_DIR, 'chrome-profile'); // 樂屋用的 Chrome profile(cf_clearance cookie 存這,不進 git)
 // 距離基準點(同 591-rent-house/index.html 的 ORIGIN)
