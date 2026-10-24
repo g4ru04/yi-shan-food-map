@@ -234,6 +234,7 @@ function toItem(list, det, prev, now) {
     iron_window: prev?.iron_window ?? null, // null = 還沒判過(加這欄之前判的舊資料也是)
     vision_note: prev?.vision_note ?? '', has_vision: prev?.has_vision ?? false,
     labels: prev?.labels ?? [], // 手動標註(例如「行銷騙術」),直接改 Supabase data.labels;爬蟲只沿用不覆寫
+    note: prev?.note ?? '', // 網頁上編輯的備註;同 labels 只沿用不覆寫
     // 房源欄位
     id: list.id, source: list.source || '591', url: list.url || `https://rent.591.com.tw/${list.id}`, title: list.title, kind: list.kind_name,
     preferred: !!list.preferred, price,
@@ -644,6 +645,12 @@ async function cmdWatch(args) {
     // 兩台電腦同時跑:開始後若別人已寫入新的一輪,這輪放棄
     if ((await lastSnapshot(api))?.scraped_at !== base?.scraped_at) throw new Error('執行期間已有其他程序寫入,這輪放棄');
 
+    // 一輪要跑好幾分鐘,期間網頁上改的備註 / 手動標註以寫回前重讀的為準(換 id 重刊的從舊 id 帶過來)
+    const manual = new Map((await readAll(api, 'rent_listings', 'id')).map((r) => [r.id, r.data]));
+    for (const d of rows) {
+      const m = [d.id, ...d.old_ids].map((id) => manual.get(id)).find(Boolean);
+      if (m) { d.note = m.note ?? ''; d.labels = m.labels ?? []; }
+    }
     const now2 = new Date().toISOString();
     const payload = rows.map((d) => ({ id: d.id, status: d.status, first_seen: d.first_seen, last_seen: d.last_seen, data: d, updated_at: now2 }));
     for (let k = 0; k < payload.length; k += 200)

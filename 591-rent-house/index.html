@@ -42,6 +42,12 @@
   #pager button { padding: 3px 12px; }
   #map { height: 100%; border-left: 1px solid #ddd; }
   #msg { padding: 24px; color: #b71c1c; }
+  /* 讀取中遮罩:頁面一開就蓋住,資料讀完(成功或失敗)才拿掉 */
+  #loading { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .45); }
+  #loading[hidden] { display: none; }
+  #loading .box { display: flex; align-items: center; gap: 12px; padding: 18px 26px; border-radius: 8px; background: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, .25); font-size: 15px; }
+  #loading .spin { width: 22px; height: 22px; border: 3px solid #ddd; border-top-color: #1a4fa0; border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   table { border-collapse: collapse; width: 100%; background: #fff; }
   th, td { padding: 6px 8px; border-bottom: 1px solid #eee; vertical-align: top; text-align: left; }
   th { position: sticky; top: 0; background: #fafafa; cursor: pointer; user-select: none; font-weight: 600; white-space: nowrap; z-index: 1; }
@@ -63,6 +69,17 @@
   tr.gone td { opacity: .45; }
   tr.gone td:nth-child(2), tr.gone td.last-seen { opacity: 1; }
   td.last-seen.stale, td.last-seen.stale .sub { color: #c62828; font-weight: 600; }
+  .note { margin-top: 3px; padding: 3px 6px; border-left: 3px solid #f9a825; background: #fffde7; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  button.note-edit { margin-top: 3px; padding: 1px 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #555; cursor: pointer; }
+  /* 備註編輯彈窗 */
+  #noteModal { position: fixed; inset: 0; z-index: 2100; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .45); }
+  #noteModal[hidden] { display: none; }
+  #noteModal .box { width: min(480px, 92vw); padding: 16px; border-radius: 8px; background: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, .25); }
+  #noteModal .t { font-weight: 600; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #noteModal textarea { width: 100%; height: 140px; font: inherit; font-size: 16px; padding: 6px; }
+  #noteModal .act { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 10px; }
+  #noteModal .act span { margin-right: auto; color: #b71c1c; font-size: 12px; }
+  #noteModal button { padding: 6px 16px; font-size: 15px; }
   .yes { color: #2e7d32; } .no { color: #b71c1c; } .unk { color: #999; }
   /* 桌機:篩選永遠展開;手機專用元件隱藏 */
   #fbox > summary, .mtabs, .sortl { display: none; }
@@ -112,6 +129,9 @@
     #rows td.c-contact a { display: inline-block; padding: 4px 0 4px 10px; font-size: 14px; }
     #rows td.c-first, #rows td.c-status.is-active { display: none; }
     #rows td.c-price { order: 2; font-weight: 600; } #rows td.c-area { order: 3; } #rows td.c-dist { order: 4; color: #1a4fa0; }
+    /* 有座標的距離標籤做成按鈕:點了切到地圖、該間變紅點 */
+    #rows td.c-dist.has-pin { background: #e8eefa; border: 1px solid #1a4fa0; cursor: pointer; }
+    #rows td.c-dist.has-pin::after { content: ' 地圖 ›'; font-weight: 600; }
     #rows td.c-floor { order: 5; } #rows td.c-light { order: 6; } #rows td.c-bed { order: 7; } #rows td.c-iron { order: 7; } #rows td.c-status { order: 8; }
     #rows td.c-post { order: 9; } #rows td.c-last { order: 10; } #rows td.c-first { order: 11; }
     #rows td.c-fac { order: 12; } #rows td.c-contact { order: 13; }
@@ -122,6 +142,12 @@
 </style>
 </head>
 <body>
+<div id="loading"><div class="box"><div class="spin"></div>讀取房源資料中…</div></div>
+<div id="noteModal" hidden><div class="box">
+  <div class="t" id="noteTitle"></div>
+  <textarea id="noteText" placeholder="例如:已約 10/26 看房、房東說可養貓…"></textarea>
+  <div class="act"><span id="noteErr"></span><button id="noteCancel">取消</button><button id="noteSave">儲存</button></div>
+</div></div>
 <div class="shell">
 <header>
   <h1>591 租屋清單 <span class="meta" id="meta">讀取中…</span></h1>
@@ -197,6 +223,7 @@ const PAGE_SIZE = 50;
 const isMobile = () => matchMedia('(max-width: 768px), (pointer: coarse)').matches;
 // 預設排序基準點(距離以直線距離計)
 const ORIGIN = [24.1418, 120.6870];
+const MAP_ZOOM = 15;
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -252,7 +279,9 @@ function areaText(i) {
 // 同一支號碼常以不同格式重複出現(0967-013-725 / 0967-013725),依數字去重
 const uniqPhones = (ps) => [...new Map(ps.map((p) => [p.replace(/\D/g, ''), p])).values()];
 
-let D, map, markers, byId, bounds, fitted = false, sortKey = 'dist', sortDir = 1, page = 0, list = [];
+const searchText = (i) => [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), (i.labels || []).join(' '), i.note, i.vision_note, i.contact].join(' ').toLowerCase();
+
+let D, map, markers, byId, fitted = false, sortKey = 'dist', sortDir = 1, page = 0, list = [];
 const baseStyle = (i) => ({ radius: 6, weight: 1, color: i.status === 'gone' ? '#999' : '#1a4fa0', fillOpacity: 0.6 });
 
 function init(data) {
@@ -269,10 +298,10 @@ function init(data) {
     i.status_n = STATUS[i.status][1];
     i.area_real = buildOk(i) ? i.area_build : i.area_ping;
     i.dist = i.lat ? distKm(i.lat, i.lng) : null;
-    i.search = [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), (i.labels || []).join(' '), i.vision_note, i.contact].join(' ').toLowerCase();
+    i.search = searchText(i);
   }
 
-  map = L.map('map').setView(ORIGIN, 14); // 先給預設視野,隱藏狀態下加 marker 才不會報錯
+  map = L.map('map').setView(ORIGIN, MAP_ZOOM); // 先給預設視野,隱藏狀態下加 marker 才不會報錯
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri', maxZoom: 19 }).addTo(map);
   markers = new Map();
   byId = new Map(D.items.map((i) => [i.id, i]));
@@ -282,23 +311,26 @@ function init(data) {
     m.on('click', () => showRow(i.id));
     markers.set(i.id, m);
   }
-  bounds = D.items.filter((i) => i.lat).map((i) => [i.lat, i.lng]);
   fitMap();
   L.marker(ORIGIN, { title: '基準點' }).addTo(map).bindPopup('距離基準點');
 
   $('rows').addEventListener('mouseover', (e) => { const tr = e.target.closest('tr'); if (tr) highlight(Number(tr.dataset.id)); });
   // 桌機點整列、手機點距離標籤:地圖定位到該房源(手機會切到地圖頁)
   $('rows').addEventListener('click', (e) => {
-    const tr = e.target.closest('tr'); if (!tr || e.target.closest('a')) return;
+    const tr = e.target.closest('tr'); if (!tr || e.target.closest('a, button')) return;
     if (isMobile() && !e.target.closest('.c-dist')) return;
-    const m = markers.get(Number(tr.dataset.id)); if (!m) return;
-    if (isMobile()) setView('map');
+    const id = Number(tr.dataset.id), m = markers.get(id); if (!m) return;
+    if (isMobile()) { setView('map'); scrollTo(0, 0); }
+    highlight(id);
     map.setView(m.getLatLng(), 16); m.openPopup();
   });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('[data-show]'); if (!a) return;
     e.preventDefault(); setView('list'); showRow(Number(a.dataset.show));
   });
+  $('rows').addEventListener('click', (e) => { const b = e.target.closest('.note-edit'); if (b) openNote(Number(b.closest('tr').dataset.id)); });
+  $('noteCancel').onclick = () => { $('noteModal').hidden = true; };
+  $('noteSave').onclick = saveNote;
   document.querySelectorAll('.mtabs button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
   $('sortSel').addEventListener('change', () => { [sortKey, sortDir] = $('sortSel').value.split(':'); sortDir = Number(sortDir); refresh(); });
   if (isMobile()) $('fbox').open = false;
@@ -311,10 +343,11 @@ function init(data) {
   refresh();
 }
 
-// 手機版地圖一開始是隱藏的(尺寸 0),fitBounds 會算錯;等第一次看得到地圖時再框
+// 預設以基準點為中心、z15;不再框全部房源(四區範圍太大會縮得很遠)
+// 手機版地圖一開始是隱藏的(尺寸 0),中心會算錯;等第一次看得到地圖時再定位
 function fitMap() {
-  if (fitted || !bounds.length || !$('map').offsetWidth) return;
-  map.fitBounds(bounds, { padding: [20, 20] });
+  if (fitted || !$('map').offsetWidth) return;
+  map.setView(ORIGIN, MAP_ZOOM);
   fitted = true;
 }
 
@@ -327,7 +360,8 @@ function setView(v) {
 function highlight(id) {
   document.querySelectorAll('tr.active').forEach((t) => t.classList.remove('active'));
   document.querySelector(`tr[data-id="${id}"]`)?.classList.add('active');
-  for (const [k, m] of markers) m.setStyle(k === id ? { color: '#e65100', radius: 10, fillOpacity: 0.9 } : baseStyle(byId.get(k)));
+  for (const [k, m] of markers) m.setStyle(k === id ? { color: '#d50000', radius: 10, fillOpacity: 0.9 } : baseStyle(byId.get(k)));
+  markers.get(id)?.bringToFront();
 }
 
 // 點地圖上的房源:跳到它所在的那一頁再捲過去
@@ -337,6 +371,44 @@ function showRow(id) {
   if (Math.floor(idx / PAGE_SIZE) !== page) { page = Math.floor(idx / PAGE_SIZE); renderPage(); }
   document.querySelector(`tr[data-id="${id}"]`)?.scrollIntoView({ block: 'center' });
   highlight(id);
+}
+
+// 備註存在 data.note(爬蟲沿用不覆寫);存檔前重讀該列最新的 data,只改 note 再整包寫回
+let noteId = null;
+function openNote(id) {
+  noteId = id;
+  $('noteTitle').textContent = `備註 · ${byId.get(id).title}`;
+  $('noteText').value = byId.get(id).note || '';
+  $('noteErr').textContent = '';
+  $('noteModal').hidden = false;
+  $('noteText').focus();
+}
+
+async function saveNote() {
+  const C = window.SUPABASE_CONFIG, h = { apikey: C.key, authorization: `Bearer ${C.key}` };
+  const id = noteId, note = $('noteText').value.trim();
+  $('noteSave').disabled = true;
+  try {
+    const r = await fetch(`${C.url}/rest/v1/rent_listings?id=eq.${id}&select=data`, { headers: h });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const [row] = await r.json();
+    if (!row) throw new Error('資料庫找不到這間(可能剛換 id 重刊),重新整理後再試');
+    const w = await fetch(`${C.url}/rest/v1/rent_listings?id=eq.${id}`, {
+      method: 'PATCH', headers: { ...h, 'content-type': 'application/json', prefer: 'return=minimal' },
+      body: JSON.stringify({ data: { ...row.data, note } }),
+    });
+    if (!w.ok) throw new Error(`HTTP ${w.status}`);
+    const i = byId.get(id);
+    i.note = note;
+    i.search = searchText(i);
+    $('noteModal').hidden = true;
+    const st = $('list').scrollTop; renderPage(); $('list').scrollTop = st; // renderPage 會捲回頂端
+    highlight(id);
+  } catch (e) {
+    $('noteErr').textContent = `儲存失敗:${e.message}`;
+  } finally {
+    $('noteSave').disabled = false;
+  }
 }
 
 function filtered() {
@@ -406,8 +478,9 @@ function renderPage() {
     return `<tr data-id="${i.id}" class="${i.status === 'gone' ? 'gone' : ''}">
       <td class="c-thumb"><a href="${esc(i.url)}" target="_blank"><img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.photo)}"></a></td>
       <td class="title"><a href="${esc(i.url)}" target="_blank">${esc(i.title)}</a><div>${badges}</div>
-        <div class="sub">${esc(i.kind)} · ${esc(i.address)} · #${i.id}</div></td>
-      <td class="num chip c-dist" data-l="📍">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
+        <div class="sub">${esc(i.kind)} · ${esc(i.address)} · #${i.id}</div>
+        ${i.note ? `<div class="note">📝 ${esc(i.note)}</div>` : ''}<button class="note-edit">${i.note ? '編輯備註' : '＋ 備註'}</button></td>
+      <td class="num chip c-dist ${markers.has(i.id) ? 'has-pin' : ''}" data-l="📍">${i.dist == null ? '?' : i.dist.toFixed(1) + ' km'}</td>
       <td class="nowrap chip c-status ${i.status === 'active' ? 'is-active' : ''}" data-l=""><span class="badge ${sc}">${st}</span>${i.status === 'gone' && i.gone_at ? `<div class="sub">${fmt(i.gone_at)} 起不見</div>` : ''}</td>
       <td class="sub nowrap chip c-first" data-l="首次">${fmt(i.first_seen)}</td>
       <td class="sub nowrap chip c-last last-seen ${i.status === 'gone' ? 'stale' : ''}" data-l="最後" title="${i.status === 'gone' ? '最新一次爬取沒有這間' : ''}">${fmt(i.last_seen)}<br><span class="sub">共 ${i.seen_count} 次</span></td>
@@ -437,7 +510,8 @@ window.__unlocked
     $('msg').hidden = false;
     $('msg').textContent = `讀取失敗(${DATA_SOURCE}):${e.message}` +
       (DATA_SOURCE === 'json' && location.protocol === 'file:' ? '。json 模式要用 http server 開(repo 根目錄 make start)' : '');
-  });
+  })
+  .finally(() => { $('loading').hidden = true; });
 </script>
 </body>
 </html>
