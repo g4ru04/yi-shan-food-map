@@ -229,6 +229,7 @@ function toItem(list, det, prev, now) {
     // 歷史欄位(由 mergeRun 設定;這裡先帶舊值)
     first_seen: prev?.first_seen ?? now, last_seen: now, seen_count: (prev?.seen_count ?? 0) + 1,
     old_ids: prev?.old_ids ?? [], price_history: prev ? [...prev.price_history] : [], gone_at: null, miss_count: 0,
+    repost_at: prev?.repost_at ?? null, // 最近一次偵測到同 id 重新刊登(發佈日被重設)的時間
     status: 'active', detail_missing: !det, // toItem 只用在「這次有出現」的房源;new/active 由 mergeRun 依 first_seen 重算
     lighting: prev?.lighting ?? 'unknown', double_bed: prev?.double_bed ?? 'unknown',
     iron_window: prev?.iron_window ?? null, // null = 還沒判過(加這欄之前判的舊資料也是)
@@ -383,14 +384,14 @@ const fetchAny = (id, url) => (id >= RAKUYA_ID_BASE ? rakuyaDetail(url) : fetchD
 
 // ---------------------------------------------------------------- 合併(純函式:不做 IO)
 // prev:Map(id → 舊 data);scraped:這次列表項;details:Map(id → { ok } / { gone } / { error });now:ISO
-// 回傳 { rows: 要寫回的 data[], deleteIds, events: { added, gone, back, relisted, price } }
+// 回傳 { rows: 要寫回的 data[], deleteIds, events: { added, gone, back, relisted, price, reposted } }
 // 上次詳情抓失敗,或 591 當時沒給座標/地址(剛上架偶爾會這樣):下一輪重抓
 const needsDetail = (p) => p.detail_missing || !p.lat;
 
 function mergeRun(prev, scraped, details, now, { full = false } = {}) {
   const t = Date.parse(now);
   const out = new Map(), deleteIds = [];
-  const ev = { added: [], gone: [], back: [], relisted: [], price: [] };
+  const ev = { added: [], gone: [], back: [], relisted: [], price: [], reposted: [] };
   const seen = new Set(scraped.map((i) => i.id));
   const det = (id) => details.get(id)?.ok || null;
 
@@ -399,8 +400,13 @@ function mergeRun(prev, scraped, details, now, { full = false } = {}) {
   for (const list of scraped) {
     const p = prev.get(list.id);
     if (!p) { fresh.push(list); continue; }
-    const useDet = (full || needsDetail(p)) && det(list.id) ? det(list.id) : p.detail;
+    let useDet = (full || needsDetail(p)) && det(list.id) ? det(list.id) : p.detail;
+    // 重新刊登檢查(cmdWatch 對超過刊登天數的房源重抓詳情):發佈日變新至少一天才更新,其餘詳情沿用舊的
+    const rd = useDet === p.detail ? det(list.id) : null, npd = rd && postDate(rd.post_time, now);
+    const reposted = !!(npd && p.detail?.post_date && Date.parse(npd) - Date.parse(p.detail.post_date) >= 864e5);
+    if (reposted) useDet = { ...p.detail, post_date: npd, post_time: rd.post_time };
     const d = toItem(list, useDet, p, now);
+    if (reposted) { d.repost_at = now; ev.reposted.push(d); }
     if (p.price !== d.price) { d.price_history.push(d.price); ev.price.push([p, d]); }
     if (p.status === 'gone') ev.back.push(d);
     out.set(d.id, d);
@@ -593,14 +599,15 @@ const byDist = (a, b) => (distKm(a) ?? 99) - (distKm(b) ?? 99);
 const ago = (from, to) => { const h = Math.round((Date.parse(to) - Date.parse(from)) / 3600e3); return h < 48 ? `${h} 小時` : `${Math.round(h / 24)} 天`; };
 
 async function notify(ev, active, now) {
-  ev = { ...ev, added: ev.added.filter(inScope), gone: ev.gone.filter(inScope), back: ev.back.filter(inScope) };
+  ev = { ...ev, added: ev.added.filter(inScope), gone: ev.gone.filter(inScope), back: ev.back.filter(inScope), reposted: ev.reposted.filter(inScope) };
   const head = `🏠 591 租屋變動 ${fmtTW(now)}:新上架 ${ev.added.length}、消失 ${ev.gone.length}` +
-    (ev.back.length ? `、回來 ${ev.back.length}` : '') + (ev.relisted.length ? `、換 id 重刊 ${ev.relisted.length}` : '') +
+    (ev.back.length ? `、回來 ${ev.back.length}` : '') + (ev.reposted.length ? `、重新刊登 ${ev.reposted.length}` : '') + (ev.relisted.length ? `、換 id 重刊 ${ev.relisted.length}` : '') +
     `(在架 ${active} 間)\n<${SITE_URL}|打開租屋清單>`;
   const ts = await slackPost(head);
   if (ev.added.length) await slackThread(ts, `🆕 新上架 ${ev.added.length} 間(依距離)`, [...ev.added].sort(byDist).map((d) => slackLine(d)));
   if (ev.gone.length) await slackThread(ts, `👋 消失 ${ev.gone.length} 間`, [...ev.gone].sort(byDist).map((d) => slackLine(d, `|在架 ${ago(d.first_seen, now)}`)));
   if (ev.back.length) await slackThread(ts, `🔁 回來 ${ev.back.length} 間`, [...ev.back].sort(byDist).map((d) => slackLine(d)));
+  if (ev.reposted.length) await slackThread(ts, `🔄 重新刊登 ${ev.reposted.length} 間`, [...ev.reposted].sort(byDist).map((d) => slackLine(d, `|首次爬到 ${ago(d.first_seen, now)}前`)));
 }
 
 // ---------------------------------------------------------------- 指令
@@ -624,8 +631,14 @@ async function cmdWatch(args) {
     const seen = new Set(items.map((i) => i.id));
     const needDetail = items.filter((i) => full || !prev.has(i.id) || needsDetail(prev.get(i.id))).map((i) => i.id);
     const verify = [...prev.values()].filter((p) => p.status !== 'gone' && !seen.has(p.id)).map((p) => p.id);
+    // 重新刊登:591 同 id 重新刊登會重設發佈日,但列表沒有發佈日;關注距離內、已超過刊登天數的在架房源每輪重抓詳情確認(樂屋不查)
+    const nd = new Set(needDetail);
+    const repost = items.filter((i) => {
+      const p = prev.get(i.id);
+      return p && !nd.has(i.id) && i.id < RAKUYA_ID_BASE && p.status !== 'gone' && (distKm(p) ?? Infinity) <= MAX_KM && p.post_days > MAX_POST_DAYS;
+    }).map((i) => i.id);
     const details = new Map();
-    for (const id of [...needDetail, ...verify]) { details.set(id, await fetchAny(id, urls.get(id))); await sleep(900); }
+    for (const id of [...needDetail, ...repost, ...verify]) { details.set(id, await fetchAny(id, urls.get(id))); await sleep(900); }
     await rakuyaClose();
 
     const { rows, deleteIds, events } = mergeRun(prev, items, details, now, { full });
@@ -633,12 +646,13 @@ async function cmdWatch(args) {
     const vision = has(args, '--no-vision') || dry ? 0 : await judgePhotos(rows, Number(argVal(args, '--vision-max', VISION_MAX)));
     const active = rows.filter((d) => d.status !== 'gone').length;
     const summary = `列表 591 ${s591.items.length}/${s591.total} + 樂屋 ${rky.items.length}/${rky.total}、詳情 ${details.size} 次 → 新上架 ${events.added.length}、消失 ${events.gone.length}、回來 ${events.back.length}、` +
-      `換 id ${events.relisted.length}、改價 ${events.price.length}、存圖 ${photos}、判圖 ${vision}、在架 ${active}`;
-    const changes = [...events.added, ...events.gone, ...events.back].filter(inScope).length; // 門檻只數關注範圍內的
+      `重新刊登 ${events.reposted.length}/查 ${repost.length}、換 id ${events.relisted.length}、改價 ${events.price.length}、存圖 ${photos}、判圖 ${vision}、在架 ${active}`;
+    const changes = [...events.added, ...events.gone, ...events.back, ...events.reposted].filter(inScope).length; // 門檻只數關注範圍內的
 
     if (dry) {
       log(`[dry-run] ${summary}`);
       for (const [p, d, w] of events.relisted) console.log(`  換 id:${p.id} → ${d.id}(${w})${d.title}`);
+      for (const d of events.reposted) console.log(`  重新刊登:${d.id} 發佈 ${d.post_time}(${d.post_days} 天)${d.title}`);
       await notify(events, active, now);
       return;
     }

@@ -471,6 +471,7 @@ function renderPage() {
     const [it, , ic] = IRON[i.iron_window] || IRON.unknown;
     const [st, , sc] = STATUS[i.status];
     const badges = (i.labels || []).map((l) => `<span class="badge warn">${esc(l)}</span>`).join('')
+      + (i.repost_at ? `<span class="badge relisted" title="${fmt(i.repost_at)} 偵測到同 id 重新刊登;發佈日以重新刊登為準">重新刊登</span>` : '')
       + (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
       + (i.preferred ? '<span class="badge">優選</span>' : '')
       + (i.source === 'rakuya' ? '<span class="badge">樂屋</span>' : '')
