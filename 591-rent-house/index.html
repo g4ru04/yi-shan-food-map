@@ -59,6 +59,7 @@
   .badge.relisted { border-color: #6a1b9a; color: #6a1b9a; }
   .badge.gone { border-color: #b71c1c; color: #b71c1c; }
   .badge.active { border-color: #1a4fa0; color: #1a4fa0; }
+  .badge.warn { border-color: #e65100; color: #fff; background: #e65100; }
   tr.gone td { opacity: .45; }
   tr.gone td:nth-child(2), tr.gone td.last-seen { opacity: 1; }
   td.last-seen.stale, td.last-seen.stale .sub { color: #c62828; font-weight: 600; }
@@ -268,7 +269,7 @@ function init(data) {
     i.status_n = STATUS[i.status][1];
     i.area_real = buildOk(i) ? i.area_build : i.area_ping;
     i.dist = i.lat ? distKm(i.lat, i.lng) : null;
-    i.search = [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), i.vision_note, i.contact].join(' ').toLowerCase();
+    i.search = [i.title, i.address, i.facilities.join(' '), i.tags.join(' '), (i.labels || []).join(' '), i.vision_note, i.contact].join(' ').toLowerCase();
   }
 
   map = L.map('map').setView(ORIGIN, 14); // 先給預設視野,隱藏狀態下加 marker 才不會報錯
@@ -397,7 +398,8 @@ function renderPage() {
     const [bt, , bc] = BED[i.double_bed] || BED.unknown;
     const [it, , ic] = IRON[i.iron_window] || IRON.unknown;
     const [st, , sc] = STATUS[i.status];
-    const badges = (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
+    const badges = (i.labels || []).map((l) => `<span class="badge warn">${esc(l)}</span>`).join('')
+      + (i.old_ids.length ? `<span class="badge relisted" title="判定與舊 id ${i.old_ids.join(', ')} 為同一間">換 id 重刊</span>` : '')
       + (i.preferred ? '<span class="badge">優選</span>' : '')
       + (i.source === 'rakuya' ? '<span class="badge">樂屋</span>' : '')
       + (i.contact_role === '屋主' ? '<span class="badge">屋主</span>' : '');

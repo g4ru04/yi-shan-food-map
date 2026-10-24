@@ -43,6 +43,7 @@
 
 - **房源資訊**:`price`、`manage_fee`、`area_ping`(可使用坪數)、`area_build`(建物面積,不含公設)、`floor`、`has_elevator`、`has_washer`、`lat`/`lng`、`phones`、`post_date`
 - **判圖結果**:`lighting`(good / fair / poor / unknown)、`double_bed`(yes / no / unknown)、`iron_window`(陽台鐵窗:yes / no / unknown;null = 還沒判,加欄位前判過的舊資料會在之後幾輪自動重判補上)、`vision_note`
+- **手動標註**:`labels`(字串陣列,例如 `["行銷騙術"]`;直接改 Supabase 的 `data.labels`,爬蟲每輪沿用不覆寫,網頁顯示成橘色 badge、可用關鍵字搜尋)
 - **歷史紀錄**:`price_history`、`old_ids`(換 id 前的舊 id)、`seen_count`、`gone_at`
 - **內部用**:`detail`(詳情頁原始欄位)、`match`(換 id 比對用)
 

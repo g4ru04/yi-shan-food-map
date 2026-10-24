@@ -233,6 +233,7 @@ function toItem(list, det, prev, now) {
     lighting: prev?.lighting ?? 'unknown', double_bed: prev?.double_bed ?? 'unknown',
     iron_window: prev?.iron_window ?? null, // null = 還沒判過(加這欄之前判的舊資料也是)
     vision_note: prev?.vision_note ?? '', has_vision: prev?.has_vision ?? false,
+    labels: prev?.labels ?? [], // 手動標註(例如「行銷騙術」),直接改 Supabase data.labels;爬蟲只沿用不覆寫
     // 房源欄位
     id: list.id, source: list.source || '591', url: list.url || `https://rent.591.com.tw/${list.id}`, title: list.title, kind: list.kind_name,
     preferred: !!list.preferred, price,
