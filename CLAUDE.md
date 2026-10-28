@@ -59,6 +59,7 @@
 
 - `korea-trip/` 有自己的 CLAUDE.md（行程檔案連動更新規則），改該目錄前先讀
 - `591-rent-house/`:591 + 樂屋網租屋清單(獨立頁,整頁 `prompt()` 密碼鎖,共用 `assets/js/config.js` 的 Supabase 設定)。**先讀 `591-rent-house/README.md`**
+  - **2026-10-28 15:00 起停止爬取**(樂屋網 Cloudflare 擋爬,launchd 排程已卸載);`/auto-retrieve-rent-data` 只剩 `view` / `photos` 有意義,不要手動跑 watch 也不要重裝排程
   - 資料只存在 Supabase(`rent_listings` / `rent_snapshots`),`591-rent-house/data/` 整個 gitignore,不要 commit 資料檔
   - 照片只存本機 `591-rent-house/data/photos/<id>/`(每輪 watch 存新房源的,下架後照留);看已消失房源照片:`node scripts/591-rent.mjs photos` → `open 591-rent-house/data/gallery.html`
   - 爬蟲 `scripts/591-rent.mjs watch`(排程入口 `scripts/591-watch.sh`,每 5 小時由這台(ben)的 launchd 跑);`dump` 才會更新 `data.json` 靜態備份

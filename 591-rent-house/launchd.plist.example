@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
+  ⚠️ 2026-10-28 15:00 起停止爬取:樂屋網 Cloudflare 擋爬,此排程已從 launchd 卸載,未解決前不要重新安裝。
+
   591 租屋排程(macOS LaunchAgent,每 5 小時)。把 __REPO__ 換成 repo 絕對路徑後:
     sed "s#__REPO__#$PWD#g" 591-rent-house/launchd.plist.example > ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist
     launchctl load ~/Library/LaunchAgents/tw.g4ru04.591-rent-watch.plist

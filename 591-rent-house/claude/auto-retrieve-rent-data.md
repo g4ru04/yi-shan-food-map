@@ -4,6 +4,8 @@ description: 爬 591 + 樂屋網租屋(台中東區+北區+中區+西區、5000-
 
 # Auto Retrieve Rent Data (591)
 
+> **⚠️ 2026-10-28 15:00 起停止爬取**:樂屋網 Cloudflare 改為連有視窗的 Chrome 也過不了(借瀏覽器 cookie 只撐約 70 個請求就被升級封鎖),launchd 每 5 小時的排程已卸載(plist 移到 `~/.config/591-rent/`)。Supabase 資料停在 10/27 10:20 那輪;要恢復先解決樂屋的擋爬或改成只跑 591。
+
 手動跑一次和排程(每 5 小時)相同的流程(`scripts/591-rent.mjs watch`),並把結果整理給使用者。
 正本在 repo `591-rent-house/claude/auto-retrieve-rent-data.md`;`~/.claude/commands/` 底下是它的 symlink / 複本。
 
