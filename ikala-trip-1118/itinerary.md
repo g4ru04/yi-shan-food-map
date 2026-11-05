@@ -61,6 +61,11 @@
 **建議：參加。** 不租車幾乎只能參加；有租車也建議參加，把「彈性」放到 11/20。
 唯一值得跳過的情境：有租車且 11/20 要去 JUNGLIA（北部，離美麗海 40 分），可以 11/19 自駕中部（青之洞窟 → 殘波岬 → 美國村日落）、11/20 一早北上 JUNGLIA、傍晚順古宇利。但 JUNGLIA 本身就是一整天，想再塞美麗海會變半套；兩個都要的話還是跟團 11/19、11/20 專心 JUNGLIA。
 
+**如果租車組 11/19 必須自己開車跟團**：建議就變了。遊覽車的兩個核心價值（不用開、不用停車）都沒了，自己開 192 km 又卡團體時刻，兩頭不討好。
+1. 先問福委遊覽車有沒有空位（上限 40、巴士組 34，理論上有 6 個），車停飯店一天 ¥1,500 就能搭巴士。
+2. 沒座位就自己走北部、不跟車：萬座毛 → 美麗海 3 小時＋備瀨福木林道 → 古宇利 → 瀨底島看日落 → 名護或回那霸晚餐，跳過美國村（離那霸 25 分，11/18 傍晚或 11/20 可補）。
+3. 停車實況：萬座毛、美麗海（P7 免費）、古宇利都有大停車場；真正要排隊找位的只有 17:00 後的美國村，跳過它就沒有「停車 20 分以上」的問題。
+
 > 停留時間與評價為一般普遍觀感整理，未逐點查 Google 評分。
 
 ## Day 3｜11/20 (五) — 全日自由行（一天一區）
@@ -86,6 +91,93 @@
 | 奧武島 → 糸滿魚市場 | 15.4 | 28 |
 | 糸滿魚市場 → 瀨長島 | 6.0 | 10 |
 | 瀨長島 → 飯店 | 8.2 | 15 |
+
+## 沖繩本島熱門景點分布（66 個）
+
+> 依台灣旅客在 IG／Threads／小紅書／部落格常出現的本島景點人工整理，不是聲量數據排名；座標來自 OpenStreetMap。`index.html` 地圖上方可開「熱門景點圖層」看分布（實心＝未排進行程、空心＝已在行程內）。離島未列。
+
+### 北部（名護・本部・今歸仁・山原）（17）
+
+| 景點 | 類型 | 說明 | 行程 |
+|------|------|------|------|
+| [備瀨福木林道](https://www.google.com/maps/search/?api=1&query=26.70304,127.88439) | 🌿 自然 | 福木綠色隧道，美麗海旁 5 分，租腳踏車或走路 |  |
+| [翡翠海灘](https://www.google.com/maps/search/?api=1&query=26.69955,127.87844) | 🌊 海景 | 海洋博公園內，水族館順遊 |  |
+| [瀨底島海灘](https://www.google.com/maps/search/?api=1&query=26.6488,127.85501) | 🌊 海景 | 開車直達的離島海灘，看日落 |  |
+| [今歸仁城跡](https://www.google.com/maps/search/?api=1&query=26.69221,127.92792) | 🏯 歷史 | 世界遺產，古城牆＋海景，1 月寒緋櫻 |  |
+| [古宇利海洋塔](https://www.google.com/maps/search/?api=1&query=26.70013,128.02416) | 🌊 海景 | 俯瞰古宇利大橋全景 |  |
+| [心形岩](https://www.google.com/maps/search/?api=1&query=26.71378,128.01484) | 🌊 海景 | 古宇利島北側，IG 打卡石 |  |
+| [Warumi 大橋](https://www.google.com/maps/search/?api=1&query=26.6674,127.99497) | 🌊 海景 | 屋我地島往古宇利路上的展望點 |  |
+| [部瀨名海中公園](https://www.google.com/maps/search/?api=1&query=26.53982,127.93586) | 🎡 體驗 | 海中展望塔＋玻璃船，不下水也能看魚 |  |
+| [Orion 啤酒工廠](https://www.google.com/maps/search/?api=1&query=26.587,127.98951) | 🍺 美食 | 名護，參觀＋免費試飲 |  |
+| [名護鳳梨園](https://www.google.com/maps/search/?api=1&query=26.61657,127.97085) | 🎡 體驗 | 鳳梨車、鳳梨酒試吃，親子向 |  |
+| [道之驛許田](https://www.google.com/maps/search/?api=1&query=26.55213,127.96952) | 🍺 美食 | 上北部必停休息站，天婦羅、紅芋 |  |
+| [岸本食堂](https://www.google.com/maps/search/?api=1&query=26.66032,127.8959) | 🍺 美食 | 百年沖繩麵名店，本部町 |  |
+| [大石林山](https://www.google.com/maps/search/?api=1&query=26.32198,127.82906) | 🌿 自然 | 山原最北，石灰岩奇石步道 |  |
+| [邊戶岬](https://www.google.com/maps/search/?api=1&query=26.87197,128.26564) | 🌊 海景 | 本島最北端斷崖 |  |
+| [慶佐次紅樹林](https://www.google.com/maps/search/?api=1&query=26.60589,128.14179) | 🌿 自然 | 東村，獨木舟／SUP |  |
+| [JUNGLIA](https://www.google.com/maps/search/?api=1&query=26.64152,127.97049) | 🎡 體驗 | 2025 開幕主題樂園 | ✅ |
+| [美麗海水族館](https://www.google.com/maps/search/?api=1&query=26.69437,127.87804) | 🎡 體驗 | 黑潮之海 | ✅ |
+
+### 中部（恩納・讀谷・北谷・宇流麻・浦添）（22）
+
+| 景點 | 類型 | 說明 | 行程 |
+|------|------|------|------|
+| [琉球村](https://www.google.com/maps/search/?api=1&query=26.42963,127.77531) | 🏯 歷史 | 傳統聚落＋表演，恩納 |  |
+| [御菓子御殿 讀谷本店](https://www.google.com/maps/search/?api=1&query=26.43282,127.71867) | 🍺 美食 | 紅芋塔總店，海景 |  |
+| [座喜味城跡](https://www.google.com/maps/search/?api=1&query=26.40657,127.74213) | 🏯 歷史 | 世界遺產，人少好拍 |  |
+| [體驗王國 Murasaki Mura](https://www.google.com/maps/search/?api=1&query=26.40684,127.71883) | 🎡 體驗 | 讀谷，手作體驗 |  |
+| [Gala 青之海](https://www.google.com/maps/search/?api=1&query=26.409,127.71642) | 🎡 體驗 | 讀谷鹽工場，玻璃吹製、鹽冰淇淋 |  |
+| [中城城跡](https://www.google.com/maps/search/?api=1&query=26.28393,127.80116) | 🏯 歷史 | 世界遺產，城牆最完整 |  |
+| [勝連城跡](https://www.google.com/maps/search/?api=1&query=26.33088,127.88101) | 🏯 歷史 | 世界遺產，俯瞰海中道路 |  |
+| [海中道路](https://www.google.com/maps/search/?api=1&query=26.3319,127.9326) | 🌊 海景 | 4.7 km 跨海公路，中途有休息站 |  |
+| [濱比嘉島](https://www.google.com/maps/search/?api=1&query=26.31893,127.95933) | 🌊 海景 | 海中道路延伸，古民家聚落 |  |
+| [伊計島](https://www.google.com/maps/search/?api=1&query=26.38809,127.99143) | 🌊 海景 | 海中道路盡頭，透明度高 |  |
+| [果報 Banta](https://www.google.com/maps/search/?api=1&query=26.36084,127.99223) | 🌊 海景 | 宮城島鹽工場旁的幸福崖，IG 熱門 |  |
+| [浦添大公園](https://www.google.com/maps/search/?api=1&query=26.25043,127.7286) | 🎡 體驗 | 超長溜滑梯，親子 |  |
+| [港川外人住宅](https://www.google.com/maps/search/?api=1&query=26.2625,127.7146) | 🛍️ 購物 | oHacorté 水果塔、小店 | ✅ |
+| [宜野灣熱帶海灘](https://www.google.com/maps/search/?api=1&query=26.28131,127.73165) | 🌊 海景 | 市區最近的海灘，日落 |  |
+| [道之驛嘉手納](https://www.google.com/maps/search/?api=1&query=26.36795,127.77425) | 🎡 體驗 | 看嘉手納基地戰機起降 |  |
+| [泡瀨漁港 Payao](https://www.google.com/maps/search/?api=1&query=26.32313,127.83726) | 🍺 美食 | 現撈海鮮丼、炸物 |  |
+| [東南植物樂園](https://www.google.com/maps/search/?api=1&query=26.37625,127.80684) | 🌿 自然 | 夜間燈光秀 |  |
+| [AEON Rycom](https://www.google.com/maps/search/?api=1&query=26.31423,127.79592) | 🛍️ 購物 | 中部最大購物中心 | ✅ |
+| [美國村](https://www.google.com/maps/search/?api=1&query=26.31652,127.75736) | 🛍️ 購物 | 北谷 | ✅ |
+| [殘波岬](https://www.google.com/maps/search/?api=1&query=26.4405,127.71192) | 🌊 海景 | 燈塔＋斷崖 | ✅ |
+| [萬座毛](https://www.google.com/maps/search/?api=1&query=26.50538,127.85035) | 🌊 海景 | 象鼻岩 | ✅ |
+| [青之洞窟](https://www.google.com/maps/search/?api=1&query=26.44588,127.77143) | 🌊 海景 | 潛水／浮潛 | ✅ |
+
+### 南部（那霸・南城・糸滿・豐見城）（27）
+
+| 景點 | 類型 | 說明 | 行程 |
+|------|------|------|------|
+| [首里城](https://www.google.com/maps/search/?api=1&query=26.217,127.71937) | 🏯 歷史 | 正殿重建中，守禮門免費 | ✅ |
+| [金城町石疊道](https://www.google.com/maps/search/?api=1&query=26.21533,127.71477) | 🏯 歷史 | 首里城下的古石板路 |  |
+| [識名園](https://www.google.com/maps/search/?api=1&query=26.20407,127.71573) | 🏯 歷史 | 世界遺產琉球王家庭園 |  |
+| [牧志公設市場](https://www.google.com/maps/search/?api=1&query=26.21455,127.68829) | 🍺 美食 | 一樓買海鮮二樓代客料理 |  |
+| [壺屋陶器通](https://www.google.com/maps/search/?api=1&query=26.21291,127.69181) | 🛍️ 購物 | 陶器老街，石板路咖啡 |  |
+| [浮島通](https://www.google.com/maps/search/?api=1&query=26.21405,127.68695) | 🛍️ 購物 | 國際通後巷文青小店 |  |
+| [泊港魚市場](https://www.google.com/maps/search/?api=1&query=26.23007,127.68025) | 🍺 美食 | 在地人魚市場，生魚片便宜 |  |
+| [福州園](https://www.google.com/maps/search/?api=1&query=26.21771,127.67603) | 🏯 歷史 | 中式庭園，近波上宮 |  |
+| [T Galleria DFS](https://www.google.com/maps/search/?api=1&query=26.2231,127.69672) | 🛍️ 購物 | 新都心免稅店 |  |
+| [齋場御嶽](https://www.google.com/maps/search/?api=1&query=26.17336,127.82741) | 🏯 歷史 | 世界遺產，琉球最高聖地 |  |
+| [知念岬公園](https://www.google.com/maps/search/?api=1&query=26.16666,127.82992) | 🌊 海景 | 齋場御嶽旁 180 度海景 |  |
+| [Nirai Kanai 橋](https://www.google.com/maps/search/?api=1&query=26.16728,127.81512) | 🌊 海景 | 南城 S 型海景公路 |  |
+| [新原海灘](https://www.google.com/maps/search/?api=1&query=26.13369,127.78914) | 🌊 海景 | 玻璃船，淺灘 |  |
+| [濱邊茶屋](https://www.google.com/maps/search/?api=1&query=26.13353,127.78461) | ☕ 咖啡 | 海邊窗景咖啡，南城代表 |  |
+| [Cafe Kurukuma](https://www.google.com/maps/search/?api=1&query=26.1624,127.81227) | ☕ 咖啡 | 高台海景泰式咖哩 |  |
+| [Gangala 之谷](https://www.google.com/maps/search/?api=1&query=26.14163,127.74688) | 🌿 自然 | 鐘乳洞咖啡＋導覽，玉泉洞隔壁 |  |
+| [琉球玻璃村](https://www.google.com/maps/search/?api=1&query=26.09754,127.67777) | 🎡 體驗 | 糸滿，玻璃體驗 |  |
+| [平和祈念公園](https://www.google.com/maps/search/?api=1&query=26.0956,127.72373) | 🏯 歷史 | 戰爭紀念，海崖 |  |
+| [沖繩 Outlet Ashibinaa](https://www.google.com/maps/search/?api=1&query=26.15863,127.6574) | 🛍️ 購物 | 豐見城，離機場 15 分 |  |
+| [iias 沖繩豐崎（DMM 水族館）](https://www.google.com/maps/search/?api=1&query=26.15711,127.65171) | 🎡 體驗 | DMM Kariyushi 水族館，雨天備案 |  |
+| [豐崎美麗 SUN 海灘](https://www.google.com/maps/search/?api=1&query=26.15585,127.65078) | 🌊 海景 | 機場旁海灘，看飛機 |  |
+| [瀨長島 Umikaji Terrace](https://www.google.com/maps/search/?api=1&query=26.17639,127.64041) | ☕ 咖啡 | 白色小希臘 | ✅ |
+| [玉泉洞](https://www.google.com/maps/search/?api=1&query=26.13944,127.75043) | 🌿 自然 | 鐘乳洞 | ✅ |
+| [奧武島](https://www.google.com/maps/search/?api=1&query=26.12971,127.77348) | 🍺 美食 | 貓島、中本天婦羅 | ✅ |
+| [糸滿魚市場](https://www.google.com/maps/search/?api=1&query=26.13814,127.6614) | 🍺 美食 | 海鮮丼 | ✅ |
+| [國際通](https://www.google.com/maps/search/?api=1&query=26.21378,127.68083) | 🛍️ 購物 | 主街 | ✅ |
+| [波上宮](https://www.google.com/maps/search/?api=1&query=26.22056,127.67114) | 🏯 歷史 | 崖上神社＋海灘 | ✅ |
+
+分布觀察：北部集中在本部半島（美麗海 10 分內有備瀨、翡翠海灘、瀨底島、今歸仁城、岸本食堂）；中部沿 58 號公路海岸線（恩納～讀谷～北谷）與宇流麻海中道路兩條帶；南部以那霸市區＋南城東海岸線（齋場御嶽、知念岬、濱邊茶屋、新原海灘）為主。
 
 ## Day 4｜11/21 (六) — 半日自由行・返台
 
@@ -130,7 +222,7 @@
 
 ## 待確認
 
-- 自己有沒有租車（決定 11/20 走哪一區、11/19 要不要跟）
+- 自己有沒有租車（決定 11/20 走哪一區、11/19 要不要跟）；租車組 11/19 遊覽車是否有空位（上限 40、巴士組 34）
 - 11/19 旅行社最終停靠時刻、美麗海海豚秀場次
 - JUNGLIA 門票與預約制設施
 - 青之洞窟 11 月業者取消政策
